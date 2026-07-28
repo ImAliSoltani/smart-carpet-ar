@@ -11,6 +11,7 @@ import os
 
 import bcrypt
 
+os.environ.setdefault("TESTING", "true")  # NullPool — see app/db/session.py
 os.environ.setdefault("SESSION_SECRET", "test-secret")
 os.environ.setdefault("ADMIN_USERNAME", "admin")
 os.environ.setdefault("STORAGE_DIR", "data/test-storage")
@@ -82,7 +83,9 @@ def client(db) -> TestClient:
     set_embedding_backend(HashEmbeddingBackend())
     from app.main import app
 
-    with TestClient(app) as test_client:
+    # https base_url: the admin session cookie is Secure, and httpx drops
+    # Secure cookies over plain http
+    with TestClient(app, base_url="https://testserver") as test_client:
         yield test_client
     set_embedding_backend(None)
 
