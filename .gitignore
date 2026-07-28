@@ -1,0 +1,29 @@
+# --- secrets: NEVER commit ---
+.env
+.env.*
+!.env.example
+
+# --- python ---
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# --- node / next ---
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+npm-debug.log*
+
+# --- heavy data: stays OUT of git (object storage instead) ---
+data/
+*.glb
+*.usdz
+models/weights/
+
+# --- local tooling ---
+.claude/
+.DS_Store
+Thumbs.db

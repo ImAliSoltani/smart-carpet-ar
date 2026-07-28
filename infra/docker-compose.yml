@@ -1,0 +1,28 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: farsh-db
+    environment:
+      POSTGRES_USER: farsh
+      POSTGRES_PASSWORD: farsh
+      POSTGRES_DB: farsh
+    ports:
+      - "5432:5432"
+    volumes:
+      - farsh_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farsh -d farsh"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # MinIO (object storage for carpet images + AR files) — enabled in Phase 4;
+  # during development files live on local disk under data/ (gitignored).
+  # minio:
+  #   image: minio/minio
+  #   command: server /data --console-address ":9001"
+  #   ports: ["9000:9000", "9001:9001"]
+  #   volumes: [farsh_minio:/data]
+
+volumes:
+  farsh_pgdata:
