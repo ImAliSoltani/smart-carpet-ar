@@ -78,16 +78,33 @@
       log('navigator.xr: MISSING (no WebXR in this browser)');
     }
 
-    customElements.whenDefined('model-viewer').then(() => {
-      log('model-viewer loaded, canActivateAR: ' + mv.canActivateAR);
+    // Chrome froze the UA string, so the real device model only comes from
+    // high-entropy client hints.
+    if (navigator.userAgentData?.getHighEntropyValues) {
+      navigator.userAgentData
+        .getHighEntropyValues(['model', 'platformVersion', 'fullVersionList'])
+        .then((hints) => log('device: ' + hints.model + ' | Android ' + hints.platformVersion))
+        .catch((err) => log('client hints unavailable: ' + err));
+    }
+
+    // canActivateAR is only meaningful once the model has loaded and
+    // model-viewer has finished resolving which AR mode it can use.
+    mv.addEventListener('load', async () => {
+      await mv.updateComplete;
+      log('model loaded — canActivateAR: ' + mv.canActivateAR);
     });
 
     mv.addEventListener('ar-status', (event) => log('ar-status: ' + event.detail.status));
     mv.addEventListener('error', (event) => log('ERROR: ' + JSON.stringify(event.detail)));
 
     const activate = async (modes, label) => {
+      log('--- requesting ' + label + ' (ar-modes="' + modes + '") ---');
       mv.setAttribute('ar-modes', modes);
-      log('--- trying ' + label + ' ---');
+      // model-viewer resolves the AR mode during its update cycle; calling
+      // activateAR() in the same tick would launch the previously resolved mode.
+      await mv.updateComplete;
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      log('resolved canActivateAR: ' + mv.canActivateAR);
       try {
         await mv.activateAR();
       } catch (err) {
