@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تست مقیاس AR — فاز ۰</title>
+  <script type="module" src="./model-viewer.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+    body { font-family: system-ui, Tahoma, sans-serif; background: #0f1220; color: #f2f2f7; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { padding: 14px 18px; }
+    header h1 { font-size: 1.1rem; }
+    header p { font-size: .85rem; color: #a8adc4; margin-top: 6px; line-height: 1.7; }
+    model-viewer { flex: 1; width: 100%; min-height: 60dvh; background: #171b30; }
+    .steps { padding: 12px 18px 20px; font-size: .85rem; line-height: 2; color: #cdd2e8; }
+    .steps b { color: #ffd166; }
+    code { direction: ltr; unicode-bidi: embed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧪 تست مقیاس واقعی AR — فرش کالیبراسیون</h1>
+    <p>فرش آزمایشی ۱٫۰۰ × ۱٫۵۰ متر — هر خانه‌ی شطرنجی دقیقاً <b>۱۰ سانتی‌متر</b> است.</p>
+  </header>
+
+  <model-viewer
+    src="assets/calib-carpet.glb"
+    alt="فرش کالیبراسیون یک در یک و نیم متر"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="fixed"
+    ar-placement="floor"
+    camera-controls
+    touch-action="pan-y"
+    shadow-intensity="1"
+    exposure="1">
+    <button slot="ar-button" style="position:absolute; bottom:16px; right:50%; transform:translateX(50%); padding:12px 28px; border-radius:24px; border:0; background:#ffd166; color:#1a1a2e; font-size:1rem; font-weight:bold;">
+      📱 دیدن روی زمین (AR)
+    </button>
+  </model-viewer>
+
+  <div class="steps">
+    ۱) دکمه‌ی زرد را بزن و دوربین را آرام روی کف اتاق حرکت بده تا فرش ظاهر شود.<br />
+    ۲) یک متر نواری کنار فرش مجازی بگذار: <b>هر خانه باید ۱۰ سانت</b> و کل عرض <b>یک متر</b> باشد.<br />
+    ۳) نتیجه را گزارش کن: ظاهر شد؟ چسبیده به کف بود؟ اندازه دقیق بود؟ مدل گوشی چه بود؟
+  </div>
+</body>
+</html>
