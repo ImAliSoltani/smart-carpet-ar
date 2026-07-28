@@ -36,6 +36,8 @@ jobs:
         run: uv sync
       - name: Lint
         run: uv run ruff check .
+      - name: Migrations
+        run: uv run alembic upgrade head
       - name: Tests
         run: uv run pytest
 
