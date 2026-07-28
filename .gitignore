@@ -22,7 +22,9 @@ data/
 *.glb
 *.usdz
 models/weights/
-spike/assets/
+
+# exception: the small calibration fixture is served by GitHub Pages for the AR test
+!spike/assets/calib-carpet.glb
 
 # --- local tooling ---
 .claude/

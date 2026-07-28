@@ -3,46 +3,111 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>تست مقیاس AR — فاز ۰</title>
+  <title>تست AR — فاز ۰</title>
   <script type="module" src="./model-viewer.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; }
-    body { font-family: system-ui, Tahoma, sans-serif; background: #0f1220; color: #f2f2f7; min-height: 100dvh; display: flex; flex-direction: column; }
-    header { padding: 14px 18px; }
-    header h1 { font-size: 1.1rem; }
-    header p { font-size: .85rem; color: #a8adc4; margin-top: 6px; line-height: 1.7; }
-    model-viewer { flex: 1; width: 100%; min-height: 60dvh; background: #171b30; }
-    .steps { padding: 12px 18px 20px; font-size: .85rem; line-height: 2; color: #cdd2e8; }
+    body { font-family: system-ui, Tahoma, sans-serif; background: #0f1220; color: #f2f2f7;
+           min-height: 100dvh; display: flex; flex-direction: column; }
+    header { padding: 12px 16px; }
+    header h1 { font-size: 1rem; }
+    header p { font-size: .8rem; color: #a8adc4; margin-top: 4px; line-height: 1.7; }
+    model-viewer { flex: 1; width: 100%; min-height: 42dvh; background: #171b30; }
+    .modes { display: flex; gap: 8px; padding: 12px 16px; }
+    .modes button { flex: 1; padding: 14px 8px; border: 0; border-radius: 14px;
+                    font-size: .95rem; font-weight: bold; color: #1a1a2e; }
+    #btn-webxr { background: #ffd166; }
+    #btn-sv { background: #7ee0a0; }
+    #log { margin: 0 16px 12px; padding: 10px 12px; background: #171b30; border-radius: 12px;
+           font-size: .72rem; line-height: 1.9; color: #cdd2e8; direction: ltr; text-align: left;
+           max-height: 22dvh; overflow: auto; white-space: pre-wrap; word-break: break-all; }
+    .steps { padding: 0 16px 18px; font-size: .8rem; line-height: 1.9; color: #cdd2e8; }
     .steps b { color: #ffd166; }
-    code { direction: ltr; unicode-bidi: embed; }
+    #copy { width: calc(100% - 32px); margin: 0 16px 18px; padding: 12px; border: 0;
+            border-radius: 12px; background: #3d4468; color: #fff; font-size: .9rem; }
   </style>
 </head>
 <body>
   <header>
-    <h1>🧪 تست مقیاس واقعی AR — فرش کالیبراسیون</h1>
-    <p>فرش آزمایشی ۱٫۰۰ × ۱٫۵۰ متر — هر خانه‌ی شطرنجی دقیقاً <b>۱۰ سانتی‌متر</b> است.</p>
+    <h1>🧪 تست AR — فرش کالیبراسیون ۱٫۰۰ × ۱٫۵۰ متر</h1>
+    <p>هر خانه‌ی شطرنجی دقیقاً <b>۱۰ سانتی‌متر</b>. دو حالت را امتحان کن و بگو کدام برای جابه‌جا کردن فرش راحت‌تر بود.</p>
   </header>
 
-  <model-viewer
+  <model-viewer id="mv"
     src="assets/calib-carpet.glb"
-    alt="فرش کالیبراسیون یک در یک و نیم متر"
+    alt="فرش کالیبراسیون"
     ar
-    ar-modes="webxr scene-viewer quick-look"
+    ar-modes="webxr"
     ar-scale="fixed"
     ar-placement="floor"
     camera-controls
     touch-action="pan-y"
-    shadow-intensity="1"
-    exposure="1">
-    <button slot="ar-button" style="position:absolute; bottom:16px; right:50%; transform:translateX(50%); padding:12px 28px; border-radius:24px; border:0; background:#ffd166; color:#1a1a2e; font-size:1rem; font-weight:bold;">
-      📱 دیدن روی زمین (AR)
-    </button>
+    shadow-intensity="1">
   </model-viewer>
 
-  <div class="steps">
-    ۱) دکمه‌ی زرد را بزن و دوربین را آرام روی کف اتاق حرکت بده تا فرش ظاهر شود.<br />
-    ۲) یک متر نواری کنار فرش مجازی بگذار: <b>هر خانه باید ۱۰ سانت</b> و کل عرض <b>یک متر</b> باشد.<br />
-    ۳) نتیجه را گزارش کن: ظاهر شد؟ چسبیده به کف بود؟ اندازه دقیق بود؟ مدل گوشی چه بود؟
+  <div class="modes">
+    <button id="btn-webxr">حالت ۱ — داخل مرورگر (WebXR)</button>
+    <button id="btn-sv">حالت ۲ — اپ گوگل (Scene Viewer)</button>
   </div>
+
+  <div class="steps">
+    برای اندازه‌گیری درست: متر را <b>روی زمین</b> بگذار، فرش را طوری بگذار که لبه‌اش روی صفر متر بیفتد،
+    بعد گوشی را <b>مستقیم از بالا</b> بگیر و ببین لبه‌ی دور کجای متر است.
+  </div>
+
+  <div id="log">در حال بررسی دستگاه…</div>
+  <button id="copy">📋 کپی گزارش فنی</button>
+
+  <script type="module">
+    const mv = document.getElementById('mv');
+    const logBox = document.getElementById('log');
+    const lines = [];
+
+    const log = (msg) => {
+      lines.push(msg);
+      logBox.textContent = lines.join('\n');
+    };
+
+    log('UA: ' + navigator.userAgent);
+
+    if (navigator.xr) {
+      navigator.xr.isSessionSupported('immersive-ar')
+        .then((ok) => log('WebXR immersive-ar supported: ' + ok))
+        .catch((err) => log('WebXR check failed: ' + err));
+    } else {
+      log('navigator.xr: MISSING (no WebXR in this browser)');
+    }
+
+    customElements.whenDefined('model-viewer').then(() => {
+      log('model-viewer loaded, canActivateAR: ' + mv.canActivateAR);
+    });
+
+    mv.addEventListener('ar-status', (event) => log('ar-status: ' + event.detail.status));
+    mv.addEventListener('error', (event) => log('ERROR: ' + JSON.stringify(event.detail)));
+
+    const activate = async (modes, label) => {
+      mv.setAttribute('ar-modes', modes);
+      log('--- trying ' + label + ' ---');
+      try {
+        await mv.activateAR();
+      } catch (err) {
+        log('activateAR failed: ' + err);
+      }
+    };
+
+    document.getElementById('btn-webxr')
+      .addEventListener('click', () => activate('webxr', 'WebXR'));
+    document.getElementById('btn-sv')
+      .addEventListener('click', () => activate('scene-viewer', 'Scene Viewer'));
+
+    document.getElementById('copy').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(lines.join('\n'));
+        document.getElementById('copy').textContent = '✅ کپی شد — برای من بفرست';
+      } catch {
+        document.getElementById('copy').textContent = 'دستی انتخاب و کپی کن ↑';
+      }
+    });
+  </script>
 </body>
 </html>
