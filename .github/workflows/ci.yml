@@ -11,6 +11,22 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: farsh
+          POSTGRES_PASSWORD: farsh
+          POSTGRES_DB: farsh_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U farsh"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgresql+asyncpg://farsh:farsh@localhost:5432/farsh_test
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
