@@ -24,11 +24,11 @@ def inspect(path: Path) -> None:
 
     node = gltf["nodes"][0]
     transform_keys = [k for k in ("scale", "matrix", "rotation", "translation") if k in node]
+    transform = f"transform: {', '.join(transform_keys)}" if transform_keys else "(no transform)"
 
     print(f"\n=== {path.name}  ({length:,} bytes, glTF {version})")
     print(f"    generator : {gltf['asset'].get('generator', '?')}")
-    print(f"    root node : {node.get('name', '(unnamed)')}"
-          f"{'  transform: ' + ', '.join(transform_keys) if transform_keys else '  (no transform)'}")
+    print(f"    root node : {node.get('name', '(unnamed)')}  {transform}")
 
     for mesh_index, mesh in enumerate(gltf.get("meshes", [])):
         for prim in mesh["primitives"]:
