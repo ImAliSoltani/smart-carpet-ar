@@ -1,7 +1,10 @@
 """Curate a raw carpet image dump into a seed catalog.
 
-Filters out small/blurry images, removes near-duplicates (perceptual dHash),
-keeps the sharpest N per class, then writes:
+Keeps only natural-color product photos (mean saturation + hue-spread checks
+reject grayscale scans, binarized patterns, and single-hue tinted variants —
+research datasets are full of those), removes near-duplicates (perceptual
+dHash with a tolerant threshold, because processed twins are tone-shifted),
+prefers higher resolution, then writes:
 
     dest/
         images/…                 renamed, curation-ordered
@@ -25,6 +28,9 @@ from PIL import Image, ImageFilter, ImageStat
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 MIN_EDGE = 450
+MIN_SATURATION = 45  # rejects grayscale/binarized research scans
+MAX_HUE_CONCENTRATION = 0.62  # rejects single-hue tinted variants
+DUPLICATE_HAMMING = 12  # tolerant: processed twins differ in tone, not layout
 
 PATTERN_FA = {"afshan": "افشان", "lachak_torang": "لچک‌ترنج", "lachak_toranj": "لچک‌ترنج"}
 PATTERN_EN = {
@@ -87,6 +93,22 @@ def sharpness(image: Image.Image) -> float:
     return ImageStat.Stat(edges).stddev[0]
 
 
+def natural_color_stats(image: Image.Image) -> tuple[float, float]:
+    """(mean saturation, hue concentration) for filtering non-product images."""
+    hsv = image.convert("RGB").resize((80, 80)).convert("HSV")
+    saturation = ImageStat.Stat(hsv).mean[1]
+    hue_channel = hsv.getchannel("H").tobytes()
+    sat_channel = hsv.getchannel("S").tobytes()
+    buckets = [0] * 12
+    total = 0
+    for hue, sat in zip(hue_channel, sat_channel, strict=True):
+        if sat > 60:
+            buckets[hue * 12 // 256] += 1
+            total += 1
+    concentration = max(buckets) / total if total > 200 else 1.0
+    return saturation, concentration
+
+
 def dominant_hex(image: Image.Image) -> str:
     small = image.convert("RGB").resize((100, 100))
     quantized = small.quantize(colors=6, method=Image.Quantize.MEDIANCUT)
@@ -120,6 +142,7 @@ def curate(src: Path, dest: Path, per_class: int, seed: int) -> None:
         pattern_en = PATTERN_EN.get(class_key, "medallion")
 
         scored = []
+        rejected_color = 0
         for path in sorted(class_dir.iterdir()):
             if path.suffix.lower() not in IMAGE_EXTENSIONS:
                 continue
@@ -128,18 +151,28 @@ def curate(src: Path, dest: Path, per_class: int, seed: int) -> None:
                     img.load()
                     if min(img.size) < MIN_EDGE:
                         continue
-                    scored.append((sharpness(img), dhash(img), path))
+                    saturation, concentration = natural_color_stats(img)
+                    if saturation < MIN_SATURATION or concentration > MAX_HUE_CONCENTRATION:
+                        rejected_color += 1
+                        continue
+                    # resolution first; sharpness only breaks ties — ranking by
+                    # sharpness alone favors binarized/processed scans
+                    score = (min(img.size), sharpness(img))
+                    scored.append((score, dhash(img), path))
             except Exception:
                 continue
 
         scored.sort(reverse=True, key=lambda item: item[0])
         picked = []
         for score, signature, path in scored:
-            if any(hamming(signature, other) <= 8 for _, other, _ in picked):
-                continue  # near-duplicate of something sharper
+            if any(
+                hamming(signature, other) <= DUPLICATE_HAMMING for _, other, _ in picked
+            ):
+                continue  # near-duplicate (incl. tone-shifted processed twins)
             picked.append((score, signature, path))
             if len(picked) >= per_class:
                 break
+        print(f"  [{class_dir.name}] rejected as non-natural-color: {rejected_color}")
 
         used_slugs = {row["filename"].rsplit(".", 1)[0] for row in rows}
         for index, (_, _, path) in enumerate(picked, start=1):
