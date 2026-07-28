@@ -188,6 +188,10 @@ async def upload_image(
         )
     ).scalar_one()
 
+    # first photo also fills in the carpet's colors unless the admin already set them
+    if count == 0 and not carpet.colors:
+        carpet.colors = image_set.dominant_colors
+
     record = CarpetImage(
         carpet_id=carpet_id,
         url=image_set.urls["card"],

@@ -50,6 +50,13 @@ class TestImagePipeline:
         with pytest.raises(InvalidImageError):
             process_upload(b"not an image at all", storage)
 
+    def test_dominant_colors_reflect_image(self, tmp_path):
+        storage = Storage(root=tmp_path, public_base="/files")
+        result = process_upload(_png(color=(180, 20, 20)), storage)
+        assert result.dominant_colors, "expected at least one dominant color"
+        r, g, b = (int(result.dominant_colors[0][i : i + 2], 16) for i in (1, 3, 5))
+        assert r > g and r > b, f"dominant color should be reddish: {result.dominant_colors}"
+
 
 class TestEmbeddings:
     def test_deterministic_normalized_and_sized(self):

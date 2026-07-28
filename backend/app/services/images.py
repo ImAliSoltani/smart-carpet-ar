@@ -39,6 +39,7 @@ class ImageSet:
     urls: dict[str, str]  # spec name -> public url
     width: int
     height: int
+    dominant_colors: list[str]
 
 
 def load_image(data: bytes) -> Image.Image:
@@ -59,6 +60,22 @@ def _load(data: bytes) -> Image.Image:
     return image.convert("RGB")
 
 
+def extract_dominant_colors(image: Image.Image, count: int = 4) -> list[str]:
+    """Dominant colors as hex, ordered by coverage (median-cut quantization).
+
+    Feeds the storefront color filter and the room-matching engine, so carpets
+    get real colors even when the admin doesn't fill them in."""
+    small = image.convert("RGB").resize((150, 150))
+    quantized = small.quantize(colors=8, method=Image.Quantize.MEDIANCUT)
+    palette = quantized.getpalette()
+    ranked = sorted(quantized.getcolors(150 * 150) or [], reverse=True)
+    colors = []
+    for _, index in ranked[:count]:
+        r, g, b = palette[index * 3 : index * 3 + 3]
+        colors.append(f"#{r:02x}{g:02x}{b:02x}")
+    return colors
+
+
 def process_upload(data: bytes, storage: Storage) -> ImageSet:
     """Validate an upload, store the original and all WebP derivatives."""
     image = _load(data)
@@ -72,4 +89,10 @@ def process_upload(data: bytes, storage: Storage) -> ImageSet:
         derived.save(buffer, format="WEBP", quality=quality, method=6)
         urls[name] = storage.save(buffer.getvalue(), kind=name, ext="webp")
 
-    return ImageSet(original_url=original_url, urls=urls, width=image.width, height=image.height)
+    return ImageSet(
+        original_url=original_url,
+        urls=urls,
+        width=image.width,
+        height=image.height,
+        dominant_colors=extract_dominant_colors(image),
+    )

@@ -107,7 +107,7 @@ async def ingest(folder: Path, activate: bool) -> None:
                 description=(row.get("description") or None),
                 pattern=CarpetPattern(row.get("pattern") or "medallion"),
                 material=CarpetMaterial(row.get("material") or "wool"),
-                colors=[],
+                colors=image_set.dominant_colors,
                 suitable_rooms=[],
                 origin=(row.get("origin") or None),
                 is_active=activate,
