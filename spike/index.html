@@ -29,13 +29,14 @@
 </head>
 <body>
   <header>
-    <h1>🧪 تست AR — فرش کالیبراسیون ۱٫۰۰ × ۱٫۵۰ متر</h1>
-    <p>هر خانه‌ی شطرنجی دقیقاً <b>۱۰ سانتی‌متر</b>. دو حالت را امتحان کن و بگو کدام برای جابه‌جا کردن فرش راحت‌تر بود.</p>
+    <h1>🧪 تست AR — فرش واقعی و مقیاس</h1>
+    <p>در حال بارگذاری…</p>
   </header>
 
   <model-viewer id="mv"
-    src="assets/calib-carpet.glb"
-    alt="فرش کالیبراسیون"
+    src="assets/carpet.glb"
+    ios-src="assets/carpet.usdz"
+    alt="فرش افشان ۲۰۰ در ۳۰۰ سانتی‌متر"
     ar
     ar-modes="webxr"
     ar-scale="fixed"
@@ -46,8 +47,14 @@
   </model-viewer>
 
   <div class="modes">
+    <button id="btn-model">🔁 فرش واقعی / شطرنجی</button>
+  </div>
+  <div class="modes">
     <button id="btn-webxr">حالت ۱ — داخل مرورگر (WebXR)</button>
     <button id="btn-sv">حالت ۲ — اپ گوگل (Scene Viewer)</button>
+  </div>
+  <div class="modes">
+    <button id="btn-ql" style="background:#9fd0ff">حالت ۳ — آیفون (Quick Look)</button>
   </div>
 
   <div class="steps">
@@ -116,6 +123,38 @@
       .addEventListener('click', () => activate('webxr', 'WebXR'));
     document.getElementById('btn-sv')
       .addEventListener('click', () => activate('scene-viewer', 'Scene Viewer'));
+    document.getElementById('btn-ql')
+      .addEventListener('click', () => activate('quick-look', 'Quick Look (iOS)'));
+
+    // The real carpet is the product; the checkerboard is the measuring stick.
+    const MODELS = {
+      real: {
+        src: 'assets/carpet.glb',
+        ios: 'assets/carpet.usdz',
+        note: 'فرش افشان — ۲۰۰ × ۳۰۰ سانتی‌متر (ساخته‌شده از یک عکس معمولی)',
+      },
+      calib: {
+        src: 'assets/calib-carpet.glb',
+        ios: '',
+        note: 'فرش کالیبراسیون ۱٫۰۰ × ۱٫۵۰ متر — هر خانه دقیقاً ۱۰ سانتی‌متر',
+      },
+    };
+    let current = 'real';
+    const noteBox = document.querySelector('header p');
+    noteBox.textContent = MODELS.real.note;
+
+    document.getElementById('btn-model').addEventListener('click', () => {
+      current = current === 'real' ? 'calib' : 'real';
+      const model = MODELS[current];
+      mv.src = model.src;
+      if (model.ios) {
+        mv.setAttribute('ios-src', model.ios);
+      } else {
+        mv.removeAttribute('ios-src');
+      }
+      noteBox.textContent = model.note;
+      log('--- switched model: ' + model.src + ' ---');
+    });
 
     document.getElementById('copy').addEventListener('click', async () => {
       try {

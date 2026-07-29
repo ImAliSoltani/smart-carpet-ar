@@ -72,3 +72,41 @@ class ImageUpdate(BaseModel):
 
 class OrderStatusUpdate(BaseModel):
     status: OrderStatus
+
+
+class CornerPoint(BaseModel):
+    x: float = Field(ge=0)
+    y: float = Field(ge=0)
+
+
+class ArGenerateRequest(BaseModel):
+    """Optional manual corners from the admin panel's draggable handles.
+
+    Order is top-left, top-right, bottom-right, bottom-left, in pixels of the
+    original photo. Omit to let detection choose.
+    """
+
+    corners: list[CornerPoint] | None = Field(default=None, min_length=4, max_length=4)
+
+    def as_tuple(self) -> tuple[tuple[float, float], ...] | None:
+        if self.corners is None:
+            return None
+        return tuple((point.x, point.y) for point in self.corners)
+
+
+class ArVariantStatus(BaseModel):
+    variant_id: int
+    width_cm: int
+    length_cm: int
+    ar_status: str
+    glb_url: str | None
+    usdz_url: str | None
+    ar_error: str | None
+
+
+class ArCornerSuggestion(BaseModel):
+    corners: list[CornerPoint]
+    confidence: float
+    needs_review: bool
+    image_width: int
+    image_height: int

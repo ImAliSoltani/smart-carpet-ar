@@ -1,15 +1,30 @@
 """Admin panel API: session auth, carpet/variant/image management, orders."""
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+)
+from PIL import Image
 from sqlalchemy import func, select
 
 from app.api.deps import DbSession, EmbeddingDep, StorageDep
+from app.ar import pipeline as ar_pipeline
+from app.ar.rectify import detect_corners
 from app.core.config import get_settings
 from app.models import Carpet, CarpetImage, CarpetVariant, Order
 from app.models.enums import OrderStatus
 from app.schemas.admin import (
+    ArCornerSuggestion,
+    ArGenerateRequest,
+    ArVariantStatus,
     CarpetCreate,
     CarpetUpdate,
+    CornerPoint,
     ImageUpdate,
     LoginRequest,
     OrderStatusUpdate,
@@ -27,6 +42,7 @@ from app.services.auth import (
     verify_credentials,
 )
 from app.services.images import InvalidImageError, process_upload
+from app.services.storage import Storage
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -233,6 +249,104 @@ async def delete_image(session: DbSession, image_id: int) -> None:
         raise HTTPException(404, detail="عکس پیدا نشد")
     await session.delete(image)
     await session.commit()
+
+
+# --- AR assets --------------------------------------------------------------
+
+
+async def _primary_image(session: DbSession, carpet_id: int) -> CarpetImage:
+    carpet = await session.get(Carpet, carpet_id)
+    if carpet is None:
+        raise HTTPException(404, detail="فرش پیدا نشد")
+    image = next(
+        iter(sorted(carpet.images, key=lambda i: (not i.is_primary, i.position))), None
+    )
+    if image is None:
+        raise HTTPException(409, detail="این فرش هنوز عکسی ندارد")
+    return image
+
+
+@router.get(
+    "/carpets/{carpet_id}/ar/corners",
+    response_model=ArCornerSuggestion,
+    dependencies=[Depends(require_admin)],
+)
+async def suggest_corners(
+    session: DbSession, storage: StorageDep, carpet_id: int
+) -> ArCornerSuggestion:
+    """گوشه‌های تشخیص‌داده‌شده برای پیش‌نمایش و اصلاح دستی در پنل."""
+    image_row = await _primary_image(session, carpet_id)
+    try:
+        source = Image.open(storage.open_public_url(image_row.url))
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail="تصویر منبع قابل خواندن نیست") from exc
+
+    corners, confidence = detect_corners(source)
+    return ArCornerSuggestion(
+        corners=[CornerPoint(x=x, y=y) for x, y in corners],
+        confidence=confidence,
+        needs_review=confidence < 0.55,
+        image_width=source.width,
+        image_height=source.height,
+    )
+
+
+@router.post(
+    "/carpets/{carpet_id}/ar/generate",
+    status_code=202,
+    dependencies=[Depends(require_admin)],
+)
+async def generate_ar_assets(
+    session: DbSession,
+    carpet_id: int,
+    background: BackgroundTasks,
+    payload: ArGenerateRequest | None = None,
+) -> dict[str, str]:
+    """ساخت (یا بازسازی) فایل‌های AR برای همه‌ی سایزهای این فرش."""
+    carpet = await session.get(Carpet, carpet_id)
+    if carpet is None:
+        raise HTTPException(404, detail="فرش پیدا نشد")
+    if not carpet.variants:
+        raise HTTPException(409, detail="ابتدا حداقل یک سایز ثبت کنید")
+    if not carpet.images:
+        raise HTTPException(409, detail="این فرش هنوز عکسی ندارد")
+
+    corners = payload.as_tuple() if payload else None
+    if corners is not None:
+        # A human placed these — run inline so mistakes surface immediately.
+        try:
+            await ar_pipeline.generate_for_carpet(
+                session, carpet_id, storage=Storage(), corners=corners
+            )
+        except ar_pipeline.ArPipelineError as exc:
+            raise HTTPException(409, detail=str(exc)) from exc
+        return {"status": "ready"}
+
+    background.add_task(ar_pipeline.generate_in_background, carpet_id)
+    return {"status": "processing"}
+
+
+@router.get(
+    "/carpets/{carpet_id}/ar",
+    response_model=list[ArVariantStatus],
+    dependencies=[Depends(require_admin)],
+)
+async def ar_status(session: DbSession, carpet_id: int) -> list[ArVariantStatus]:
+    carpet = await session.get(Carpet, carpet_id)
+    if carpet is None:
+        raise HTTPException(404, detail="فرش پیدا نشد")
+    return [
+        ArVariantStatus(
+            variant_id=variant.id,
+            width_cm=variant.width_cm,
+            length_cm=variant.length_cm,
+            ar_status=variant.ar_status.value,
+            glb_url=variant.glb_url,
+            usdz_url=variant.usdz_url,
+            ar_error=variant.ar_error,
+        )
+        for variant in carpet.variants
+    ]
 
 
 # --- orders -----------------------------------------------------------------
