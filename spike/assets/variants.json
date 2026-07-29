@@ -1,0 +1,29 @@
+{
+  "name": "فرش افشان کاشان",
+  "variants": [
+    {
+      "glb": "assets/carpet-150x225.glb",
+      "usdz": "assets/carpet-150x225.usdz",
+      "widthCm": 150,
+      "lengthCm": 225,
+      "price": 8500000,
+      "label": "150 × 225"
+    },
+    {
+      "glb": "assets/carpet-200x300.glb",
+      "usdz": "assets/carpet-200x300.usdz",
+      "widthCm": 200,
+      "lengthCm": 300,
+      "price": 15000000,
+      "label": "200 × 300"
+    },
+    {
+      "glb": "assets/carpet-250x350.glb",
+      "usdz": "assets/carpet-250x350.usdz",
+      "widthCm": 250,
+      "lengthCm": 350,
+      "price": 21500000,
+      "label": "250 × 350"
+    }
+  ]
+}

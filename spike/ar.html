@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>فرش در خانه‌ی من — تجربه‌ی اختصاصی</title>
+  <script type="importmap">
+    { "imports": { "three": "./three.module.min.js" } }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: system-ui, Tahoma, sans-serif; background: #0f1220; color: #f2f2f7;
+           min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+    .intro { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .intro h1 { font-size: 1.15rem; }
+    .intro p, .intro li { font-size: .86rem; color: #b9bed4; line-height: 2; }
+    .intro ul { padding-inline-start: 20px; }
+    .start { padding: 16px; border: 0; border-radius: 16px; background: #ffd166;
+             color: #1a1a2e; font-size: 1.05rem; font-weight: bold; }
+    .start:disabled { background: #4a4f6a; color: #9aa0bb; }
+
+    /* DOM overlay shown on top of the camera feed during the AR session */
+    #overlay { position: fixed; inset: 0; display: none; flex-direction: column;
+               justify-content: space-between; pointer-events: none; }
+    #overlay.active { display: flex; }
+    #overlay > * { pointer-events: auto; }
+    .chip { margin: 14px auto 0; padding: 10px 18px; border-radius: 999px;
+            background: rgba(15,18,32,.82); backdrop-filter: blur(8px);
+            font-size: .92rem; text-align: center; line-height: 1.8; }
+    .chip b { color: #ffd166; }
+    .hint { margin: 0 auto 18px; padding: 10px 16px; border-radius: 14px;
+            background: rgba(15,18,32,.72); font-size: .78rem; color: #cdd2e8; text-align: center; }
+    .exit { position: fixed; top: 14px; inset-inline-start: 14px; width: 42px; height: 42px;
+            border: 0; border-radius: 50%; background: rgba(15,18,32,.82); color: #fff; font-size: 1.1rem; }
+    #error { color: #ff9f9f; font-size: .85rem; line-height: 2; }
+  </style>
+</head>
+<body>
+  <div class="intro" id="intro">
+    <h1>🪄 فرش در خانه‌ی من</h1>
+    <p id="product">در حال بارگذاری…</p>
+    <ul>
+      <li>گوشی را آرام روی کف اتاق بچرخان تا حلقه‌ی زرد ظاهر شود، بعد یک‌بار روی صفحه بزن.</li>
+      <li><b>یک انگشت</b>: جابه‌جا کردن فرش روی کف.</li>
+      <li><b>دو انگشت چرخشی</b>: تغییر زاویه‌ی فرش.</li>
+      <li><b>دو انگشت باز/بسته</b>: رفتن به سایز بعدی یا قبلیِ <b>موجود در فروشگاه</b> — نه بزرگ‌نمایی دلخواه.</li>
+    </ul>
+    <button class="start" id="start" disabled>در حال بررسی دستگاه…</button>
+    <p id="error"></p>
+  </div>
+
+  <div id="overlay">
+    <div class="chip" id="chip">کف اتاق را پیدا کن…</div>
+    <div class="hint" id="hint">یک انگشت: جابه‌جایی · دو انگشت: چرخش و تغییر سایز</div>
+  </div>
+  <button class="exit" id="exit" style="display:none">✕</button>
+
+  <script type="module">
+    import { CarpetPlacer } from './carpet-placer.js';
+
+    const startBtn = document.getElementById('start');
+    const errorBox = document.getElementById('error');
+    const intro = document.getElementById('intro');
+    const overlay = document.getElementById('overlay');
+    const chip = document.getElementById('chip');
+    const hint = document.getElementById('hint');
+    const exitBtn = document.getElementById('exit');
+
+    const toman = (value) => new Intl.NumberFormat('fa-IR').format(value) + ' تومان';
+
+    const catalog = await fetch('./assets/variants.json').then((r) => r.json());
+    document.getElementById('product').textContent =
+      `${catalog.name} — در ${catalog.variants.length} سایز موجود است.`;
+
+    const supported = navigator.xr && (await navigator.xr.isSessionSupported('immersive-ar'));
+    if (supported) {
+      startBtn.disabled = false;
+      startBtn.textContent = '▶️ شروع واقعیت افزوده';
+    } else {
+      startBtn.textContent = 'این دستگاه پشتیبانی نمی‌کند';
+      errorBox.textContent =
+        'واقعیت افزوده‌ی داخل مرورگر روی این دستگاه در دسترس نیست. ' +
+        'روی آیفون از صفحه‌ی اصلی و دکمه‌ی Quick Look استفاده کن.';
+    }
+
+    // Start at the middle size so both pinch directions are discoverable.
+    const placer = new CarpetPlacer({
+      variants: catalog.variants,
+      initialIndex: Math.floor(catalog.variants.length / 2),
+      overlay,
+      onState: (state) => {
+        if (state.ended) {
+          overlay.classList.remove('active');
+          exitBtn.style.display = 'none';
+          intro.style.display = 'flex';
+          return;
+        }
+        if (!state.placed) {
+          chip.textContent = 'کف اتاق را پیدا کن، بعد روی صفحه بزن';
+          return;
+        }
+        const v = state.variant;
+        chip.innerHTML =
+          `<b>${v.label} سانتی‌متر</b><br>${toman(v.price)}` +
+          `<br><span style="opacity:.7">سایز ${state.index + 1} از ${state.count}</span>`;
+        if (state.atLimit === 'largest') hint.textContent = 'بزرگ‌ترین سایز موجود همین است';
+        else if (state.atLimit === 'smallest') hint.textContent = 'کوچک‌ترین سایز موجود همین است';
+        else hint.textContent = 'یک انگشت: جابه‌جایی · دو انگشت: چرخش و تغییر سایز';
+      },
+    });
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        errorBox.textContent = '';
+        await placer.start();
+        intro.style.display = 'none';
+        overlay.classList.add('active');
+        exitBtn.style.display = 'block';
+      } catch (err) {
+        errorBox.textContent = 'شروع نشد: ' + err.message;
+      }
+    });
+
+    exitBtn.addEventListener('click', () => placer.end());
+  </script>
+</body>
+</html>
