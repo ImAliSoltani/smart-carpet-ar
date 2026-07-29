@@ -19,19 +19,25 @@
              color: #1a1a2e; font-size: 1.05rem; font-weight: bold; }
     .start:disabled { background: #4a4f6a; color: #9aa0bb; }
 
-    /* DOM overlay shown on top of the camera feed during the AR session */
+    /* DOM overlay shown on top of the camera feed during the AR session.
+       The root must be the touch surface for the WHOLE screen — the carpet is
+       placed and dragged by touching anywhere, so only the exit button opts
+       back into receiving events; the text panels stay transparent to touch. */
     #overlay { position: fixed; inset: 0; display: none; flex-direction: column;
-               justify-content: space-between; pointer-events: none; }
+               justify-content: space-between; pointer-events: auto;
+               touch-action: none; user-select: none; }
     #overlay.active { display: flex; }
-    #overlay > * { pointer-events: auto; }
     .chip { margin: 14px auto 0; padding: 10px 18px; border-radius: 999px;
             background: rgba(15,18,32,.82); backdrop-filter: blur(8px);
-            font-size: .92rem; text-align: center; line-height: 1.8; }
+            font-size: .92rem; text-align: center; line-height: 1.8;
+            pointer-events: none; }
     .chip b { color: #ffd166; }
     .hint { margin: 0 auto 18px; padding: 10px 16px; border-radius: 14px;
-            background: rgba(15,18,32,.72); font-size: .78rem; color: #cdd2e8; text-align: center; }
-    .exit { position: fixed; top: 14px; inset-inline-start: 14px; width: 42px; height: 42px;
-            border: 0; border-radius: 50%; background: rgba(15,18,32,.82); color: #fff; font-size: 1.1rem; }
+            background: rgba(15,18,32,.72); font-size: .78rem; color: #cdd2e8;
+            text-align: center; pointer-events: none; }
+    .exit { position: absolute; top: 14px; inset-inline-start: 14px; width: 46px; height: 46px;
+            border: 0; border-radius: 50%; background: rgba(15,18,32,.82); color: #fff;
+            font-size: 1.15rem; pointer-events: auto; }
     #error { color: #ff9f9f; font-size: .85rem; line-height: 2; }
   </style>
 </head>
@@ -49,11 +55,13 @@
     <p id="error"></p>
   </div>
 
+  <!-- Everything interactive during the session must live inside the overlay
+       root: the XR compositor only shows this subtree over the camera feed. -->
   <div id="overlay">
+    <button class="exit" id="exit">✕</button>
     <div class="chip" id="chip">کف اتاق را پیدا کن…</div>
     <div class="hint" id="hint">یک انگشت: جابه‌جایی · دو انگشت: چرخش و تغییر سایز</div>
   </div>
-  <button class="exit" id="exit" style="display:none">✕</button>
 
   <script type="module">
     import { CarpetPlacer } from './carpet-placer.js';
@@ -91,7 +99,6 @@
       onState: (state) => {
         if (state.ended) {
           overlay.classList.remove('active');
-          exitBtn.style.display = 'none';
           intro.style.display = 'flex';
           return;
         }
@@ -115,13 +122,14 @@
         await placer.start();
         intro.style.display = 'none';
         overlay.classList.add('active');
-        exitBtn.style.display = 'block';
       } catch (err) {
         errorBox.textContent = 'شروع نشد: ' + err.message;
       }
     });
 
     exitBtn.addEventListener('click', () => placer.end());
+    // Tapping the close button must not also count as an XR select on the floor.
+    exitBtn.addEventListener('beforexrselect', (event) => event.preventDefault());
   </script>
 </body>
 </html>

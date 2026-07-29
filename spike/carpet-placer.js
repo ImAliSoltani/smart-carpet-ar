@@ -273,11 +273,15 @@ export class CarpetPlacer {
 
     if (!this.placed) {
       if (!this.reticle.visible) return;
+      // Seed at the reticle, then immediately drag: the next frame's
+      // transient hit test snaps the carpet under the finger that placed it,
+      // so it lands where you touched rather than at the screen centre.
       const position = new THREE.Vector3().setFromMatrixPosition(this.reticle.matrix);
       this.carpetGroup.position.copy(position);
       this.carpetGroup.visible = true;
       this.reticle.visible = false;
       this.placed = true;
+      this.gesture = { kind: 'drag' };
       this._emit();
       return;
     }
