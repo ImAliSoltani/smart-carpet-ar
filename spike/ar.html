@@ -18,6 +18,11 @@
     .start { padding: 16px; border: 0; border-radius: 16px; background: #ffd166;
              color: #1a1a2e; font-size: 1.05rem; font-weight: bold; }
     .start:disabled { background: #4a4f6a; color: #9aa0bb; }
+    .ql { display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+          border-radius: 16px; background: #9fd0ff; color: #10233a;
+          text-decoration: none; font-size: 1rem; font-weight: bold; }
+    .ql[hidden] { display: none; }
+    .ql img { width: 46px; height: 46px; object-fit: cover; border-radius: 10px; }
 
     /* DOM overlay shown on top of the camera feed during the AR session.
        The root must be the touch surface for the WHOLE screen — the carpet is
@@ -58,6 +63,11 @@
       <li><b>دکمه‌ی «اندازه‌ی دلخواه»</b>: حالت اندازه‌گیری — فرش را به هر اندازه‌ای در بیاور تا بفهمی چه ابعادی به اتاقت می‌خورد. نسبت طول به عرض ثابت می‌ماند و ابعاد زنده نمایش داده می‌شود.</li>
     </ul>
     <button class="start" id="start" disabled>در حال بررسی دستگاه…</button>
+    <!-- iOS has no WebXR; Apple's native Quick Look is the path there. -->
+    <a rel="ar" id="ios-ar" href="assets/carpet-200x300.usdz" class="ql" hidden>
+      <img src="assets/poster.jpg" alt="فرش افشان" />
+      <span>دیدن روی زمین (آیفون)</span>
+    </a>
     <p id="error"></p>
   </div>
 
@@ -94,10 +104,20 @@
       startBtn.disabled = false;
       startBtn.textContent = '▶️ شروع واقعیت افزوده';
     } else {
-      startBtn.textContent = 'این دستگاه پشتیبانی نمی‌کند';
-      errorBox.textContent =
-        'واقعیت افزوده‌ی داخل مرورگر روی این دستگاه در دسترس نیست. ' +
-        'روی آیفون از صفحه‌ی اصلی و دکمه‌ی Quick Look استفاده کن.';
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      startBtn.hidden = true;
+      if (isIOS) {
+        // Quick Look gives placement and true scale; the custom gestures are
+        // Android-only because Safari does not implement WebXR.
+        document.getElementById('ios-ar').hidden = false;
+        errorBox.textContent =
+          'روی آیفون، واقعیت افزوده از طریق Quick Look اپل باز می‌شود. ' +
+          'جای‌گذاری و مقیاس واقعی کار می‌کند؛ حالت اندازه‌ی دلخواه فعلاً فقط روی اندروید است.';
+      } else {
+        errorBox.textContent = 'واقعیت افزوده‌ی داخل مرورگر روی این دستگاه در دسترس نیست.';
+      }
     }
 
     // Start at the middle size so both pinch directions are discoverable.

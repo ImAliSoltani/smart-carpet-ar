@@ -18,6 +18,13 @@
                     font-size: .95rem; font-weight: bold; color: #1a1a2e; }
     #btn-webxr { background: #ffd166; }
     #btn-sv { background: #7ee0a0; }
+    .ql { flex: 1; display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+          border-radius: 14px; background: #9fd0ff; color: #10233a; text-decoration: none;
+          font-size: .95rem; font-weight: bold; }
+    .ql img { width: 44px; height: 44px; object-fit: cover; border-radius: 10px; }
+    /* Each platform only sees the paths it can actually run. */
+    body:not(.ios) #ios-row { display: none; }
+    body.ios #android-row { display: none; }
     #log { margin: 0 16px 12px; padding: 10px 12px; background: #171b30; border-radius: 12px;
            font-size: .72rem; line-height: 1.9; color: #cdd2e8; direction: ltr; text-align: left;
            max-height: 22dvh; overflow: auto; white-space: pre-wrap; word-break: break-all; }
@@ -49,12 +56,19 @@
   <div class="modes">
     <button id="btn-model">🔁 فرش واقعی / شطرنجی</button>
   </div>
-  <div class="modes">
+  <div class="modes" id="android-row">
     <button id="btn-webxr">حالت ۱ — داخل مرورگر (WebXR)</button>
     <button id="btn-sv">حالت ۲ — اپ گوگل (Scene Viewer)</button>
   </div>
-  <div class="modes">
-    <button id="btn-ql" style="background:#9fd0ff">حالت ۳ — آیفون (Quick Look)</button>
+  <!-- iOS: Apple's native path. An <a rel="ar"> containing an <img> is the
+       documented way to open AR Quick Look, and because the tap goes straight
+       to Safari there is no JavaScript in the way that could consume the user
+       gesture (which is exactly what broke the previous button). -->
+  <div class="modes" id="ios-row">
+    <a rel="ar" id="ql-link" href="assets/carpet.usdz" class="ql">
+      <img src="assets/poster.jpg" alt="فرش افشان" />
+      <span>حالت ۳ — دیدن روی زمین (آیفون)</span>
+    </a>
   </div>
   <div class="modes">
     <a href="ar.html" style="flex:1; text-decoration:none">
@@ -128,8 +142,13 @@
       .addEventListener('click', () => activate('webxr', 'WebXR'));
     document.getElementById('btn-sv')
       .addEventListener('click', () => activate('scene-viewer', 'Scene Viewer'));
-    document.getElementById('btn-ql')
-      .addEventListener('click', () => activate('quick-look', 'Quick Look (iOS)'));
+    // iOS: no JS activation path at all — see the markup comment above.
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    document.body.classList.toggle('ios', isIOS);
+    log('platform: ' + (isIOS ? 'iOS (Quick Look)' : 'non-iOS (WebXR / Scene Viewer)'));
+    log('rel="ar" supported: ' + (document.createElement('a').relList?.supports('ar') ?? 'unknown'));
 
     // The real carpet is the product; the checkerboard is the measuring stick.
     const MODELS = {
@@ -152,10 +171,14 @@
       current = current === 'real' ? 'calib' : 'real';
       const model = MODELS[current];
       mv.src = model.src;
+      const qlRow = document.getElementById('ios-row');
       if (model.ios) {
         mv.setAttribute('ios-src', model.ios);
+        document.getElementById('ql-link').href = model.ios;
+        qlRow.style.visibility = '';
       } else {
         mv.removeAttribute('ios-src');
+        qlRow.style.visibility = 'hidden'; // no iOS asset for this model
       }
       noteBox.textContent = model.note;
       log('--- switched model: ' + model.src + ' ---');
