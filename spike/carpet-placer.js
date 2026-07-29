@@ -23,6 +23,8 @@ const CARPET_LIFT = 0.003;          // metres above the floor plane, avoids z-fi
 const SHADOW_MARGIN = 0.22;         // contact shadow spread beyond the carpet edge
 const PINCH_STEP = 0.18;            // relative pinch travel before the size changes
 const SIZE_SWITCH_COOLDOWN = 350;   // ms, stops one gesture racing through sizes
+const MIN_FREE_SCALE = 0.35;        // free-size bounds, kept within plausible rug sizes
+const MAX_FREE_SCALE = 2.60;
 
 export class CarpetPlacer {
   /**
@@ -52,6 +54,13 @@ export class CarpetPlacer {
 
     this.gesture = null;
     this.lastSwitchAt = 0;
+
+    // "Free size" mode: the carpet stops being a product for a moment and
+    // becomes a measuring tool — pinch to any size to discover what actually
+    // fits the room, with the live dimensions reported back. Scaling is always
+    // uniform, so the carpet's real proportions never distort.
+    this.freeMode = false;
+    this.freeScale = 1;
   }
 
   get variant() {
@@ -110,6 +119,21 @@ export class CarpetPlacer {
     this.carpetGroup = new THREE.Group();
     this.carpetGroup.visible = false;
     this.scene.add(this.carpetGroup);
+
+    this.raycaster = new THREE.Raycaster();
+  }
+
+  /** Did this touch land on the carpet itself? Dragging requires it. */
+  _touchHitsCarpet(touch) {
+    if (!this.carpetMesh) return false;
+    const xrCamera = this.renderer.xr.getCamera();
+    const camera = xrCamera.cameras?.[0] ?? xrCamera;
+    const ndc = new THREE.Vector2(
+      (touch.clientX / window.innerWidth) * 2 - 1,
+      -(touch.clientY / window.innerHeight) * 2 + 1
+    );
+    this.raycaster.setFromCamera(ndc, camera);
+    return this.raycaster.intersectObject(this.carpetMesh, true).length > 0;
   }
 
   _buildReticle() {
@@ -225,18 +249,28 @@ export class CarpetPlacer {
     this.reticle.matrix.fromArray(pose.transform.matrix);
   }
 
-  /** Follow the finger across the floor, keeping the carpet flat and its yaw. */
+  /** Follow the finger across the floor, keeping the carpet flat and its yaw.
+   *
+   * The offset between the grab point and the carpet's centre is captured on
+   * the first frame of the drag, so grabbing a corner slides the carpet from
+   * that corner instead of snapping its centre under the finger.
+   */
   _updateDrag(frame) {
     if (!this.transientHitSource) return;
     const [result] = frame.getHitTestResultsForTransientInput(this.transientHitSource);
     const hit = result?.results?.[0];
     if (!hit) return;
-    const pose = hit.getPose(this.refSpace);
-    this.carpetGroup.position.set(
-      pose.transform.position.x,
-      pose.transform.position.y,
-      pose.transform.position.z
-    );
+
+    const { x, y, z } = hit.getPose(this.refSpace).transform.position;
+    if (!this.gesture.grabOffset) {
+      this.gesture.grabOffset = new THREE.Vector3(
+        this.carpetGroup.position.x - x,
+        this.carpetGroup.position.y - y,
+        this.carpetGroup.position.z - z
+      );
+    }
+    const offset = this.gesture.grabOffset;
+    this.carpetGroup.position.set(x + offset.x, y + offset.y, z + offset.z);
   }
 
   /** Match room brightness so the rug does not glow against a dim floor. */
@@ -273,27 +307,31 @@ export class CarpetPlacer {
 
     if (!this.placed) {
       if (!this.reticle.visible) return;
-      // Seed at the reticle, then immediately drag: the next frame's
-      // transient hit test snaps the carpet under the finger that placed it,
-      // so it lands where you touched rather than at the screen centre.
+      // Only the FIRST touch may land anywhere: seed at the reticle, then drag
+      // for one gesture so the carpet appears under the finger that placed it.
       const position = new THREE.Vector3().setFromMatrixPosition(this.reticle.matrix);
       this.carpetGroup.position.copy(position);
       this.carpetGroup.visible = true;
       this.reticle.visible = false;
       this.placed = true;
-      this.gesture = { kind: 'drag' };
+      this.gesture = { kind: 'drag', grabOffset: null };
       this._emit();
       return;
     }
 
     if (event.touches.length === 1) {
-      this.gesture = { kind: 'drag' };
+      // Once placed, the carpet stays put unless the user grabs the carpet
+      // itself. Tapping bare floor must not teleport it — otherwise every
+      // attempt to rotate or resize would also move it.
+      if (!this._touchHitsCarpet(event.touches[0])) return;
+      this.gesture = { kind: 'drag', grabOffset: null };
     } else if (event.touches.length === 2) {
       this.gesture = {
         kind: 'two-finger',
         startAngle: this._touchAngle(event.touches),
         startYaw: this.yaw,
         startSpread: this._touchSpread(event.touches),
+        startScale: this.freeScale,
       };
     }
   };
@@ -303,14 +341,29 @@ export class CarpetPlacer {
     event.preventDefault();
 
     if (this.gesture.kind === 'two-finger' && event.touches.length === 2) {
-      // twist -> yaw
+      // Twist -> yaw. Screen angles grow clockwise (y points down) while a
+      // positive yaw turns counter-clockwise seen from above, so the delta is
+      // negated — otherwise the carpet turns against the fingers.
       const angle = this._touchAngle(event.touches);
-      this.yaw = this.gesture.startYaw + (angle - this.gesture.startAngle);
+      this.yaw = this.gesture.startYaw - (angle - this.gesture.startAngle);
       this.carpetGroup.rotation.y = this.yaw;
 
-      // pinch -> step through the sizes the shop actually stocks
       const spread = this._touchSpread(event.touches);
       const ratio = spread / this.gesture.startSpread;
+
+      if (this.freeMode) {
+        // Continuous, uniform: the carpet's proportions are a property of the
+        // product and never distort, only the overall size changes.
+        this.freeScale = Math.max(
+          MIN_FREE_SCALE,
+          Math.min(MAX_FREE_SCALE, this.gesture.startScale * ratio)
+        );
+        this.carpetGroup.scale.setScalar(this.freeScale);
+        this._emit();
+        return;
+      }
+
+      // Stock mode: pinch steps through the sizes the shop actually sells.
       const now = performance.now();
       if (now - this.lastSwitchAt > SIZE_SWITCH_COOLDOWN) {
         if (ratio > 1 + PINCH_STEP) this._stepSize(+1, event);
@@ -318,6 +371,35 @@ export class CarpetPlacer {
       }
     }
   };
+
+  /** Switch between "sizes we stock" and "any size, tell me the number". */
+  setFreeMode(enabled) {
+    this.freeMode = enabled;
+    this.freeScale = 1;
+    this.carpetGroup.scale.setScalar(1);
+    this._emit();
+  }
+
+  /** Live dimensions in cm under the current free-mode scale. */
+  get liveSize() {
+    return {
+      widthCm: Math.round(this.variant.widthCm * this.freeScale),
+      lengthCm: Math.round(this.variant.lengthCm * this.freeScale),
+      percent: Math.round(this.freeScale * 100),
+    };
+  }
+
+  /** The stock size closest in area to the current free size — keeps the
+   *  measuring tool connected to something the customer can actually buy. */
+  get nearestStockVariant() {
+    const target = this.variant.widthCm * this.variant.lengthCm * this.freeScale ** 2;
+    return this.variants.reduce((best, candidate) =>
+      Math.abs(candidate.widthCm * candidate.lengthCm - target) <
+      Math.abs(best.widthCm * best.lengthCm - target)
+        ? candidate
+        : best
+    );
+  }
 
   _onTouchEnd = () => {
     this.gesture = null;
@@ -356,6 +438,9 @@ export class CarpetPlacer {
       variant: this.variant,
       index: this.index,
       count: this.variants.length,
+      freeMode: this.freeMode,
+      liveSize: this.liveSize,
+      nearestStock: this.freeMode ? this.nearestStockVariant : null,
       ...extra,
     });
   }

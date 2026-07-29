@@ -32,9 +32,14 @@
             font-size: .92rem; text-align: center; line-height: 1.8;
             pointer-events: none; }
     .chip b { color: #ffd166; }
-    .hint { margin: 0 auto 18px; padding: 10px 16px; border-radius: 14px;
+    .bottom { display: flex; flex-direction: column; align-items: center; gap: 10px;
+              margin-bottom: 18px; pointer-events: none; }
+    .hint { padding: 10px 16px; border-radius: 14px; max-width: 90vw;
             background: rgba(15,18,32,.72); font-size: .78rem; color: #cdd2e8;
             text-align: center; pointer-events: none; }
+    .mode { padding: 12px 22px; border: 0; border-radius: 999px; font-size: .92rem;
+            font-weight: bold; background: #ffd166; color: #1a1a2e; pointer-events: auto; }
+    .mode.on { background: #7ee0a0; }
     .exit { position: absolute; top: 14px; inset-inline-start: 14px; width: 46px; height: 46px;
             border: 0; border-radius: 50%; background: rgba(15,18,32,.82); color: #fff;
             font-size: 1.15rem; pointer-events: auto; }
@@ -46,10 +51,11 @@
     <h1>🪄 فرش در خانه‌ی من</h1>
     <p id="product">در حال بارگذاری…</p>
     <ul>
-      <li>گوشی را آرام روی کف اتاق بچرخان تا حلقه‌ی زرد ظاهر شود، بعد یک‌بار روی صفحه بزن.</li>
-      <li><b>یک انگشت</b>: جابه‌جا کردن فرش روی کف.</li>
+      <li>گوشی را آرام روی کف اتاق بچرخان تا حلقه‌ی زرد ظاهر شود، بعد یک‌بار <b>هرجای صفحه</b> بزن تا فرش همان‌جا قرار بگیرد.</li>
+      <li><b>یک انگشت روی خود فرش</b>: جابه‌جا کردن آن روی کف.</li>
       <li><b>دو انگشت چرخشی</b>: تغییر زاویه‌ی فرش.</li>
-      <li><b>دو انگشت باز/بسته</b>: رفتن به سایز بعدی یا قبلیِ <b>موجود در فروشگاه</b> — نه بزرگ‌نمایی دلخواه.</li>
+      <li><b>دو انگشت باز/بسته</b>: رفتن به سایز بعدی یا قبلیِ <b>موجود در فروشگاه</b>.</li>
+      <li><b>دکمه‌ی «اندازه‌ی دلخواه»</b>: حالت اندازه‌گیری — فرش را به هر اندازه‌ای در بیاور تا بفهمی چه ابعادی به اتاقت می‌خورد. نسبت طول به عرض ثابت می‌ماند و ابعاد زنده نمایش داده می‌شود.</li>
     </ul>
     <button class="start" id="start" disabled>در حال بررسی دستگاه…</button>
     <p id="error"></p>
@@ -60,7 +66,10 @@
   <div id="overlay">
     <button class="exit" id="exit">✕</button>
     <div class="chip" id="chip">کف اتاق را پیدا کن…</div>
-    <div class="hint" id="hint">یک انگشت: جابه‌جایی · دو انگشت: چرخش و تغییر سایز</div>
+    <div class="bottom">
+      <button class="mode" id="mode">📏 اندازه‌ی دلخواه</button>
+      <div class="hint" id="hint">روی فرش انگشت بگذار و بکش · دو انگشت: چرخش و تغییر سایز</div>
+    </div>
   </div>
 
   <script type="module">
@@ -106,13 +115,26 @@
           chip.textContent = 'کف اتاق را پیدا کن، بعد روی صفحه بزن';
           return;
         }
+
+        if (state.freeMode) {
+          const live = state.liveSize;
+          const near = state.nearestStock;
+          chip.innerHTML =
+            `<b>${live.widthCm} × ${live.lengthCm} سانتی‌متر</b>` +
+            `<br><span style="opacity:.75">${live.percent}٪ از اندازه‌ی اصلی</span>` +
+            `<br><span style="opacity:.75">نزدیک‌ترین سایز موجود: ${near.label}</span>`;
+          hint.textContent =
+            'حالت اندازه‌گیری: با دو انگشت اندازه را تغییر بده تا ببینی چه ابعادی به اتاقت می‌خورد. این اندازه لزوماً در انبار موجود نیست.';
+          return;
+        }
+
         const v = state.variant;
         chip.innerHTML =
           `<b>${v.label} سانتی‌متر</b><br>${toman(v.price)}` +
           `<br><span style="opacity:.7">سایز ${state.index + 1} از ${state.count}</span>`;
         if (state.atLimit === 'largest') hint.textContent = 'بزرگ‌ترین سایز موجود همین است';
         else if (state.atLimit === 'smallest') hint.textContent = 'کوچک‌ترین سایز موجود همین است';
-        else hint.textContent = 'یک انگشت: جابه‌جایی · دو انگشت: چرخش و تغییر سایز';
+        else hint.textContent = 'روی فرش انگشت بگذار و بکش · دو انگشت: چرخش و تغییر سایز';
       },
     });
 
@@ -128,8 +150,19 @@
     });
 
     exitBtn.addEventListener('click', () => placer.end());
-    // Tapping the close button must not also count as an XR select on the floor.
-    exitBtn.addEventListener('beforexrselect', (event) => event.preventDefault());
+
+    const modeBtn = document.getElementById('mode');
+    modeBtn.addEventListener('click', () => {
+      const enabled = !placer.freeMode;
+      placer.setFreeMode(enabled);
+      modeBtn.classList.toggle('on', enabled);
+      modeBtn.textContent = enabled ? '🏷️ بازگشت به سایزهای فروشگاه' : '📏 اندازه‌ی دلخواه';
+    });
+
+    // Taps on the controls must not also count as an XR select on the floor.
+    for (const control of [exitBtn, modeBtn]) {
+      control.addEventListener('beforexrselect', (event) => event.preventDefault());
+    }
   </script>
 </body>
 </html>
