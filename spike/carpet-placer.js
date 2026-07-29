@@ -61,6 +61,7 @@ export class CarpetPlacer {
     // uniform, so the carpet's real proportions never distort.
     this.freeMode = false;
     this.freeScale = 1;
+    this.floorTracked = false; // true once ARCore reports a real surface
   }
 
   get variant() {
@@ -121,6 +122,33 @@ export class CarpetPlacer {
     this.scene.add(this.carpetGroup);
 
     this.raycaster = new THREE.Raycaster();
+  }
+
+  /** Where a ray through a screen point meets the floor.
+   *
+   * The session runs in `local-floor` space, so the floor is the y = 0 plane
+   * and its height is known from the moment tracking starts. Plane detection,
+   * by contrast, needs the user to move the phone enough for parallax — which
+   * is the wait that made placement feel slow. Intersecting the known floor
+   * height gives an immediate, usable target; a real hit test result is still
+   * preferred as soon as one arrives, because it follows uneven ground.
+   */
+  _floorPoint(ndcX = 0, ndcY = 0) {
+    const xrCamera = this.renderer.xr.getCamera();
+    const camera = xrCamera.cameras?.[0] ?? xrCamera;
+    this.raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+    const { origin, direction } = this.raycaster.ray;
+    if (Math.abs(direction.y) < 1e-4) return null; // looking at the horizon
+    const distance = -origin.y / direction.y;
+    if (distance <= 0 || distance > 12) return null; // behind camera, or absurdly far
+    return origin.clone().addScaledVector(direction, distance);
+  }
+
+  _screenToNdc(clientX, clientY) {
+    return [
+      (clientX / window.innerWidth) * 2 - 1,
+      -(clientY / window.innerHeight) * 2 + 1,
+    ];
   }
 
   /** Did this touch land on the carpet itself? Dragging requires it. */
@@ -240,13 +268,25 @@ export class CarpetPlacer {
 
   _updateReticle(frame) {
     const hits = frame.getHitTestResults(this.viewerHitSource);
-    if (!hits.length) {
+    if (hits.length) {
+      this.reticle.matrix.fromArray(hits[0].getPose(this.refSpace).transform.matrix);
+      this.reticle.visible = true;
+      if (!this.floorTracked) {
+        this.floorTracked = true;
+        this._emit();
+      }
+      return;
+    }
+
+    // Plane detection has not converged — aim at the known floor height so the
+    // user can place right away instead of waving the phone around first.
+    const point = this._floorPoint();
+    if (!point) {
       this.reticle.visible = false;
       return;
     }
-    const pose = hits[0].getPose(this.refSpace);
+    this.reticle.matrix.makeTranslation(point.x, point.y, point.z);
     this.reticle.visible = true;
-    this.reticle.matrix.fromArray(pose.transform.matrix);
   }
 
   /** Follow the finger across the floor, keeping the carpet flat and its yaw.
@@ -256,12 +296,21 @@ export class CarpetPlacer {
    * that corner instead of snapping its centre under the finger.
    */
   _updateDrag(frame) {
-    if (!this.transientHitSource) return;
-    const [result] = frame.getHitTestResultsForTransientInput(this.transientHitSource);
-    const hit = result?.results?.[0];
-    if (!hit) return;
+    let target = null;
+    if (this.transientHitSource) {
+      const [result] = frame.getHitTestResultsForTransientInput(this.transientHitSource);
+      const hit = result?.results?.[0];
+      if (hit) target = hit.getPose(this.refSpace).transform.position;
+    }
+    if (!target && this.gesture.touch) {
+      // Same fallback as the reticle: slide along the known floor plane when no
+      // detected surface is under the finger.
+      const [ndcX, ndcY] = this._screenToNdc(this.gesture.touch.x, this.gesture.touch.y);
+      target = this._floorPoint(ndcX, ndcY);
+    }
+    if (!target) return;
 
-    const { x, y, z } = hit.getPose(this.refSpace).transform.position;
+    const { x, y, z } = target;
     if (!this.gesture.grabOffset) {
       this.gesture.grabOffset = new THREE.Vector3(
         this.carpetGroup.position.x - x,
@@ -314,7 +363,11 @@ export class CarpetPlacer {
       this.carpetGroup.visible = true;
       this.reticle.visible = false;
       this.placed = true;
-      this.gesture = { kind: 'drag', grabOffset: null };
+      this.gesture = {
+        kind: 'drag',
+        grabOffset: null,
+        touch: this._touchPoint(event.touches[0]),
+      };
       this._emit();
       return;
     }
@@ -324,7 +377,7 @@ export class CarpetPlacer {
       // itself. Tapping bare floor must not teleport it — otherwise every
       // attempt to rotate or resize would also move it.
       if (!this._touchHitsCarpet(event.touches[0])) return;
-      this.gesture = { kind: 'drag', grabOffset: null };
+      this.gesture = { kind: 'drag', grabOffset: null, touch: this._touchPoint(event.touches[0]) };
     } else if (event.touches.length === 2) {
       this.gesture = {
         kind: 'two-finger',
@@ -339,6 +392,10 @@ export class CarpetPlacer {
   _onTouchMove = (event) => {
     if (!this.placed || !this.gesture) return;
     event.preventDefault();
+
+    if (this.gesture.kind === 'drag' && event.touches.length === 1) {
+      this.gesture.touch = this._touchPoint(event.touches[0]);
+    }
 
     if (this.gesture.kind === 'two-finger' && event.touches.length === 2) {
       // Twist -> yaw. Screen angles grow clockwise (y points down) while a
@@ -418,6 +475,10 @@ export class CarpetPlacer {
     this._showVariant(next);
   }
 
+  _touchPoint(touch) {
+    return { x: touch.clientX, y: touch.clientY };
+  }
+
   _touchAngle(touches) {
     return Math.atan2(
       touches[1].clientY - touches[0].clientY,
@@ -439,6 +500,7 @@ export class CarpetPlacer {
       index: this.index,
       count: this.variants.length,
       freeMode: this.freeMode,
+      floorTracked: this.floorTracked,
       liveSize: this.liveSize,
       nearestStock: this.freeMode ? this.nearestStockVariant : null,
       ...extra,

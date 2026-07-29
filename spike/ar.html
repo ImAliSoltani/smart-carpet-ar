@@ -132,7 +132,10 @@
           return;
         }
         if (!state.placed) {
-          chip.textContent = 'کف اتاق را پیدا کن، بعد روی صفحه بزن';
+          chip.innerHTML = state.floorTracked
+            ? '✅ کف شناسایی شد — هرجای صفحه بزن'
+            : 'روی صفحه بزن تا فرش قرار بگیرد<br>' +
+              '<span style="opacity:.7">برای دقت بیشتر، گوشی را آرام چپ و راست حرکت بده</span>';
           return;
         }
 
