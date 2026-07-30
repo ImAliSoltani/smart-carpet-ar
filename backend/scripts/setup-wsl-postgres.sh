@@ -54,12 +54,18 @@ db_exists "$DB_NAME" || su postgres -c "createdb -O $DB_USER $DB_NAME"
 su postgres -c "psql -qd $DB_NAME -c 'CREATE EXTENSION IF NOT EXISTS vector'"
 
 say "keeping it running across restarts"
-if [ ! -f /etc/wsl.conf ] || ! grep -q "systemd=true" /etc/wsl.conf; then
+# A boot command rather than systemd: systemd never reached "running" on this
+# setup (systemctl reported the system as offline), while the boot command is
+# honoured by every WSL version we care about.
+if [ ! -f /etc/wsl.conf ] || ! grep -q "service postgresql start" /etc/wsl.conf; then
     cat >/etc/wsl.conf <<'WSLCONF'
 [boot]
-systemd=true
+command = service postgresql start
+
+[interop]
+appendWindowsPath=true
 WSLCONF
-    echo "wrote /etc/wsl.conf — run 'wsl --shutdown' once so systemd takes over"
+    echo "wrote /etc/wsl.conf — run 'wsl --shutdown' once so it takes effect"
 fi
 
 say "verifying"
@@ -67,3 +73,7 @@ su postgres -c "psql -qd $DB_NAME -tAc \"SELECT 'pgvector ' || extversion FROM p
 su postgres -c "psql -tAc 'SELECT version()'" | cut -c1-40
 echo
 echo "ready:  postgresql+asyncpg://${DB_USER}:${DB_PASS}@localhost:5432/${DB_NAME}"
+echo
+echo "WSL stops a distribution seconds after its last process exits, and the"
+echo "server goes with it. Start each working session from Windows with:"
+echo "    pwsh scripts/dev-db.ps1"
