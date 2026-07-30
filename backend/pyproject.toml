@@ -26,6 +26,12 @@ dev = [
     "httpx>=0.27",
     "ruff>=0.6",
 ]
+ml = [
+    "timm>=1.0.28",
+    "torch>=2.13.0",
+    "torchvision>=0.28.0",
+    "transformers>=5.14.1",
+]
 
 [tool.ruff]
 line-length = 100
