@@ -20,6 +20,7 @@ from PIL import Image
 
 from app.room.depth import back_project, estimate_depth, intrinsics
 from app.room.floor import FloorPlane, fit_floor
+from app.room.segment import floor_mask
 
 # Scene points closer than the floor by more than this are treated as objects
 # standing on it. Below the tolerance we are inside depth noise.
@@ -35,6 +36,7 @@ class RoomScene:
     focal: float
     cx: float
     cy: float
+    floor_mask: np.ndarray
 
     @property
     def confidence(self) -> float:
@@ -53,7 +55,8 @@ def analyze_room(image: Image.Image, *, hfov_deg: float | None = None) -> RoomSc
     focal, cx, cy = intrinsics(depth.width, depth.height, hfov)
     points = back_project(depth.depth_m, focal, cx, cy)
 
-    floor = fit_floor(points)
+    mask = floor_mask(image)
+    floor = fit_floor(points, mask=mask)
     if floor is None:
         raise RoomAnalysisError(
             "کف اتاق در این عکس تشخیص داده نشد؛ عکسی بگیرید که کف در آن دیده شود"
@@ -67,6 +70,7 @@ def analyze_room(image: Image.Image, *, hfov_deg: float | None = None) -> RoomSc
         focal=focal,
         cx=cx,
         cy=cy,
+        floor_mask=mask,
     )
 
 
@@ -112,28 +116,27 @@ def project(points_3d: np.ndarray, focal: float, cx: float, cy: float) -> np.nda
 
 
 def occlusion_mask(scene: RoomScene) -> np.ndarray:
-    """Full-frame visibility: 1 where the floor is exposed, 0 where an object
-    stands in front of it.
+    """Full-frame visibility: 1 where the floor is exposed, 0 where something
+    stands on it.
 
-    This does not depend on where the carpet is. The carpet always lies on the
-    same plane, so "is this pixel nearer than the floor" is a fixed property of
-    the photo — which is what lets the client move the carpet around freely
-    after a single server-side analysis.
+    Primarily the segmentation mask, because its boundaries come from the photo
+    and therefore land on real object edges — thin chair legs included. Depth
+    still contributes: anything clearly nearer than the floor plane is an
+    occluder even if the segmenter labelled it floor, which catches objects
+    lying flat on the ground.
+
+    Independent of where the carpet is: the carpet never leaves the plane, so
+    this is a fixed property of the photo. That is what lets the browser move
+    the carpet freely after a single server-side analysis.
     """
+    visible = scene.floor_mask.astype(np.float32).copy()
+
     height, width = scene.depth_m.shape
     us, vs = np.meshgrid(np.arange(width, dtype=np.float32), np.arange(height, dtype=np.float32))
     plane_depth = scene.floor.depth_at(us, vs, scene.focal, scene.cx, scene.cy)
+    clearly_in_front = (scene.depth_m < plane_depth - OCCLUSION_MARGIN_M) & np.isfinite(plane_depth)
+    visible[clearly_in_front] = 0.0
 
-    in_front = (scene.depth_m < plane_depth - OCCLUSION_MARGIN_M) & np.isfinite(plane_depth)
-    visible = (~in_front).astype(np.float32)
-
-    # Follow the real object edges: a guided/joint-bilateral step snaps the mask
-    # to the photo's own boundaries instead of the depth map's softer ones.
-    guide = cv2.cvtColor(np.array(scene.image), cv2.COLOR_RGB2GRAY)
-    if hasattr(cv2, "ximgproc"):
-        visible = cv2.ximgproc.jointBilateralFilter(guide, visible, 9, 24, 9)
-    else:
-        visible = cv2.bilateralFilter(visible, 9, 0.15, 9)
     return np.clip(visible, 0.0, 1.0)
 
 

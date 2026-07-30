@@ -69,12 +69,23 @@ class FloorPlane:
         return right.astype(np.float32), (forward / np.linalg.norm(forward)).astype(np.float32)
 
 
-def fit_floor(points: np.ndarray, *, rng_seed: int = 1405) -> FloorPlane | None:
-    """Fit the floor to a (H, W, 3) camera-space point grid."""
+def fit_floor(
+    points: np.ndarray, *, mask: np.ndarray | None = None, rng_seed: int = 1405
+) -> FloorPlane | None:
+    """Fit the floor to a (H, W, 3) camera-space point grid.
+
+    `mask` is a 0..1 floor probability. When supplied, only pixels the segmenter
+    called floor take part — which is far better than a geometric guess, because
+    a room photo's lower half is mostly furniture.
+    """
     height, width = points.shape[:2]
-    # The floor is essentially always in the lower half of a room photo, and
-    # restricting the sample keeps ceilings and far walls out of the vote.
-    region = points[int(height * 0.45) :].reshape(-1, 3)
+    if mask is not None and float(mask.mean()) > 0.02:
+        selected = points[mask > 0.6]
+        region = selected.reshape(-1, 3)
+    else:
+        # Fallback when segmentation found nothing: the floor is essentially
+        # always in the lower part of the frame.
+        region = points[int(height * 0.45) :].reshape(-1, 3)
     region = region[np.isfinite(region).all(axis=1) & (region[:, 2] > 0.15)]
     if len(region) < 500:
         return None
