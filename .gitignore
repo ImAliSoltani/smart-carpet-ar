@@ -28,6 +28,5 @@ models/weights/
 !spike/assets/*.usdz
 
 # --- local tooling ---
-.claude/
 .DS_Store
 Thumbs.db
