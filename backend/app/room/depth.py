@@ -21,10 +21,42 @@ from PIL import Image
 
 MODEL_ID = "depth-anything/Depth-Anything-V2-Metric-Indoor-Small-hf"
 
-# Typical phone/camera horizontal field of view. A single photo carries no
-# intrinsics, so this is an assumption; it is exposed because getting it badly
-# wrong tilts the recovered floor.
-DEFAULT_HFOV_DEG = 60.0
+# Fallback horizontal field of view when the photo carries no lens data.
+# Phone main cameras cluster around 65-72 degrees; getting this badly wrong
+# skews the recovered floor, so EXIF is always preferred.
+DEFAULT_HFOV_DEG = 68.0
+
+
+def hfov_from_exif(image: Image.Image) -> float | None:
+    """Horizontal field of view from the photo's own lens data, if present.
+
+    Phones record the 35 mm-equivalent focal length, which maps directly to a
+    field of view against the 36 mm full-frame width — far better than guessing,
+    and it costs nothing to read.
+    """
+    try:
+        exif = image.getexif()
+    except Exception:
+        return None
+    if not exif:
+        return None
+
+    equivalent = exif.get(41989)  # FocalLengthIn35mmFilm
+    if not equivalent:
+        return None
+    try:
+        focal_35mm = float(equivalent)
+    except (TypeError, ValueError):
+        return None
+    if not 8.0 <= focal_35mm <= 400.0:
+        return None
+
+    hfov = 2.0 * np.degrees(np.arctan(36.0 / (2.0 * focal_35mm)))
+    # Portrait shots record the focal for the long edge; swap when needed.
+    if image.height > image.width:
+        vfov_rad = 2.0 * np.arctan(24.0 / (2.0 * focal_35mm))
+        hfov = np.degrees(vfov_rad)
+    return float(hfov)
 
 
 @dataclass

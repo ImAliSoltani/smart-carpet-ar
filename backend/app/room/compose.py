@@ -46,10 +46,11 @@ class RoomAnalysisError(RuntimeError):
 
 
 def analyze_room(image: Image.Image, *, hfov_deg: float | None = None) -> RoomScene:
-    from app.room.depth import DEFAULT_HFOV_DEG
+    from app.room.depth import DEFAULT_HFOV_DEG, hfov_from_exif
 
     depth = estimate_depth(image)
-    focal, cx, cy = intrinsics(depth.width, depth.height, hfov_deg or DEFAULT_HFOV_DEG)
+    hfov = hfov_deg or hfov_from_exif(image) or DEFAULT_HFOV_DEG
+    focal, cx, cy = intrinsics(depth.width, depth.height, hfov)
     points = back_project(depth.depth_m, focal, cx, cy)
 
     floor = fit_floor(points)
@@ -110,8 +111,15 @@ def project(points_3d: np.ndarray, focal: float, cx: float, cy: float) -> np.nda
     return np.stack([points_3d[:, 0] / z * focal + cx, points_3d[:, 1] / z * focal + cy], axis=-1)
 
 
-def _occlusion_mask(scene: RoomScene, carpet_alpha: np.ndarray) -> np.ndarray:
-    """1 where the carpet is visible, 0 where furniture covers it."""
+def occlusion_mask(scene: RoomScene) -> np.ndarray:
+    """Full-frame visibility: 1 where the floor is exposed, 0 where an object
+    stands in front of it.
+
+    This does not depend on where the carpet is. The carpet always lies on the
+    same plane, so "is this pixel nearer than the floor" is a fixed property of
+    the photo — which is what lets the client move the carpet around freely
+    after a single server-side analysis.
+    """
     height, width = scene.depth_m.shape
     us, vs = np.meshgrid(np.arange(width, dtype=np.float32), np.arange(height, dtype=np.float32))
     plane_depth = scene.floor.depth_at(us, vs, scene.focal, scene.cx, scene.cy)
@@ -122,14 +130,11 @@ def _occlusion_mask(scene: RoomScene, carpet_alpha: np.ndarray) -> np.ndarray:
     # Follow the real object edges: a guided/joint-bilateral step snaps the mask
     # to the photo's own boundaries instead of the depth map's softer ones.
     guide = cv2.cvtColor(np.array(scene.image), cv2.COLOR_RGB2GRAY)
-    visible = cv2.ximgproc.jointBilateralFilter(guide, visible, 9, 24, 9) if _has_ximgproc() else (
-        cv2.bilateralFilter(visible, 9, 0.15, 9)
-    )
-    return np.clip(visible, 0.0, 1.0) * carpet_alpha
-
-
-def _has_ximgproc() -> bool:
-    return hasattr(cv2, "ximgproc")
+    if hasattr(cv2, "ximgproc"):
+        visible = cv2.ximgproc.jointBilateralFilter(guide, visible, 9, 24, 9)
+    else:
+        visible = cv2.bilateralFilter(visible, 9, 0.15, 9)
+    return np.clip(visible, 0.0, 1.0)
 
 
 def _match_lighting(carpet: np.ndarray, room: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -181,7 +186,7 @@ def place_carpet(
     )
 
     warped = _match_lighting(warped, room, alpha)
-    visible = _occlusion_mask(scene, alpha)
+    visible = occlusion_mask(scene) * alpha
 
     # Contact shadow: a soft darkening just outside the carpet edge sells the
     # idea that it is resting on the floor rather than floating in the image.

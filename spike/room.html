@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>فرش در اتاق من — از روی عکس</title>
+  <script type="importmap">
+    { "imports": { "three": "./three.module.min.js" } }
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: system-ui, Tahoma, sans-serif; background: #0f1220; color: #f2f2f7;
+           min-height: 100dvh; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+    h1 { font-size: 1.05rem; }
+    p.lead { font-size: .84rem; color: #b9bed4; line-height: 1.9; }
+    .stage { position: relative; width: 100%; max-width: 900px; margin: 0 auto;
+             border-radius: 16px; overflow: hidden; background: #171b30; }
+    .stage img.photo { display: block; width: 100%; height: auto; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+                max-width: 900px; margin: 0 auto; width: 100%; }
+    button, select { padding: 11px 16px; border: 0; border-radius: 12px; font-size: .9rem;
+                     font-weight: bold; background: #2a3050; color: #f2f2f7; }
+    button.primary { background: #ffd166; color: #1a1a2e; }
+    .chip { padding: 10px 16px; border-radius: 999px; background: #171b30;
+            font-size: .86rem; line-height: 1.8; }
+    .chip b { color: #ffd166; }
+    label { font-size: .8rem; color: #b9bed4; display: flex; align-items: center; gap: 8px; }
+    input[type=range] { width: 150px; }
+    #status { font-size: .8rem; color: #9aa0bb; max-width: 900px; margin: 0 auto; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>🖼️ فرش در اتاق من — از روی عکس</h1>
+  <p class="lead">
+    عکس اتاق یک بار پردازش شده است. حالا فرش را با انگشت (یا موس) روی کف جابه‌جا کن،
+    با دو انگشت بچرخان، و سایز را عوض کن. فرش پشت پایه‌ی میز و صندلی می‌رود.
+  </p>
+
+  <div class="stage" id="stage">
+    <img class="photo" id="photo" alt="اتاق" />
+  </div>
+
+  <div class="controls">
+    <select id="room"></select>
+    <select id="size"></select>
+    <label>چرخش <input type="range" id="yaw" min="-180" max="180" value="0" /></label>
+    <label>روشنایی <input type="range" id="exposure" min="70" max="130" value="100" /></label>
+    <div class="chip" id="chip">…</div>
+  </div>
+  <div id="status"></div>
+
+  <script type="module">
+    import { RoomVisualizer } from './room-visualizer.js';
+
+    const ASSETS = './assets/rooms';
+    const ROOMS = ['color2', 'color1', 'room2', 'room1'];
+    const toman = (v) => new Intl.NumberFormat('fa-IR').format(v) + ' تومان';
+
+    const stage = document.getElementById('stage');
+    const photo = document.getElementById('photo');
+    const chip = document.getElementById('chip');
+    const status = document.getElementById('status');
+    const roomSelect = document.getElementById('room');
+    const sizeSelect = document.getElementById('size');
+    const yawInput = document.getElementById('yaw');
+    const exposureInput = document.getElementById('exposure');
+
+    const catalog = await fetch('./assets/variants.json').then((r) => r.json());
+    // The visualizer needs flat rectified textures, not the AR meshes.
+    const variants = catalog.variants.map((v) => ({
+      ...v,
+      texture: `textures/carpet-${v.widthCm}x${v.lengthCm}.jpg`,
+    }));
+
+    sizeSelect.innerHTML = variants
+      .map((v, i) => `<option value="${i}">${v.label} سانتی‌متر</option>`)
+      .join('');
+
+    let visualizer = null;
+
+    // Surface failures on the page: a silently rejected promise here would just
+    // leave the user staring at a photo with no carpet and no explanation.
+    window.addEventListener('unhandledrejection', (event) => {
+      status.textContent = 'خطا: ' + (event.reason?.message ?? event.reason);
+    });
+
+    async function loadRoom(name) {
+      status.textContent = 'در حال بارگذاری صحنه…';
+      const scene = await fetch(`${ASSETS}/${name}-scene.json`).then((r) => r.json());
+      photo.src = `${ASSETS}/${scene.photo}`;
+      // Not decode(): it never settles when the page is not compositing (a
+      // background tab, or a hidden panel), which hangs the whole load.
+      await new Promise((resolve, reject) => {
+        if (photo.complete && photo.naturalWidth) return resolve();
+        photo.onload = resolve;
+        photo.onerror = () => reject(new Error('عکس اتاق بارگذاری نشد'));
+      });
+
+      stage.querySelector('canvas')?.remove();
+      visualizer = new RoomVisualizer({
+        container: stage,
+        scene,
+        assetBase: ASSETS,
+        variants,
+        onState: (state) => {
+          const v = state.variant;
+          chip.innerHTML = `<b>${v.label} سانتی‌متر</b> · ${toman(v.price)}`;
+          status.textContent =
+            `اطمینان تشخیص کف: ${state.confidence} · ارتفاع دوربین: ${state.cameraHeightM} متر`;
+        },
+      });
+      await visualizer.start();
+      sizeSelect.value = String(visualizer.index);
+      yawInput.value = '0';
+    }
+
+    roomSelect.innerHTML = ROOMS.map(
+      (r, i) => `<option value="${r}">اتاق نمونه ${i + 1}</option>`
+    ).join('');
+    roomSelect.addEventListener('change', () => loadRoom(roomSelect.value));
+    sizeSelect.addEventListener('change', () => visualizer?.setVariant(Number(sizeSelect.value)));
+    yawInput.addEventListener('input', () =>
+      visualizer?.setYaw((Number(yawInput.value) * Math.PI) / 180)
+    );
+    exposureInput.addEventListener('input', () =>
+      visualizer?.setExposure(Number(exposureInput.value) / 100)
+    );
+
+    try {
+      await loadRoom(ROOMS[0]);
+    } catch (error) {
+      status.textContent = 'بارگذاری صحنه ناموفق بود: ' + (error?.message ?? error);
+      throw error;
+    }
+  </script>
+</body>
+</html>
