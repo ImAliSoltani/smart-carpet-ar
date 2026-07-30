@@ -20,11 +20,15 @@ from PIL import Image
 
 from app.room.depth import back_project, estimate_depth, intrinsics
 from app.room.floor import FloorPlane, fit_floor
-from app.room.segment import floor_mask
+from app.room.segment import floor_mask, refine_edges
 
 # Scene points closer than the floor by more than this are treated as objects
 # standing on it. Below the tolerance we are inside depth noise.
 OCCLUSION_MARGIN_M = 0.035
+# How closely depth must match the plane for a pixel to count as floor despite
+# what the segmenter said. Generous, because monocular depth is smooth but not
+# exact; the margin above still removes anything genuinely standing up.
+FLOOR_AGREEMENT_M = 0.06
 
 
 @dataclass
@@ -134,10 +138,22 @@ def occlusion_mask(scene: RoomScene) -> np.ndarray:
     height, width = scene.depth_m.shape
     us, vs = np.meshgrid(np.arange(width, dtype=np.float32), np.arange(height, dtype=np.float32))
     plane_depth = scene.floor.depth_at(us, vs, scene.focal, scene.cx, scene.cy)
-    clearly_in_front = (scene.depth_m < plane_depth - OCCLUSION_MARGIN_M) & np.isfinite(plane_depth)
+    valid = np.isfinite(plane_depth)
+
+    # Rescue shadowed floor. A segmenter often loses the floor inside a shadow
+    # and hands that region to the object casting it, which punches holes in the
+    # carpet exactly where a chair meets the ground. Depth does not care about
+    # shadows: where it agrees closely with the plane, the pixel is floor.
+    agrees = valid & (np.abs(scene.depth_m - plane_depth) < FLOOR_AGREEMENT_M)
+    visible = np.maximum(visible, agrees.astype(np.float32) * 0.95)
+
+    # Depth still has the final veto: anything clearly nearer than the plane is
+    # standing on it, even where the segmenter called it floor.
+    clearly_in_front = valid & (scene.depth_m < plane_depth - OCCLUSION_MARGIN_M)
     visible[clearly_in_front] = 0.0
 
-    return np.clip(visible, 0.0, 1.0)
+    # One more pass against the photo, so the rescued regions keep clean edges.
+    return refine_edges(np.clip(visible, 0.0, 1.0), scene.image)
 
 
 def _match_lighting(carpet: np.ndarray, room: np.ndarray, mask: np.ndarray) -> np.ndarray:
