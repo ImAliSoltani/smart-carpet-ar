@@ -11,13 +11,18 @@ Layout:
         another.png
 
 metadata.csv columns (all optional except filename):
-    filename, name, pattern, material, origin, description,
-    sizes  (e.g. "200x300:12000000; 250x350:18500000"), stock
+    filename, slug, name, pattern, material, origin, description,
+    sizes  (e.g. "200x300:12000000; 250x350:18500000"), stock,
+    suitable_rooms  (e.g. "living_room; bedroom")
 
 Rows without metadata get sensible defaults: name from the filename, pattern
 "medallion", material "wool", one 200x300 size with a placeholder price, and
 the carpet is created INACTIVE so obviously-unfinished entries never leak into
 the storefront until reviewed in the admin panel (pass --activate to override).
+
+The URL slug comes from the `slug` column when given. Otherwise it is derived
+from the file name rather than the display name, because a Persian name has no
+ASCII to slugify — deriving from it would give every carpet the same slug.
 
     uv run python scripts/ingest_folder.py path/to/folder [--activate]
 """
@@ -35,7 +40,7 @@ from sqlalchemy import select
 
 from app.db.session import SessionLocal
 from app.models import Carpet, CarpetImage, CarpetVariant
-from app.models.enums import CarpetMaterial, CarpetPattern
+from app.models.enums import CarpetMaterial, CarpetPattern, RoomType
 from app.services.embeddings import get_embedding_backend
 from app.services.images import InvalidImageError, process_upload
 from app.services.storage import Storage
@@ -48,6 +53,10 @@ def slugify(value: str) -> str:
     value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
     value = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
     return value or "carpet"
+
+
+def parse_rooms(raw: str) -> list[RoomType]:
+    return [RoomType(part.strip()) for part in raw.split(";") if part.strip()]
 
 
 def parse_sizes(raw: str) -> list[tuple[int, int, Decimal]]:
@@ -86,7 +95,7 @@ async def ingest(folder: Path, activate: bool) -> None:
         for path in images:
             row = metadata.get(path.name, {})
             name = (row.get("name") or path.stem.replace("_", " ").replace("-", " ")).strip()
-            slug = slugify(row.get("name") or path.stem)
+            slug = slugify(row.get("slug") or path.stem)
 
             existing = await session.execute(select(Carpet.id).where(Carpet.slug == slug))
             if existing.scalar_one_or_none() is not None:
@@ -108,7 +117,7 @@ async def ingest(folder: Path, activate: bool) -> None:
                 pattern=CarpetPattern(row.get("pattern") or "medallion"),
                 material=CarpetMaterial(row.get("material") or "wool"),
                 colors=image_set.dominant_colors,
-                suitable_rooms=[],
+                suitable_rooms=parse_rooms(row.get("suitable_rooms") or ""),
                 origin=(row.get("origin") or None),
                 is_active=activate,
             )
