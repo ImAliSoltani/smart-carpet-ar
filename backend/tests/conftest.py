@@ -4,6 +4,10 @@ Environment is pinned BEFORE any app import so every module (settings cache,
 engine) sees test values. Integration tests need a reachable Postgres with the
 pgvector extension — CI provides one as a service container; locally they skip
 automatically when no server is listening.
+
+The suite truncates the catalog between tests, so it must never be pointed at
+the database a developer is browsing: `DATABASE_URL` defaults here to a
+separate `farsh_test` database, and CI sets the variable explicitly.
 """
 
 import asyncio
@@ -12,6 +16,9 @@ import os
 import bcrypt
 
 os.environ.setdefault("TESTING", "true")  # NullPool — see app/db/session.py
+os.environ.setdefault(
+    "DATABASE_URL", "postgresql+asyncpg://farsh:farsh@localhost:5432/farsh_test"
+)
 os.environ.setdefault("SESSION_SECRET", "test-secret")
 os.environ.setdefault("ADMIN_USERNAME", "admin")
 os.environ.setdefault("STORAGE_DIR", "data/test-storage")

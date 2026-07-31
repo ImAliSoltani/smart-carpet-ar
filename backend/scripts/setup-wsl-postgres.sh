@@ -53,6 +53,11 @@ role_exists "$DB_USER" || su postgres -c \
 db_exists "$DB_NAME" || su postgres -c "createdb -O $DB_USER $DB_NAME"
 su postgres -c "psql -qd $DB_NAME -c 'CREATE EXTENSION IF NOT EXISTS vector'"
 
+# A second database for pytest. The suite truncates the catalog between tests,
+# so it must not share a database with the one being developed against.
+db_exists "${DB_NAME}_test" || su postgres -c "createdb -O $DB_USER ${DB_NAME}_test"
+su postgres -c "psql -qd ${DB_NAME}_test -c 'CREATE EXTENSION IF NOT EXISTS vector'"
+
 say "keeping it running across restarts"
 # A boot command rather than systemd: systemd never reached "running" on this
 # setup (systemctl reported the system as offline), while the boot command is
