@@ -432,26 +432,33 @@ def main() -> None:
         print(f"re-saved as JPEG: {name}")
 
     rows = [build_row(s) for s in CARPETS]
-
-    on_disk = {p.name for p in IMAGES.glob("*.jpg")}
-    listed = {r["filename"] for r in rows}
-    if on_disk != listed:
-        raise SystemExit(
-            f"metadata and images disagree: {sorted(on_disk ^ listed)}"
-        )
     if len({r["slug"] for r in rows}) != len(rows):
         raise SystemExit("duplicate slug")
 
+    on_disk = {p.name for p in IMAGES.glob("*.jpg")}
+    missing = sorted({r["filename"] for r in rows} - on_disk)
+    if missing:
+        raise SystemExit(f"photographs missing for: {missing}")
+
+    # The folder also holds carpets whose metadata was authored elsewhere, so
+    # rewrite only the rows this script owns and carry the rest through intact.
     out = IMAGES / "metadata.csv"
+    merged = {r["slug"]: r for r in rows}
+    if out.exists():
+        with open(out, encoding="utf-8-sig") as f:
+            for existing in csv.DictReader(f):
+                merged.setdefault(existing["slug"], existing)
+
+    final = sorted(merged.values(), key=lambda r: r["filename"])
     with open(out, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]))
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows(final)
 
     prices = [
-        int(part.split(":")[1]) for r in rows for part in r["sizes"].split("; ")
+        int(part.split(":")[1]) for r in final for part in r["sizes"].split("; ")
     ]
-    print(f"wrote {len(rows)} carpets -> {out}")
+    print(f"authored {len(rows)} carpets; catalogue now holds {len(final)} -> {out}")
     print(f"variants: {len(prices)}")
     print(f"price range: {min(prices):,} – {max(prices):,} تومان")
 
