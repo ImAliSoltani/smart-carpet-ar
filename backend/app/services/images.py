@@ -57,6 +57,11 @@ def _load(data: bytes) -> Image.Image:
         raise InvalidImageError(f"قالب تصویر پشتیبانی نمی‌شود: {image.format}")
     # honor camera rotation EXIF before any resizing
     image = ImageOps.exif_transpose(image)
+    # Keep transparency. Catalogue photographs are cut out from their backdrop so
+    # every carpet sits on the page's own background; flattening to RGB here
+    # would paint the discarded backdrop straight back in.
+    if image.mode in {"RGBA", "LA", "PA"} or "transparency" in image.info:
+        return image.convert("RGBA")
     return image.convert("RGB")
 
 
@@ -65,10 +70,30 @@ def extract_dominant_colors(image: Image.Image, count: int = 4) -> list[str]:
 
     Feeds the storefront color filter and the room-matching engine, so carpets
     get real colors even when the admin doesn't fill them in."""
-    small = image.convert("RGB").resize((150, 150))
+    small = image.resize((150, 150))
+    if small.mode == "RGBA":
+        # Only the carpet has a say: transparent padding would otherwise report
+        # the discarded backdrop as one of the carpet's colours.
+        opaque = [
+            rgb
+            for rgb, a in zip(
+                small.convert("RGB").getdata(),
+                small.getchannel("A").getdata(),
+                strict=True,
+            )
+            if a > 200
+        ]
+        if opaque:
+            small = Image.new("RGB", (len(opaque), 1))
+            small.putdata(opaque)
+        else:
+            small = image.convert("RGB").resize((150, 150))
+    else:
+        small = small.convert("RGB")
+
     quantized = small.quantize(colors=8, method=Image.Quantize.MEDIANCUT)
     palette = quantized.getpalette()
-    ranked = sorted(quantized.getcolors(150 * 150) or [], reverse=True)
+    ranked = sorted(quantized.getcolors(small.width * small.height) or [], reverse=True)
     colors = []
     for _, index in ranked[:count]:
         r, g, b = palette[index * 3 : index * 3 + 3]

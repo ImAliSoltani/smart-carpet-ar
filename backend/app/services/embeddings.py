@@ -34,13 +34,29 @@ def _normalize(vector: list[float]) -> list[float]:
     return [v / norm for v in vector]
 
 
+def _flatten(image: Image.Image) -> Image.Image:
+    """Drop transparency onto white before the model sees the image.
+
+    Catalogue photographs are cut out from their backdrop, and `convert("RGB")`
+    on its own keeps whatever colour hid behind the transparent pixels — the very
+    backdrop we removed. Compositing onto white gives every carpet the same
+    neutral surround, so the query image and the catalogue meet on equal terms.
+    """
+    if image.mode not in {"RGBA", "LA", "PA"} and "transparency" not in image.info:
+        return image.convert("RGB")
+    rgba = image.convert("RGBA")
+    canvas = Image.new("RGB", rgba.size, (255, 255, 255))
+    canvas.paste(rgba, mask=rgba.getchannel("A"))
+    return canvas
+
+
 class HashEmbeddingBackend:
     """Deterministic fake for tests/CI — see module docstring."""
 
     def embed_image(self, data: bytes) -> list[float]:
         # 32x32 grayscale sketch keeps "visually identical bytes" stable,
         # then a seeded hash expands it to the full dimensionality.
-        image = Image.open(BytesIO(data)).convert("L").resize((32, 32))
+        image = _flatten(Image.open(BytesIO(data))).convert("L").resize((32, 32))
         sketch = list(image.tobytes())
         vector: list[float] = []
         counter = 0
@@ -82,7 +98,7 @@ class DinoV2Backend:
 
     def embed_image(self, data: bytes) -> list[float]:
         self._ensure_loaded()
-        image = Image.open(BytesIO(data)).convert("RGB")
+        image = _flatten(Image.open(BytesIO(data)))
         tensor = self._transform(image).unsqueeze(0)
         with self._torch.inference_mode():
             features = self._model(tensor)

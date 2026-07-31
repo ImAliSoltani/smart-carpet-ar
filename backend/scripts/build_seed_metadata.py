@@ -134,16 +134,6 @@ CARPETS = [
         LIVING_BEDROOM,
     ),
     Seed(
-        "afshan-06", "afshan-kerman-firoozei", "hand_wool", "کرمان", "afshan", "فیروزه‌ای",
-        "زمینه‌ی سبزِ فیروزه‌ای با گل‌های ریز نارنجی و کرم، و حاشیه‌ی لاکی",
-        LIVING_DINING,
-    ),
-    Seed(
-        "afshan-07", "afshan-kerman-sabz", "hand_wool", "کرمان", "afshan", "سبز",
-        "زمینه‌ی سبز زمردی با شبکه‌ی منظم گل‌های طلایی و حاشیه‌ی گلبهی",
-        LIVING_DINING,
-    ),
-    Seed(
         "afshan-08", "afshan-esfahan-kerem", "hand_wool", "اصفهان", "afshan", "کرم",
         "زمینه‌ی کرم روشن با گل‌های ریز سرخ و حاشیه‌ی گلبهی، فضایی باز و روشن",
         LIVING_BEDROOM,
@@ -222,12 +212,6 @@ CARPETS = [
         "lachak_toranj", "سرمه‌ای",
         "ترنج گرد استخوانی روی زمینه‌ی سرمه‌ای متراکم، با حاشیه‌ی زرشکی",
         LIVING_DINING,
-    ),
-    Seed(
-        "lachak_toranj-06", "toranj-tabriz-lozi", "hand_wool", "تبریز",
-        "lachak_toranj", "آبی",
-        "ترنج لوزیِ مشکی با گل‌های روشن در مرکز، روی زمینه‌ی آبی کم‌رنگ",
-        LIVING_OFFICE,
     ),
     Seed(
         "lachak_toranj-07", "toranj-mashhad-laki", "hand_wool", "مشهد",
