@@ -84,6 +84,19 @@
     direction: ltr; text-align: left; white-space: pre;
   }
 
+  /* A returning visitor never builds the intro at all. The decision is taken
+     before the first paint, so nothing flashes on its way out. */
+  html.skip-intro body { overflow: auto; }
+  html.skip-intro .intro { display: none; }
+
+  .replay {
+    display: block; margin: 48px auto 0; width: max-content;
+    background: none; border: none; border-bottom: 1px solid #d6d3d1;
+    color: #78716c; font: inherit; font-size: 13px;
+    padding: 2px 0; cursor: pointer;
+  }
+  .replay:hover { color: #1c1917; border-color: #1c1917; }
+
   .shop { background: #faf9f7; color: #1c1917; padding: 72px 24px 140px; min-height: 100vh; }
   .shop h2 { font-size: 20px; font-weight: 400; margin-bottom: 30px; text-align: center; color: #57534e; }
   .grid { display: grid; gap: 22px; max-width: 1180px; margin: 0 auto;
@@ -93,6 +106,20 @@
   .card p { margin-top: 12px; font-size: 14px; }
   .card small { display: block; margin-top: 6px; color: #78716c; font-size: 13px; }
 </style>
+<script>
+// Runs before the body is parsed, so the class is on <html> in time for the
+// first paint. Doing this after load would show a frame of the intro and then
+// yank it away, which is worse than not skipping at all.
+(function () {
+  var HOURS = 24;
+  try {
+    var forced = /[?&]intro=1(?:&|$)/.test(location.search);
+    var seenAt = parseInt(localStorage.getItem('introSeenAt') || '0', 10);
+    var fresh = seenAt > 0 && (Date.now() - seenAt) < HOURS * 3600 * 1000;
+    if (!forced && fresh) document.documentElement.classList.add('skip-intro');
+  } catch (e) { /* private mode: just play it */ }
+})();
+</script>
 </head>
 <body>
 
@@ -118,13 +145,14 @@
 <section class="shop" id="shop">
   <h2>تازه‌ترین‌ها</h2>
   <div class="grid">
-    <div class="card"><img src="lachak_toranj-11.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۱۲۰٬۷۰۰٬۰۰۰ تومان</small></div>
-    <div class="card"><img src="lachak_toranj-16.png" alt=""><p>فرش ماشینی آران و بیدگل</p><small>۲۶٬۵۰۰٬۰۰۰ تومان</small></div>
-    <div class="card"><img src="afshan-14.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۷۷٬۲۰۰٬۰۰۰ تومان</small></div>
-    <div class="card"><img src="lachak_toranj-27.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۹۴٬۳۰۰٬۰۰۰ تومان</small></div>
-    <div class="card"><img src="lachak_toranj-19.png" alt=""><p>فرش ماشینی کاشان</p><small>۱۹٬۳۰۰٬۰۰۰ تومان</small></div>
-    <div class="card"><img src="afshan-12.png" alt=""><p>فرش دستباف تبریز</p><small>۶۳٬۸۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="lachak_toranj-11.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۱۲۰٬۷۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="lachak_toranj-16.png" alt=""><p>فرش ماشینی آران و بیدگل</p><small>۲۶٬۵۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="afshan-14.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۷۷٬۲۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="lachak_toranj-27.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۹۴٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="lachak_toranj-19.png" alt=""><p>فرش ماشینی کاشان</p><small>۱۹٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img data-src="afshan-12.png" alt=""><p>فرش دستباف تبریز</p><small>۶۳٬۸۰۰٬۰۰۰ تومان</small></div>
   </div>
+  <button class="replay" id="replay">دیدن دوباره‌ی ورودی</button>
 </section>
 
 <script>
@@ -140,7 +168,58 @@ let CHAPTERS = STOPS.length - 1;
 // one move at the same pace instead of one of them looking rushed.
 let MS_PER_FRAME = 42;
 const DUR_MIN = 500, DUR_MAX = 3200;
-const src = i => `frames/f-${String(i).padStart(3, '0')}.webp`;
+// Which frame set to fetch is decided once, from what the browser can decode
+// and what the screen can actually show. Sending 1920px frames to a 1080px-wide
+// phone is wasted bytes, not extra quality.
+let SET = 'webp-1280', EXT = '.webp';
+
+// In hybrid mode the five resting frames come from the full-quality set and
+// everything between them from a lighter one. The eye stops only at the resting
+// frames; the rest are on screen for a twentieth of a second while the camera
+// moves, which is where compression is invisible and bytes are worth saving.
+let MODE = 'full';            // 'full' | 'hybrid'
+let MOTION_SET = 'motion-1280';
+const isStop = i => STOPS.includes(i);
+
+function src(i) {
+  const pad = String(i).padStart(3, '0');
+  if (MODE === 'hybrid' && !isStop(i)) return `frames2/${MOTION_SET}/f-${pad}.avif`;
+  return `frames2/${SET}/f-${pad}${EXT}`;
+}
+
+const AVIF_PROBE = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADrbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAETAAAAIAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAABqaXBycAAAAEtpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGl4aQAAAAADCAgIAAAADGF2MUOBAAwAAAAAE2NvbHJuY2x4AAEADQAGgAAAABdpcG1hAAAAAAAAAAEAAQQBAoMEAAAAKG1kYXQSAAoIGAAGiAhoNCAyEh/3h4UV3///4s/AAJA1jjx+3A==';
+
+function supportsAvif() {
+  return new Promise(done => {
+    const probe = new Image();
+    probe.onload = () => done(probe.width === 1);
+    probe.onerror = () => done(false);
+    probe.src = AVIF_PROBE;
+  });
+}
+
+async function chooseSet() {
+  const params = new URLSearchParams(location.search);
+
+  // ?mode=hybrid to compare the two weight strategies on one machine.
+  if (params.get('mode') === 'hybrid') MODE = 'hybrid';
+  const needForMotion = innerWidth * (devicePixelRatio || 1);
+  MOTION_SET = needForMotion > 1400 ? 'motion-1280' : 'motion-960';
+
+  // ?set=webp-1280 forces a set, for comparing decode cost between formats and
+  // sizes on one machine. Without it the choice is automatic.
+  const forced = params.get('set');
+  if (forced && /^(avif|webp)-(1280|1920)$/.test(forced)) {
+    SET = forced;
+    EXT = forced.startsWith('avif') ? '.avif' : '.webp';
+    return;
+  }
+  const avif = await supportsAvif();
+  const needed = innerWidth * (devicePixelRatio || 1);
+  const width = needed > 1400 ? 1920 : 1280;
+  SET = `${avif ? 'avif' : 'webp'}-${width}`;
+  EXT = avif ? '.avif' : '.webp';
+}
 
 const canvas = document.getElementById('stage');
 const ctx    = canvas.getContext('2d', { alpha: false });
@@ -155,29 +234,171 @@ let loaded = 0;
 
 for (let i = 0; i < CHAPTERS; i++) dots.appendChild(document.createElement('i'));
 
+// Decoding happens off the main thread. An <img> hands the browser a compressed
+// file and the decode lands on whichever thread is free — with AVIF that is
+// expensive enough to stall the very animation it is feeding. createImageBitmap
+// does the work elsewhere and returns something the canvas can draw immediately.
+const inFlight = new Map();
+
 function load(i) {
-  return new Promise(res => {
-    if (images[i]) return res();
-    const img = new Image();
-    img.decoding = 'async';
-    img.onload = () => { images[i] = img; ready[i] = true; loaded++; res(); };
-    img.onerror = res;
-    img.src = src(i);
-  });
+  if (ready[i]) return Promise.resolve();
+  if (inFlight.has(i)) return inFlight.get(i);
+
+  const job = (async () => {
+    try {
+      const response = await fetch(src(i));
+      if (!response.ok) return;
+      const bitmap = await createImageBitmap(await response.blob());
+      images[i] = bitmap;
+      ready[i] = true;
+      loaded++;
+    } catch (e) {
+      /* a missing frame is survivable: nearest() covers the gap */
+    } finally {
+      inFlight.delete(i);
+    }
+  })();
+
+  inFlight.set(i, job);
+  return job;
 }
 
-async function preload() {
-  const coarse = [];
-  for (let i = 0; i < FRAMES; i += 6) coarse.push(i);
-  if (!coarse.includes(FRAMES - 1)) coarse.push(FRAMES - 1);
-  await Promise.all(coarse.map(load));
-  fit();
-  const rest = [];
-  for (let i = 0; i < FRAMES; i++) if (!ready[i]) rest.push(i);
-  for (let i = 0; i < rest.length; i += 8) {
-    await Promise.all(rest.slice(i, i + 8).map(load));
-    draw();
+// Downloading is ordered by what the visitor needs next, not by chapter.
+// The order is: the opening picture, then enough of chapter one to play it,
+// then chapter two's skeleton, and only then the gaps get filled in. Fetching a
+// whole chapter up front just re-orders the same wait.
+const COARSE_STEP = 4;
+
+// A decoded 1920x1080 frame is ~8 MB of memory. Holding all 137 of them is over
+// a gigabyte, which shows up as stutter long before it shows up as a crash, so
+// only the frames near the playhead are kept decoded.
+const KEEP_RADIUS = 22;
+
+function evict() {
+  for (let i = 0; i < FRAMES; i++) {
+    if (!ready[i] || Math.abs(i - current) <= KEEP_RADIUS) continue;
+    if (images[i] && typeof images[i].close === 'function') images[i].close();
+    images[i] = null;
+    ready[i] = false;
+    loaded--;
   }
+}
+
+function chapterRange(i) {
+  const from = STOPS[Math.max(0, Math.min(CHAPTERS, i))];
+  const to = STOPS[Math.max(0, Math.min(CHAPTERS, i + 1))];
+  return [Math.min(from, to), Math.max(from, to)];
+}
+
+async function loadCoarse(i) {
+  if (i < 0 || i >= CHAPTERS) return;
+  const [from, to] = chapterRange(i);
+  const picks = [];
+  for (let f = from; f <= to; f += COARSE_STEP) picks.push(f);
+  if (picks[picks.length - 1] !== to) picks.push(to);
+
+  for (let n = 0; n < picks.length; n++) {
+    await load(picks[n]);
+    draw();
+    if (i === 0 && !armed) {
+      cue.textContent = `در حال آماده‌سازی — ${Math.round((n + 1) / picks.length * 100)}٪`;
+    }
+  }
+}
+
+// Nothing may start until the opening chapter can actually be played through.
+// Letting the visitor scroll into an empty sequence is what made it stutter:
+// the fewer frames had arrived, the worse it looked.
+function arm() {
+  armed = true;
+  cue.textContent = 'اسکرول کن';
+  cue.style.opacity = 1;
+  if (pendingGesture) {
+    const dir = pendingGesture;
+    pendingGesture = 0;
+    gesture(dir);
+  }
+}
+
+async function loadFill(i) {
+  if (i < 0 || i >= CHAPTERS) return;
+  const [from, to] = chapterRange(i);
+  for (let f = from; f <= to; f++) {
+    if (ready[f]) continue;
+    await load(f);
+    if (!playing) draw();   // never repaint underneath a running chapter
+  }
+}
+
+// Called when the visitor moves into a chapter: make sure the one being played
+// is complete, give the next one a skeleton, and leave the rest alone.
+function prioritise(chapterIndex) {
+  evict();
+  loadCoarse(chapterIndex)
+    .then(() => loadCoarse(chapterIndex + 1))
+    .then(() => loadFill(chapterIndex))
+    .then(() => loadFill(chapterIndex + 1));
+}
+
+// A four-chapter sequence cannot stream in real time on a slow link: each
+// chapter's skeleton is a few hundred kilobytes and a visitor scrolls faster
+// than that arrives. Rather than show them a broken film, the sequence is
+// abandoned and the closing frame is shown as a still.
+const READY_BUDGET_MS = 5000;
+
+function goStatic(why) {
+  if (staticMode || document.body.classList.contains('done')) return;
+  staticMode = true;
+  armed = true;
+  cue.textContent = 'برای ورود به فروشگاه اسکرول کن';
+  cue.style.opacity = 1;
+  title.style.opacity = 1;
+  [...dots.children].forEach(d => d.classList.add('on'));
+  staticReason = why;
+
+  // The closing frame is the one worth showing: the finished carpet under light.
+  load(FRAMES - 1).then(() => { current = FRAMES - 1; draw(); });
+  if (pendingGesture) { pendingGesture = 0; finish(); }
+}
+
+function linkLooksSlow() {
+  const c = navigator.connection;
+  if (!c) return false;                       // Firefox has no such API — we measure instead
+  if (c.saveData) return true;
+  return ['slow-2g', '2g', '3g'].includes(c.effectiveType);
+}
+
+async function boot() {
+  await chooseSet();
+
+  const forced = new URLSearchParams(location.search).get('force');
+  if (forced !== 'play' && (forced === 'static' || linkLooksSlow())) {
+    fit();
+    return goStatic(forced === 'static' ? 'forced' : 'connection api');
+  }
+
+  cue.textContent = 'در حال آماده‌سازی';
+  await load(0);          // one picture is all the first paint needs
+  fit();
+
+  // Measured, not guessed: if the opening chapter cannot be assembled inside the
+  // budget, this visitor is not going to enjoy the sequence.
+  const budget = new Promise(r => setTimeout(() => r('timeout'), READY_BUDGET_MS));
+  const outcome = await Promise.race([loadCoarse(0).then(() => 'ready'), budget]);
+  if (outcome === 'timeout') return goStatic('too slow to assemble');
+
+  arm();
+  loadFill(0);            // smooth it out while they watch
+}
+
+// What has actually come down the wire for the sequence so far, taken from the
+// browser's own resource timings rather than guessed from frame counts.
+function bytesish() {
+  try {
+    return performance.getEntriesByType('resource')
+      .filter(e => e.name.includes('/frames2/'))
+      .reduce((sum, e) => sum + (e.transferSize || e.encodedBodySize || 0), 0);
+  } catch (e) { return 0; }
 }
 
 function nearest(i) {
@@ -212,6 +433,11 @@ function paint(img, alpha) {
 let current = 0;         // frame on screen
 let chapter = 0;         // chapters already played (0 .. CHAPTERS)
 let playing = false;
+let staticMode = false;          // the link is too slow: show a still, not a film
+let staticReason = '';
+let armed = false;               // the opening chapter is loaded enough to play
+let pendingGesture = 0;          // a scroll that arrived before it was
+let bytesAtFirstScroll = null;   // what the visitor waited for before acting
 let rate = 1;            // playback speed multiplier, raised by scrolling mid-chapter
 let queued = 0;          // scrolls that arrived mid-chapter, to run once it lands
 
@@ -226,7 +452,13 @@ function draw() {
   hud.textContent =
     `chapter   ${chapter} / ${CHAPTERS}\n` +
     `frame     ${current.toFixed(1)} / ${FRAMES - 1}\n` +
-    `loaded    ${loaded} / ${FRAMES}\n` +
+    `mode      ${staticMode ? 'STATIC — ' + staticReason : MODE}` +
+    `${!staticMode && MODE === 'hybrid' ? '  (' + MOTION_SET + ' + stops full)' : ''}\n` +
+    `set       ${SET}\n` +
+    `loaded    ${loaded} / ${FRAMES}   (${(bytesish() / 1024).toFixed(0)} KB so far)\n` +
+    `at 1st scroll  ${bytesAtFirstScroll === null
+      ? '— not scrolled yet'
+      : (bytesAtFirstScroll / 1024).toFixed(0) + ' KB'}\n` +
     `stops     ${STOPS.join(' ')}\n` +
     `speed     ${MS_PER_FRAME}ms/frame  x${rate.toFixed(1)}\n` +
     `queued    ${queued}`;
@@ -278,10 +510,27 @@ function advance(dir) {
   if (next === chapter) { queued = 0; return; }
   chapter = next;
   [...dots.children].forEach((d, i) => d.classList.toggle('on', i < chapter));
+
+  // The segment about to be traversed; prioritise() handles the one after it.
+  prioritise(Math.min(chapter, CHAPTERS) - (dir > 0 ? 1 : 0));
+
   play(chapter);
 }
 
+// The shop's photographs are held back until the intro is done with the
+// connection. Left as plain src they are fetched immediately — and being far
+// heavier than the frames, they starve the very sequence covering them.
+function loadShopImages() {
+  document.querySelectorAll('.card img[data-src]').forEach(img => {
+    img.src = img.dataset.src;
+    img.removeAttribute('data-src');
+  });
+}
+
 function finish() {
+  loadShopImages();
+  // Watched through or deliberately skipped — either way it has been seen.
+  try { localStorage.setItem('introSeenAt', String(Date.now())); } catch (e) {}
   document.body.classList.add('done');
   removeEventListener('wheel', onWheel);
   removeEventListener('keydown', onKey);
@@ -291,6 +540,10 @@ function finish() {
 }
 
 function gesture(dir) {
+  if (staticMode) return finish();                // nothing to play; let them in
+  if (!armed) { pendingGesture = dir; return; }   // held, not dropped
+  // The number that matters: what the visitor waited for before they could act.
+  if (bytesAtFirstScroll === null) bytesAtFirstScroll = bytesish();
   if (!playing) return advance(dir);
   // Mid-chapter: keep the intent and hurry the film along instead of dropping it.
   queued = Math.max(-2, Math.min(2, queued + dir));
@@ -338,16 +591,35 @@ function onKey(e) {
   if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); gesture(-1); }
 }
 
-addEventListener('wheel', onWheel, { passive: false });
-addEventListener('touchstart', onTouchStart, { passive: true });
-addEventListener('touchmove', onTouchMove, { passive: false });
-addEventListener('touchend', onTouchEnd, { passive: true });
-addEventListener('keydown', onKey);
-addEventListener('resize', fit);
-document.getElementById('skip').addEventListener('click', finish);
+document.getElementById('replay').addEventListener('click', () => {
+  try { localStorage.removeItem('introSeenAt'); } catch (e) {}
+  location.href = location.pathname + '?intro=1';
+});
 
-fit();
-preload();
+const skipping = document.documentElement.classList.contains('skip-intro');
+
+if (skipping) {
+  // Nothing is loaded, locked or listened to: for a returning visitor this page
+  // is simply the shop.
+  loadShopImages();
+  let seenAt = 0;
+  try { seenAt = parseInt(localStorage.getItem('introSeenAt') || '0', 10); } catch (e) {}
+  const mins = Math.round((Date.now() - seenAt) / 60000);
+  hud.textContent =
+    `intro     skipped\n` +
+    `seen      ${mins} min ago (valid 24h)\n` +
+    `force it  add ?intro=1 to the URL`;
+} else {
+  addEventListener('wheel', onWheel, { passive: false });
+  addEventListener('touchstart', onTouchStart, { passive: true });
+  addEventListener('touchmove', onTouchMove, { passive: false });
+  addEventListener('touchend', onTouchEnd, { passive: true });
+  addEventListener('keydown', onKey);
+  addEventListener('resize', fit);
+  document.getElementById('skip').addEventListener('click', finish);
+
+  boot();
+}
 </script>
 </body>
 </html>
