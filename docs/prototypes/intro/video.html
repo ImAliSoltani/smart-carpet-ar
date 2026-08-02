@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ویدیوی خودپخش — نمونه‌ی مقایسه</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #07060a; color: #faf9f7; font-family: Tahoma, "Segoe UI", sans-serif; }
+
+  .film { position: relative; height: 100vh; overflow: hidden; background: #07060a; }
+  .film video { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 44%, rgba(0,0,0,.5) 100%);
+  }
+  .title {
+    position: absolute; inset: auto 0 15vh 0; text-align: center;
+    opacity: 0; transition: opacity .9s ease; pointer-events: none;
+  }
+  .title b { display: block; font-weight: 400; font-size: clamp(30px, 5.4vw, 62px);
+             letter-spacing: .2em; text-shadow: 0 2px 30px rgba(0,0,0,.85); }
+  .title span { display: block; margin-top: 16px; font-size: 15px; color: #d8c9ae;
+                letter-spacing: .06em; text-shadow: 0 2px 20px rgba(0,0,0,.9); }
+
+  .bar {
+    position: absolute; inset: auto 0 0 0; height: 2px;
+    background: rgba(255,205,130,.9); width: 0;
+  }
+
+  .nav { position: fixed; top: 18px; left: 0; right: 0; z-index: 6;
+         display: flex; gap: 8px; justify-content: center; }
+  .nav a, .nav span {
+    background: rgba(0,0,0,.45); border: 1px solid rgba(250,249,247,.3);
+    color: #faf9f7; font: inherit; font-size: 12px; text-decoration: none;
+    padding: 7px 14px; border-radius: 999px;
+  }
+  .nav .on { background: rgba(255,205,130,.92); color: #23180a; border-color: transparent; }
+
+  .hud {
+    position: fixed; bottom: 14px; left: 14px; z-index: 6;
+    background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px; padding: 7px 11px; font: 12px/1.6 monospace;
+    color: #f5f0e8; direction: ltr; text-align: left; white-space: pre;
+  }
+
+  .shop { background: #faf9f7; color: #1c1917; padding: 72px 24px 140px; }
+  .shop h2 { font-size: 20px; font-weight: 400; margin-bottom: 30px; text-align: center; color: #57534e; }
+  .grid { display: grid; gap: 22px; max-width: 1180px; margin: 0 auto;
+          grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
+  .card img { width: 100%; height: 230px; object-fit: contain; display: block; }
+  .card p { margin-top: 12px; font-size: 14px; }
+  .card small { display: block; margin-top: 6px; color: #78716c; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html">فصل‌بندی‌شده</a>
+  <a href="scrub.html">اسکرول پیوسته</a>
+  <a href="snap.html">پیوسته + چسبیدن</a>
+  <span class="on">ویدیوی خودپخش</span>
+</nav>
+<div class="hud" id="hud">loading…</div>
+
+<div class="film">
+  <video id="film" src="film.mp4" muted playsinline preload="auto" autoplay></video>
+  <div class="vignette"></div>
+  <div class="title" id="title">
+    <b>نام برند</b>
+    <span>فرش را پیش از خرید، در خانه‌ی خودت ببین</span>
+  </div>
+  <div class="bar" id="bar"></div>
+</div>
+
+<section class="shop">
+  <h2>تازه‌ترین‌ها</h2>
+  <div class="grid">
+    <div class="card"><img src="lachak_toranj-11.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۱۲۰٬۷۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-16.png" alt=""><p>فرش ماشینی آران و بیدگل</p><small>۲۶٬۵۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="afshan-14.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۷۷٬۲۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-27.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۹۴٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-19.png" alt=""><p>فرش ماشینی کاشان</p><small>۱۹٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="afshan-12.png" alt=""><p>فرش دستباف تبریز</p><small>۶۳٬۸۰۰٬۰۰۰ تومان</small></div>
+  </div>
+</section>
+
+<script>
+// This is the whole implementation. That is the point of this variant: the
+// browser plays the film, the visitor watches, and the page below waits.
+const film  = document.getElementById('film');
+const bar   = document.getElementById('bar');
+const title = document.getElementById('title');
+const hud   = document.getElementById('hud');
+const t0 = performance.now();
+let firstFrameAt = null;
+
+film.addEventListener('loadeddata', () => { firstFrameAt = performance.now() - t0; });
+
+film.addEventListener('timeupdate', () => {
+  const p = film.duration ? film.currentTime / film.duration : 0;
+  bar.style.width = (p * 100).toFixed(2) + '%';
+  title.style.opacity = p > 0.94 ? 1 : 0;
+  hud.textContent =
+    `mode      autoplay video\n` +
+    `time      ${film.currentTime.toFixed(1)}s / ${(film.duration || 0).toFixed(1)}s\n` +
+    `buffered  ${film.buffered.length ? (film.buffered.end(0)).toFixed(1) : 0}s\n` +
+    `first frame after ${firstFrameAt ? Math.round(firstFrameAt) : '…'} ms\n` +
+    `file      21.8 MB`;
+});
+
+film.play().catch(() => {
+  hud.textContent = 'autoplay blocked by the browser — tap the video to start';
+  film.controls = true;
+});
+</script>
+</body>
+</html>

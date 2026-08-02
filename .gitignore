@@ -19,6 +19,8 @@ npm-debug.log*
 
 # --- heavy data: stays OUT of git (object storage instead) ---
 data/
+assets/
+docs/prototypes/**/frames/
 *.glb
 *.usdz
 models/weights/

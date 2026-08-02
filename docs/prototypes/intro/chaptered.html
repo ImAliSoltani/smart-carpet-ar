@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ورودی سینمایی — نمونه</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #07060a; color: #faf9f7;
+    font-family: Tahoma, "Segoe UI", sans-serif;
+    overflow: hidden;           /* the page is held until the intro finishes */
+  }
+  body.done { overflow: auto; }
+
+  .intro {
+    position: fixed; inset: 0; z-index: 3;
+    background: #07060a;
+    transition: opacity .7s ease;
+  }
+  body.done .intro { opacity: 0; pointer-events: none; }
+
+  canvas { display: block; width: 100%; height: 100%; }
+
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 44%, rgba(0,0,0,.5) 100%);
+  }
+
+  .title {
+    position: absolute; inset: auto 0 15vh 0; text-align: center;
+    opacity: 0; transition: opacity .8s ease; pointer-events: none;
+  }
+  .title b {
+    display: block; font-weight: 400;
+    font-size: clamp(30px, 5.4vw, 62px); letter-spacing: .2em;
+    text-shadow: 0 2px 30px rgba(0,0,0,.85);
+  }
+  .title span {
+    display: block; margin-top: 16px; font-size: 15px;
+    color: #d8c9ae; letter-spacing: .06em; text-shadow: 0 2px 20px rgba(0,0,0,.9);
+  }
+
+  /* one dot per chapter, so it is obvious there is more to come */
+  .dots {
+    position: absolute; inset: auto 0 34px 0;
+    display: flex; gap: 10px; justify-content: center; align-items: center;
+  }
+  .dots i {
+    width: 22px; height: 2px; border-radius: 2px;
+    background: rgba(250,249,247,.22); transition: background .5s ease;
+  }
+  .dots i.on { background: rgba(255,205,130,.95); }
+
+  .cue {
+    position: absolute; inset: auto 0 58px 0; text-align: center;
+    font-size: 12px; letter-spacing: .18em; color: rgba(250,249,247,.55);
+    transition: opacity .4s ease;
+  }
+
+  .skip {
+    position: absolute; top: 20px; left: 20px; z-index: 4;
+    background: rgba(0,0,0,.3); border: 1px solid rgba(250,249,247,.3);
+    color: #faf9f7; font: inherit; font-size: 13px;
+    padding: 8px 16px; border-radius: 999px; cursor: pointer;
+  }
+  .skip:hover { border-color: rgba(250,249,247,.85); }
+
+  .nav { position: absolute; top: 18px; left: 0; right: 0; z-index: 5;
+         display: flex; gap: 8px; justify-content: center; }
+  .nav a, .nav span {
+    background: rgba(0,0,0,.45); border: 1px solid rgba(250,249,247,.3);
+    color: #faf9f7; font: inherit; font-size: 12px; text-decoration: none;
+    padding: 7px 14px; border-radius: 999px;
+  }
+  .nav .on { background: rgba(255,205,130,.92); color: #23180a; border-color: transparent; }
+
+  .hud {
+    position: absolute; bottom: 14px; left: 14px; z-index: 4;
+    background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px; padding: 7px 11px;
+    font: 12px/1.6 monospace; color: #f5f0e8;
+    direction: ltr; text-align: left; white-space: pre;
+  }
+
+  .shop { background: #faf9f7; color: #1c1917; padding: 72px 24px 140px; min-height: 100vh; }
+  .shop h2 { font-size: 20px; font-weight: 400; margin-bottom: 30px; text-align: center; color: #57534e; }
+  .grid { display: grid; gap: 22px; max-width: 1180px; margin: 0 auto;
+          grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
+  .card img { width: 100%; height: 230px; object-fit: contain; display: block; }
+  .card p { margin-top: 12px; font-size: 14px; }
+  .card small { display: block; margin-top: 6px; color: #78716c; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro">
+  <canvas id="stage"></canvas>
+  <div class="vignette"></div>
+  <div class="title" id="title">
+    <b>نام برند</b>
+    <span>فرش را پیش از خرید، در خانه‌ی خودت ببین</span>
+  </div>
+  <div class="cue" id="cue">اسکرول کن</div>
+  <div class="dots" id="dots"></div>
+  <button class="skip" id="skip">رد شدن</button>
+  <nav class="nav">
+    <span class="on">فصل‌بندی‌شده</span>
+    <a href="scrub.html">اسکرول پیوسته</a>
+    <a href="snap.html">پیوسته + چسبیدن</a>
+    <a href="video.html">ویدیوی خودپخش</a>
+  </nav>
+  <div class="hud" id="hud">loading…</div>
+</div>
+
+<section class="shop" id="shop">
+  <h2>تازه‌ترین‌ها</h2>
+  <div class="grid">
+    <div class="card"><img src="lachak_toranj-11.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۱۲۰٬۷۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-16.png" alt=""><p>فرش ماشینی آران و بیدگل</p><small>۲۶٬۵۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="afshan-14.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۷۷٬۲۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-27.png" alt=""><p>فرش دستباف ابریشم قم</p><small>۹۴٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="lachak_toranj-19.png" alt=""><p>فرش ماشینی کاشان</p><small>۱۹٬۳۰۰٬۰۰۰ تومان</small></div>
+    <div class="card"><img src="afshan-12.png" alt=""><p>فرش دستباف تبریز</p><small>۶۳٬۸۰۰٬۰۰۰ تومان</small></div>
+  </div>
+</section>
+
+<script>
+const FRAMES = 137;
+
+// Where the film is allowed to rest. These are the five supplied stills, found
+// in the footage at 0.0s, 5.1s, 10.0s, 14.1s and 18.2s and converted to indices
+// in this frame set. Resting anywhere else lands on a half-composed shot.
+let STOPS = [0, 38, 75, 105, 136];
+let CHAPTERS = STOPS.length - 1;
+
+// Playback speed rather than a fixed duration, so a long chapter and a short
+// one move at the same pace instead of one of them looking rushed.
+let MS_PER_FRAME = 42;
+const DUR_MIN = 500, DUR_MAX = 3200;
+const src = i => `frames/f-${String(i).padStart(3, '0')}.webp`;
+
+const canvas = document.getElementById('stage');
+const ctx    = canvas.getContext('2d', { alpha: false });
+const title  = document.getElementById('title');
+const cue    = document.getElementById('cue');
+const dots   = document.getElementById('dots');
+const hud    = document.getElementById('hud');
+
+const images = new Array(FRAMES);
+const ready  = new Array(FRAMES).fill(false);
+let loaded = 0;
+
+for (let i = 0; i < CHAPTERS; i++) dots.appendChild(document.createElement('i'));
+
+function load(i) {
+  return new Promise(res => {
+    if (images[i]) return res();
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => { images[i] = img; ready[i] = true; loaded++; res(); };
+    img.onerror = res;
+    img.src = src(i);
+  });
+}
+
+async function preload() {
+  const coarse = [];
+  for (let i = 0; i < FRAMES; i += 6) coarse.push(i);
+  if (!coarse.includes(FRAMES - 1)) coarse.push(FRAMES - 1);
+  await Promise.all(coarse.map(load));
+  fit();
+  const rest = [];
+  for (let i = 0; i < FRAMES; i++) if (!ready[i]) rest.push(i);
+  for (let i = 0; i < rest.length; i += 8) {
+    await Promise.all(rest.slice(i, i + 8).map(load));
+    draw();
+  }
+}
+
+function nearest(i) {
+  i = Math.max(0, Math.min(FRAMES - 1, i));
+  if (ready[i]) return images[i];
+  for (let d = 1; d < FRAMES; d++) {
+    if (ready[i - d]) return images[i - d];
+    if (ready[i + d]) return images[i + d];
+  }
+  return null;
+}
+
+function fit() {
+  const first = images.find(Boolean);
+  const sourceW = first ? first.width : 1920;
+  const dpr = Math.min(devicePixelRatio || 1, Math.max(1, sourceW / innerWidth));
+  canvas.width = Math.round(innerWidth * dpr);
+  canvas.height = Math.round(innerHeight * dpr);
+  draw();
+}
+
+function paint(img, alpha) {
+  if (!img) return;
+  const cw = canvas.width, ch = canvas.height;
+  const scale = Math.min(cw / img.width, ch / img.height);
+  const w = img.width * scale, h = img.height * scale;
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+  ctx.globalAlpha = 1;
+}
+
+let current = 0;         // frame on screen
+let chapter = 0;         // chapters already played (0 .. CHAPTERS)
+let playing = false;
+let rate = 1;            // playback speed multiplier, raised by scrolling mid-chapter
+let queued = 0;          // scrolls that arrived mid-chapter, to run once it lands
+
+function draw() {
+  ctx.fillStyle = '#07060a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const base = Math.floor(current);
+  const frac = current - base;
+  paint(nearest(base), 1);
+  if (frac > 0.02) paint(nearest(base + 1), frac);
+
+  hud.textContent =
+    `chapter   ${chapter} / ${CHAPTERS}\n` +
+    `frame     ${current.toFixed(1)} / ${FRAMES - 1}\n` +
+    `loaded    ${loaded} / ${FRAMES}\n` +
+    `stops     ${STOPS.join(' ')}\n` +
+    `speed     ${MS_PER_FRAME}ms/frame  x${rate.toFixed(1)}\n` +
+    `queued    ${queued}`;
+}
+
+const chapterFrame = c => STOPS[Math.max(0, Math.min(STOPS.length - 1, c))];
+const easeInOut = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+
+function play(to) {
+  const from = current;
+  const goal = chapterFrame(to);
+  const DUR = Math.max(DUR_MIN, Math.min(DUR_MAX, Math.abs(goal - from) * MS_PER_FRAME));
+  let elapsed = 0;
+  let last = performance.now();
+  rate = 1;
+  playing = true;
+  cue.style.opacity = 0;
+
+  (function step(t) {
+    // A scroll during playback raises `rate` instead of being dropped, so the
+    // film hurries to the next resting point and the scroll still counts.
+    elapsed += (t - last) * rate;
+    last = t;
+    const k = Math.min(1, elapsed / DUR);
+    current = from + (goal - from) * easeInOut(k);
+    draw();
+    if (k < 1) return requestAnimationFrame(step);
+
+    current = goal;
+    playing = false;
+    rate = 1;
+    draw();
+
+    if (queued !== 0) {              // a scroll arrived mid-chapter: honour it now
+      const dir = Math.sign(queued);
+      queued -= dir;
+      return advance(dir);
+    }
+
+    cue.textContent = to >= CHAPTERS ? 'برای ورود به فروشگاه اسکرول کن' : 'اسکرول کن';
+    cue.style.opacity = 1;
+    title.style.opacity = to >= CHAPTERS ? 1 : 0;
+  })(last);
+}
+
+function advance(dir) {
+  if (dir > 0 && chapter >= CHAPTERS) return finish();
+  const next = Math.max(0, Math.min(CHAPTERS, chapter + dir));
+  if (next === chapter) { queued = 0; return; }
+  chapter = next;
+  [...dots.children].forEach((d, i) => d.classList.toggle('on', i < chapter));
+  play(chapter);
+}
+
+function finish() {
+  document.body.classList.add('done');
+  removeEventListener('wheel', onWheel);
+  removeEventListener('keydown', onKey);
+  removeEventListener('touchstart', onTouchStart);
+  removeEventListener('touchend', onTouchEnd);
+  scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function gesture(dir) {
+  if (!playing) return advance(dir);
+  // Mid-chapter: keep the intent and hurry the film along instead of dropping it.
+  queued = Math.max(-2, Math.min(2, queued + dir));
+  rate = Math.min(rate * 2.2, 7);
+}
+
+// One flick of a wheel or trackpad should be one gesture. Trackpads emit a
+// stream of small deltas, so they are accumulated to a threshold and then the
+// rest of that same flick is ignored until the stream goes quiet.
+const WHEEL_THRESHOLD = 90;
+const FLICK_GAP = 220;
+let wheelAccum = 0, lastWheelAt = 0, flickSpent = false;
+
+function onWheel(e) {
+  if (document.body.classList.contains('done')) return;
+  e.preventDefault();
+
+  const now = performance.now();
+  if (now - lastWheelAt > FLICK_GAP) { wheelAccum = 0; flickSpent = false; }
+  lastWheelAt = now;
+  if (flickSpent) return;
+
+  wheelAccum += e.deltaY;
+  if (Math.abs(wheelAccum) < WHEEL_THRESHOLD) return;
+  const dir = Math.sign(wheelAccum);
+  wheelAccum = 0;
+  flickSpent = true;
+  gesture(dir);
+}
+
+let touchY = 0;
+const onTouchStart = e => { touchY = e.touches[0].clientY; };
+function onTouchEnd(e) {
+  if (document.body.classList.contains('done')) return;
+  const dy = touchY - (e.changedTouches[0] ? e.changedTouches[0].clientY : touchY);
+  if (Math.abs(dy) > 35) gesture(dy > 0 ? 1 : -1);
+}
+function onTouchMove(e) {
+  if (!document.body.classList.contains('done')) e.preventDefault();
+}
+
+function onKey(e) {
+  if (document.body.classList.contains('done')) return;
+  if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); gesture(1); }
+  if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); gesture(-1); }
+}
+
+addEventListener('wheel', onWheel, { passive: false });
+addEventListener('touchstart', onTouchStart, { passive: true });
+addEventListener('touchmove', onTouchMove, { passive: false });
+addEventListener('touchend', onTouchEnd, { passive: true });
+addEventListener('keydown', onKey);
+addEventListener('resize', fit);
+document.getElementById('skip').addEventListener('click', finish);
+
+fit();
+preload();
+</script>
+</body>
+</html>
