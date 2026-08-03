@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Vazirmatn, Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 // Persian carries every word of the interface, so it is the one face that is
 // never allowed to fall back.
@@ -51,7 +52,9 @@ export default function RootLayout({
           href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
