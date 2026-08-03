@@ -36,6 +36,11 @@ jobs:
         run: uv sync
       - name: Lint
         run: uv run ruff check .
+      # The frontend's types are generated from the committed openapi.json, so a
+      # route or schema change that skipped the export has to fail here — not in
+      # the browser, weeks later.
+      - name: API contract is current
+        run: uv run python scripts/check_openapi.py
       - name: Migrations
         run: uv run alembic upgrade head
       - name: Tests
