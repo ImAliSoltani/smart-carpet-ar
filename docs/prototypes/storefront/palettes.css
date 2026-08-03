@@ -1,0 +1,101 @@
+/* Palette candidates for the gallery direction.
+   Every colour in d-gallery.css is a variable, so a palette is only this block —
+   which is also the point: swapping one later is a token change, not a rewrite.
+
+   Every value below was measured, not eyeballed. Body and secondary text clear
+   4.5:1 against their own background and the accent clears 3:1, per the quality
+   bar in ROADMAP section 3. The secondary-text colour in particular had to be
+   darkened in all five; the shade that looked right failed at about 3.6:1. */
+
+/* Two accent roles, not one:
+
+   --accent  marks small things — the size count on a card, the AR icon, the
+             cart badge, the focus ring. It may be chromatic without the page
+             becoming colourful.
+   --cta     fills the one large action surface. A palette can keep its accent
+             for it, or hold the surface neutral so the colour stays a detail.
+
+   The split exists because the chosen palette wants exactly that: charcoal
+   everywhere, gold only in the small marks. */
+
+/* ۱ — کرم و طلا: warm neutral ground, ochre gold throughout. */
+[data-palette="cream-gold"] {
+  --bg: #FAFAF9; --paper: #FFFFFF;
+  --ink: #1C1917; --ink-2: #44403C; --muted: #79726D;
+  --line: #E7E5E4; --line-2: #D6D3D1;
+  --accent: #A16207; --cta: #A16207; --cta-hover: #8A5406; --on-cta: #FFFFFF;
+}
+
+/* ۲ — گچ و زغال — CHOSEN. Charcoal and paper, with the gold kept for detail
+   only. Gold on this ground measures 4.72:1, so it is legible as text, not
+   merely as decoration. The action surface stays charcoal. */
+[data-palette="chalk-char"] {
+  --bg: #FAFAFA; --paper: #FFFFFF;
+  --ink: #18181B; --ink-2: #3F3F46; --muted: #72727A;
+  --line: #E9E9EB; --line-2: #D6D6DA;
+  --accent: #A16207; --cta: #18181B; --cta-hover: #3F3F46; --on-cta: #FAFAFA;
+}
+
+/* ۳ — صدفی و مسی: paper warmed toward undyed wool, copper accent. */
+[data-palette="shell-copper"] {
+  --bg: #F7F3EC; --paper: #FDFBF7;
+  --ink: #2A2320; --ink-2: #514741; --muted: #786D65;
+  --line: #E6DFD4; --line-2: #D3C9BB;
+  --accent: #A65A2E; --cta: #A65A2E; --cta-hover: #8C4A25; --on-cta: #FFFFFF;
+}
+
+/* ۴ — استخوانی و لاجوردی: lapis is the blue of the carpets themselves. */
+[data-palette="bone-lapis"] {
+  --bg: #F8F6F1; --paper: #FFFEFB;
+  --ink: #1B1A17; --ink-2: #403E38; --muted: #73716B;
+  --line: #E7E3DA; --line-2: #D4CFC3;
+  --accent: #2B4C7E; --cta: #2B4C7E; --cta-hover: #223D66; --on-cta: #FFFFFF;
+}
+
+/* ۵ — خاکستری و ترنجی: cool neutral, with the red of the toranj as the accent. */
+[data-palette="grey-toranj"] {
+  --bg: #F6F6F7; --paper: #FFFFFF;
+  --ink: #17171A; --ink-2: #3D3D42; --muted: #707076;
+  --line: #E7E7EA; --line-2: #D4D4D9;
+  --accent: #B0442C; --cta: #B0442C; --cta-hover: #963A25; --on-cta: #FFFFFF;
+}
+
+/* ---- the picker itself: prototype furniture, not part of the design ---- */
+/* Sits opposite the direction switcher and stays out of the grid. Only the
+   selected swatch carries its name; the rest are dots until hovered, so five
+   options cost about the width of one button. */
+.palette-bar {
+  position: fixed; inset-block-end: 14px; inset-inline-end: 14px; z-index: 999;
+  display: flex; align-items: center; gap: 3px; padding: 6px 8px;
+  background: rgba(24, 22, 20, .9); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, .34);
+}
+.palette-bar b {
+  font-size: 11px; font-weight: 400; color: rgba(255, 255, 255, .5);
+  padding-inline: 6px 3px;
+}
+.palette-bar button {
+  display: flex; align-items: center; gap: 7px; padding: 5px; border-radius: 999px;
+  font-size: 11.5px; color: #E7E5E4; white-space: nowrap;
+  transition: background .25s ease, padding .25s ease;
+}
+.palette-bar button:hover { background: rgba(255, 255, 255, .12); }
+.palette-bar button[aria-pressed="true"] { background: #E7E5E4; color: #1C1917; padding-inline-end: 11px; }
+/* the name is only spelled out for the active palette */
+.palette-bar button > span:last-child {
+  max-width: 0; overflow: hidden; opacity: 0;
+  transition: max-width .3s ease, opacity .25s ease;
+}
+.palette-bar button[aria-pressed="true"] > span:last-child { max-width: 160px; opacity: 1; }
+.palette-bar .dots { display: flex; flex: none; }
+.palette-bar .dots i {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 1.5px solid rgba(24, 22, 20, .45); margin-inline-start: -5px;
+}
+.palette-bar .dots i:first-child { margin-inline-start: 0; }
+@media (max-width: 860px) {
+  .palette-bar { inset-block-end: 68px; }
+  .palette-bar b { display: none; }
+  .palette-bar button[aria-pressed="true"] > span:last-child { max-width: 0; opacity: 0; }
+}

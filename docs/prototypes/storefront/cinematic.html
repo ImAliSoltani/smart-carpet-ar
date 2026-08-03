@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ترنجان — سینمایی تاریک</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Bodoni+Moda:opsz,wght@6..96,400..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="d-cinematic.css">
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+  import { build } from './shared.js';
+  const app = document.getElementById('app');
+  await build(app, 'cinematic');
+
+  // The spotlight follows the pointer inside a card. Written straight to a
+  // custom property on rAF so the gradient is the only thing that repaints.
+  let frame = 0, pending = null;
+  app.addEventListener('pointermove', e => {
+    const shot = e.target.closest('.shot');
+    if (!shot) return;
+    pending = [shot, e.clientX, e.clientY];
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const [el, x, y] = pending;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', ((x - r.left) / r.width * 100) + '%');
+      el.style.setProperty('--my', ((y - r.top) / r.height * 100) + '%');
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>

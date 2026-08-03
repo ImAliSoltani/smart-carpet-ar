@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ترنجان — مقایسه‌ی قلم لاتین</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Cormorant:wght@300..700&family=Playfair+Display:wght@400..900&family=Montserrat:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFAF9; --ink:#1C1917; --ink-2:#44403C; --muted:#78716C;
+    --accent:#A16207; --line:#D6D3D1; --paper:#FFFFFF;
+    --fa:'Vazirmatn', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--fa);-webkit-font-smoothing:antialiased}
+
+  /* ---- page chrome ---- */
+  .top{
+    position:sticky;top:0;z-index:10;background:rgba(250,250,249,.86);
+    backdrop-filter:blur(14px);border-bottom:1px solid var(--line);
+    padding:14px clamp(16px,4vw,40px);display:flex;gap:16px;align-items:baseline;flex-wrap:wrap
+  }
+  .top h1{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .top p{font-size:13px;color:var(--muted);line-height:1.9}
+  .hint{margin-inline-start:auto;font-size:12px;color:var(--muted)}
+
+  .grid{
+    display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);
+    border-bottom:1px solid var(--line)
+  }
+  @media(min-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+
+  .panel{background:var(--paper);padding:clamp(22px,3.4vw,44px);position:relative;transition:background .3s}
+  .panel.dim{opacity:.32;filter:saturate(.4)}
+  .panel.solo{grid-column:1/-1}
+
+  .tag{
+    display:flex;align-items:center;gap:10px;margin-bottom:26px;
+    font-size:11px;color:var(--muted);letter-spacing:.02em
+  }
+  .tag b{color:var(--ink);font-weight:600;font-size:12.5px}
+  .tag button{
+    margin-inline-start:auto;font:inherit;font-size:11px;color:var(--accent);
+    background:none;border:1px solid var(--line);border-radius:999px;
+    padding:5px 13px;cursor:pointer;transition:.2s
+  }
+  .tag button:hover{border-color:var(--accent);background:#A162070d}
+
+  /* ---- the specimen ---- */
+  .lockup{display:flex;align-items:center;gap:18px;margin-bottom:8px}
+  .lockup .fa{font-family:var(--fa);font-weight:600;font-size:clamp(34px,4.6vw,46px);letter-spacing:-.02em;line-height:1}
+  .lockup .rule{width:1px;align-self:stretch;background:var(--line)}
+  .lockup .lat{font-family:var(--lat-d);font-weight:var(--lat-d-w,500);font-size:clamp(24px,3.2vw,32px);letter-spacing:var(--lat-d-ls,.18em);line-height:1;padding-inline-start:.1em}
+
+  .kicker{
+    font-family:var(--lat-b);font-size:10.5px;font-weight:500;letter-spacing:.34em;
+    text-transform:uppercase;color:var(--muted);margin:22px 0 10px
+  }
+  .display{
+    font-family:var(--lat-d);font-weight:var(--lat-d-w,400);
+    font-size:clamp(30px,4.4vw,44px);line-height:1.14;letter-spacing:-.005em;
+    direction:ltr;text-align:left;margin-bottom:6px
+  }
+  .display em{font-style:italic;color:var(--accent)}
+  .fa-display{font-size:clamp(21px,2.6vw,26px);font-weight:500;line-height:1.7;color:var(--ink-2);margin-bottom:26px}
+
+  .nav{display:flex;gap:22px;flex-wrap:wrap;border-block:1px solid var(--line);padding:14px 0;margin-bottom:26px}
+  .nav span{font-size:14px;color:var(--ink-2);font-weight:500}
+  .nav .lat{font-family:var(--lat-b);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-inline-start:auto;align-self:center}
+
+  /* product card */
+  .card{display:grid;grid-template-columns:132px 1fr;gap:22px;align-items:start}
+  .card figure{background:#F5F5F4;border:1px solid var(--line);aspect-ratio:2/3;overflow:hidden}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card h3{font-size:15px;font-weight:500;line-height:1.75;margin-bottom:6px}
+  .card .meta{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .card .price{font-size:19px;font-weight:600;letter-spacing:-.01em}
+  .card .price small{font-size:12px;font-weight:400;color:var(--muted);margin-inline-start:4px}
+  .card .ar{
+    display:inline-flex;align-items:center;gap:9px;margin-top:16px;
+    border:1px solid var(--ink);padding:9px 16px;border-radius:999px;cursor:pointer;
+    transition:.25s cubic-bezier(.2,.7,.3,1);background:none
+  }
+  .card .ar:hover{background:var(--ink);color:var(--paper)}
+  .card .ar .fa{font-family:var(--fa);font-size:13px;font-weight:500}
+  .card .ar .lat{font-family:var(--lat-b);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;opacity:.55}
+
+  .nums{margin-top:30px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:34px;flex-wrap:wrap}
+  .nums div small{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;font-family:var(--lat-b)}
+  .nums .fa-n{font-size:21px;font-weight:500;letter-spacing:.06em}
+  .nums .lat-n{font-family:var(--lat-d);font-size:21px;letter-spacing:.06em;direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+  .note{margin-top:24px;font-size:12.5px;line-height:2;color:var(--muted);border-inline-start:2px solid var(--accent);padding-inline-start:14px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>ترنجان — کدام قلم لاتین؟</h1>
+  <p>فارسی در همه‌ی نسخه‌ها وزیرمتن است. فقط قلم لاتین عوض می‌شود.</p>
+  <span class="hint">روی «تک‌نمایی» بزن تا یکی را تمام‌عرض ببینی</span>
+</header>
+
+<main class="grid" id="grid"></main>
+
+<script type="module">
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+const faNum = n => String(n).replace(/\d/g, d => FA_DIGITS[+d]).replace('.', '٫');
+const faPrice = p => faNum(Number(p).toLocaleString('en-US').replace(/,/g, '٫'));
+
+const OPTIONS = [
+  {
+    id:'bodoni', label:'Bodoni Moda + Satoshi', note:'پیشنهاد من',
+    display:"'Bodoni Moda', serif", dw:500, dls:'.2em',
+    body:"'Satoshi', sans-serif",
+    why:'کنتراست بالای بودونی همان حسِ خانه‌ی مد لاکچری را می‌دهد و کمتر از Playfair دیده شده. ساتوشی برای برچسب‌ها امروزی و خنثی است.'
+  },
+  {
+    id:'cormorant', label:'Cormorant + Montserrat', note:'',
+    display:"'Cormorant', serif", dw:500, dls:'.22em',
+    body:"'Montserrat', sans-serif",
+    why:'ظریف‌تر و کلاسیک‌تر — حس گالری قدیمی. در اندازه‌ی کوچک نازک می‌شود و ممکن است کم‌جان به نظر برسد.'
+  },
+  {
+    id:'playfair', label:'Playfair Display + Inter', note:'',
+    display:"'Playfair Display', serif", dw:500, dls:'.16em',
+    body:"'Inter', sans-serif",
+    why:'استاندارد امن لاکچری. قشنگ است ولی همه‌جا هست؛ کمترین ریسک و کمترین تمایز.'
+  },
+  {
+    id:'satoshi', label:'Satoshi + General Sans', note:'بدون سریف',
+    display:"'Satoshi', sans-serif", dw:700, dls:'.24em',
+    body:"'General Sans', sans-serif",
+    why:'مدرن و مینیمال — لاکچری از جنس «کوایت لاکچری». هم‌جنس‌تر با وزیرمتن، ولی لحظه‌ی برندی کمتری می‌سازد.'
+  },
+];
+
+const CARPETS = await (await fetch('carpets.json', {cache:'no-store'})).json();
+const c = CARPETS[0];
+const sz = c.sizes[1] || c.sizes[0];
+const IMG = '../../../backend/data/storage' + (c.img || '').replace('/files','');
+
+document.getElementById('grid').innerHTML = OPTIONS.map(o => `
+<section class="panel" id="p-${o.id}" style="--lat-d:${o.display};--lat-d-w:${o.dw};--lat-d-ls:${o.dls};--lat-b:${o.body}">
+  <div class="tag">
+    <b>${o.label}</b>${o.note ? `<span>· ${o.note}</span>` : ''}
+    <button data-solo="${o.id}">تک‌نمایی</button>
+  </div>
+
+  <div class="lockup">
+    <span class="fa">ترنجان</span>
+    <span class="rule"></span>
+    <span class="lat">TORANJAN</span>
+  </div>
+
+  <p class="kicker">Hand-knotted · Since the loom</p>
+  <h2 class="display">The rug, at its <em>true</em> size.</h2>
+  <p class="fa-display">فرش را پیش از خرید، روی کف خانه‌ی خودت ببین.</p>
+
+  <nav class="nav">
+    <span>فرش‌ها</span><span>جست‌وجوی بصری</span><span>مشاور چیدمان</span><span>راهنمای اندازه</span>
+    <span class="lat">Collection</span>
+  </nav>
+
+  <article class="card">
+    <figure><img src="${IMG}" alt="${c.name || ''}" loading="lazy"></figure>
+    <div>
+      <h3>${c.name || 'فرش دستباف'}</h3>
+      <p class="meta">${c.origin || 'قم'} · دستباف پشم · ${faNum(sz.w/100)} × ${faNum(sz.l/100)} متر</p>
+      <p class="price">${faPrice(sz.p)}<small>تومان</small></p>
+      <button class="ar"><span class="fa">در خانه‌ی من ببین</span><span class="lat">AR</span></button>
+    </div>
+  </article>
+
+  <div class="nums">
+    <div><small>Persian numerals</small><span class="fa-n">۰۱۲۳۴۵۶۷۸۹</span></div>
+    <div><small>Latin numerals</small><span class="lat-n">0123456789</span></div>
+    <div><small>Size notation</small><span class="lat-n">300 × 400 cm</span></div>
+  </div>
+
+  <p class="note">${o.why}</p>
+</section>`).join('');
+
+document.getElementById('grid').addEventListener('click', e => {
+  const id = e.target.dataset.solo; if (!id) return;
+  const panel = document.getElementById('p-' + id);
+  const on = !panel.classList.contains('solo');
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('solo', on && p === panel);
+    p.classList.toggle('dim', false);
+    p.style.display = on && p !== panel ? 'none' : '';
+  });
+  e.target.textContent = on ? 'بازگشت به مقایسه' : 'تک‌نمایی';
+  if (!on) document.querySelectorAll('.tag button').forEach(b => b.textContent = 'تک‌نمایی');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+</script>
+</body>
+</html>

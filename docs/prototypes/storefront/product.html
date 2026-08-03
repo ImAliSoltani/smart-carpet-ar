@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ترنجان — صفحه‌ی فرش</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..700&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="d-gallery.css">
+<link rel="stylesheet" href="palettes.css">
+<script>
+  // Must match the grid, or the shared-element transition lands on a page in a
+  // different palette and the whole effect reads as a bug.
+  document.documentElement.dataset.palette =
+    localStorage.getItem('toranjan-palette') || 'chalk-char';
+</script>
+<style>
+  @view-transition { navigation: auto; }
+  /* The rug is the one element that survives the navigation, so it is the only
+     thing that must not cross-fade with the rest of the page. */
+  ::view-transition-group(carpet) { animation-duration: .62s; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .42s; }
+</style>
+</head>
+<body>
+<main id="app" class="product"></main>
+<script type="module">
+  import { loadCarpets, toSrc, faNum, faPrice, meters, MATERIAL, PATTERN, words } from './shared.js';
+
+  const slug = new URLSearchParams(location.search).get('c');
+  const carpets = await loadCarpets();
+  const c = carpets.find(x => x.slug === slug) || carpets[0];
+  const sizes = c.sizes || [];
+  const cheapest = sizes.reduce((a, b) => (a.p <= b.p ? a : b), sizes[0]);
+
+  document.title = `ترنجان — ${c.name}`;
+
+  document.getElementById('app').innerHTML = `
+<a class="back" href="gallery.html">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+       stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+  بازگشت به فرش‌ها
+</a>
+
+<div class="product-body">
+  <div class="stage">
+    <img src="${toSrc(c.img)}" alt="${c.name}" style="view-transition-name:carpet">
+  </div>
+
+  <div>
+    <p class="eyebrow">${c.origin || '—'} · ${PATTERN[c.pattern] || ''} · ${MATERIAL[c.material] || ''}</p>
+    <h1>${words(faNum(c.name), .1)}</h1>
+
+    <p class="price">
+      <span class="from">از</span>
+      <span class="num">${faPrice(cheapest.p)}</span>
+      <span class="cur">تومان</span>
+    </p>
+
+    <p class="label">اندازه</p>
+    <div class="sizes">
+      ${sizes.map((s, i) => `
+        <button type="button" aria-pressed="${i === 0}">
+          ${meters(s.w)} × ${meters(s.l)} متر — ${faPrice(s.p)} تومان
+        </button>`).join('')}
+    </div>
+
+    <button class="cta" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3 4 7.5v9L12 21l8-4.5v-9Z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/>
+      </svg>
+      در خانه‌ی من ببین
+    </button>
+
+    <p class="label" style="margin-top:26px">
+      این صفحه فقط مقصد ترنزیشن است تا حرکت اشتراکی تصویر دیده شود — صفحه‌ی کامل محصول در فاز ۳ ساخته می‌شود.
+    </p>
+  </div>
+</div>`;
+
+  // one selected size at a time
+  document.querySelector('.sizes').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    document.querySelectorAll('.sizes button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  });
+</script>
+</body>
+</html>

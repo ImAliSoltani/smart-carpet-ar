@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ترنجان — گالری موزه‌ای</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..700&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="d-gallery.css">
+<link rel="stylesheet" href="palettes.css">
+<style>@view-transition { navigation: auto; }</style>
+<script>
+  // Set before first paint so the page never flashes the default palette.
+  // `?pal=` wins over the stored choice so a palette can be linked to directly.
+  (() => {
+    const q = new URLSearchParams(location.search).get('pal');
+    if (q) localStorage.setItem('toranjan-palette', q);
+    document.documentElement.dataset.palette =
+      q || localStorage.getItem('toranjan-palette') || 'chalk-char';
+  })();
+</script>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+  import { build, faNum } from './shared.js';
+  import { watchScroll, loupe, magnetic, sharedElement, countUp, palettePicker } from './gallery-motion.js';
+
+  const app = document.getElementById('app');
+  const carpets = await build(app, 'gallery');
+
+  palettePicker();
+  watchScroll();
+  loupe(app);
+  sharedElement(app);
+  magnetic(app.querySelector('.loadmore'));
+  countUp(app.querySelector('.count'), carpets.length, n => faNum(n) + ' فرش');
+</script>
+</body>
+</html>
