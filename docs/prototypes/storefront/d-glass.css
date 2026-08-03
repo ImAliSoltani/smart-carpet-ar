@@ -1,0 +1,258 @@
+/* Direction 5 — Liquid Glass.
+   Added after the other four, to answer a fair question: the design database
+   recommends glassmorphism for luxury commerce, and it was never actually put
+   on the table here.
+
+   Built to give the style its best case, not a strawman. Frosted glass only
+   reads as glass when something rich passes behind it, so the page has an
+   ambient wash for the panels to work against — on a flat near-white ground
+   the whole effect collapses into slightly grey white.
+
+   The one thing that is never frosted is the carpet. Blur over the product
+   fights the only claim this shop makes, so the glass is the chrome around the
+   photograph, never over it. */
+
+:root {
+  --fa: 'Vazirmatn', system-ui, sans-serif;
+  --lat: 'Playfair Display', serif;
+
+  --bg: #EFEAE4;
+  --ink: #1A1614;
+  --ink-2: #453D38;
+  --muted: #6E645D;
+  --accent: #A9701C;
+
+  /* The glass itself. Kept as tokens because a translucent surface has three
+     separate jobs — the tint, the light caught on its top edge, and the shadow
+     it drops — and they have to move together to stay believable. */
+  --glass: rgba(255, 253, 250, .55);
+  --glass-strong: rgba(255, 253, 250, .72);
+  --glass-edge: rgba(255, 255, 255, .62);
+  --glass-lip: rgba(255, 255, 255, .85);
+  --glass-drop: rgba(60, 44, 30, .17);
+  --blur: blur(22px) saturate(175%);
+
+  --ease: cubic-bezier(.16, 1, .3, 1);
+}
+
+body { background: var(--bg); color: var(--ink); }
+
+/* Ambient wash — fixed, so scrolling content changes what every panel is
+   filtering.
+
+   Deliberately saturated. A first pass kept these colours polite so they would
+   not compete with the carpets, and the result was fog: the panels sat at the
+   same lightness as the ground and stopped reading as panes at all. Glass is
+   only legible when it is clearly brighter than what is behind it, which means
+   the ground has to commit to a colour. That trade is the whole question this
+   direction exists to ask. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(56vw 46vw at 84% -8%, rgba(196, 128, 32, .92), transparent 60%),
+    radial-gradient(54vw 46vw at 2% 16%,  rgba(38, 106, 120, .82), transparent 62%),
+    radial-gradient(48vw 42vw at 66% 70%, rgba(158, 62, 74, .62), transparent 64%),
+    radial-gradient(74vw 58vw at 22% 108%, rgba(72, 96, 66, .60), transparent 62%),
+    linear-gradient(160deg, #D9CDBC, #C9BCA9);
+}
+
+/* ---------- header ---------- */
+.site {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: clamp(20px, 4vw, 56px);
+  padding: 0 clamp(18px, 5vw, 60px); height: 76px;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 12px 34px -26px var(--glass-drop);
+}
+.brand { display: flex; align-items: baseline; gap: 11px; }
+.brand .fa { font-size: 25px; font-weight: 600; letter-spacing: -.02em; }
+.brand .lat { font-family: var(--lat); font-size: 11px; letter-spacing: .34em; color: var(--accent); }
+.nav { display: flex; gap: clamp(14px, 2vw, 26px); font-size: 14.5px; color: var(--ink-2); }
+.nav a {
+  padding: 8px 15px; border-radius: 999px;
+  transition: background .4s var(--ease), color .4s var(--ease), box-shadow .4s var(--ease);
+}
+.nav a:hover {
+  background: var(--glass-strong); color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 6px 16px -10px var(--glass-drop);
+}
+.nav a.on {
+  background: var(--glass-strong); color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 2px 10px -6px var(--glass-drop);
+}
+.tools { margin-inline-start: auto; display: flex; gap: 6px; }
+/* 44px, not the 42 the earlier directions used: that is the touch floor in
+   ROADMAP §3-5, and a prototype that might get approved should not carry a
+   violation of our own bar into the build. */
+.tools button {
+  position: relative; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 20px; color: var(--ink-2);
+  transition: background .35s var(--ease), transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.tools button:hover {
+  background: var(--glass-strong); transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 8px 18px -12px var(--glass-drop);
+}
+.tools em {
+  position: absolute; top: 5px; inset-inline-end: 4px; font-style: normal; font-size: 9.5px;
+  min-width: 16px; height: 16px; border-radius: 999px; background: var(--accent); color: #fff;
+  display: grid; place-items: center;
+  box-shadow: 0 2px 6px -2px rgba(140, 90, 20, .8);
+}
+@media (max-width: 900px) { .nav { display: none; } }
+
+/* ---------- page head ---------- */
+.pagehead { padding: clamp(54px, 9vw, 118px) clamp(18px, 5vw, 60px) clamp(28px, 4vw, 50px); max-width: 800px; }
+.kicker {
+  display: inline-block; font-family: var(--lat); font-size: 11px; letter-spacing: .34em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 22px;
+  padding: 7px 16px; border-radius: 999px;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-lip);
+}
+.pagehead h1 { font-size: clamp(34px, 5.8vw, 62px); font-weight: 500; letter-spacing: -.03em; line-height: 1.26; }
+.lede { margin-top: 18px; font-size: clamp(15px, 1.6vw, 17px); line-height: 2.1; color: var(--ink-2); max-width: 46ch; }
+
+/* ---------- filters ---------- */
+.filters {
+  position: sticky; top: 76px; z-index: 40;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 12px clamp(18px, 5vw, 60px);
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-lip);
+}
+.chips { display: flex; gap: 9px; flex-wrap: wrap; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 17px; border-radius: 999px;
+  background: var(--glass-strong); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge); font-size: 13.5px; color: var(--ink-2);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 4px 12px -8px var(--glass-drop);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), color .35s var(--ease);
+}
+.chip svg { font-size: 14px; opacity: .55; }
+.chip:hover {
+  transform: translateY(-2px); color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 12px 24px -12px var(--glass-drop);
+}
+.sortbar { margin-inline-start: auto; display: flex; align-items: center; gap: 16px; }
+.count { font-size: 13px; color: var(--muted); }
+
+/* ---------- grid ---------- */
+.grid {
+  display: grid; gap: clamp(26px, 3vw, 46px) clamp(20px, 2.4vw, 32px);
+  grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+  padding: clamp(40px, 5.5vw, 84px) clamp(18px, 5vw, 60px);
+}
+
+.card { transform: translateY(24px) scale(.985); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+.card.in { transform: none; transition-delay: calc(var(--i) * 55ms); }
+
+/* The panel is glass; the plate inside it is not. A frosted surface over the
+   photograph would blur the pattern and the colour, which is the whole product. */
+.shot {
+  position: relative; display: block; overflow: hidden; border-radius: 26px;
+  padding: clamp(15px, 2vw, 22px); aspect-ratio: 3 / 4;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow:
+    inset 0 1px 0 var(--glass-lip),
+    inset 0 -14px 26px -22px rgba(60, 44, 30, .5),
+    0 18px 42px -28px var(--glass-drop);
+  transition: transform .55s var(--ease), box-shadow .55s var(--ease);
+}
+/* Specular sweep: the highlight a curved glass edge catches, which is what
+   separates glass from a translucent rectangle. */
+.shot::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(142deg, rgba(255, 255, 255, .55) 0 16%, transparent 42%);
+  opacity: .75; transition: opacity .55s var(--ease);
+}
+.shot img {
+  position: relative; z-index: 1;
+  width: 100%; height: 100%; object-fit: contain; border-radius: 12px;
+  filter: drop-shadow(0 10px 18px rgba(60, 44, 30, .22));
+  transition: transform .65s var(--ease);
+}
+.card:hover .shot {
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 1px 0 var(--glass-lip),
+    inset 0 -14px 26px -22px rgba(60, 44, 30, .5),
+    0 34px 60px -32px var(--glass-drop);
+}
+.card:hover .shot::after { opacity: 1; }
+.card:hover .shot img { transform: scale(1.035); }
+.shot-veil { display: none; }
+
+.ar {
+  position: absolute; z-index: 2;
+  inset-inline: clamp(15px, 2vw, 22px); bottom: clamp(15px, 2vw, 22px);
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  padding: 12px 16px; border-radius: 999px;
+  background: var(--glass-strong); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge); color: var(--ink);
+  font-size: 13px; font-weight: 500; white-space: nowrap;
+  opacity: 0; transform: translateY(12px);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 14px 28px -16px var(--glass-drop);
+  transition: opacity .5s var(--ease), transform .5s var(--ease), background .3s, color .3s;
+}
+.ar svg { font-size: 17px; color: var(--accent); }
+.card:hover .ar, .shot:focus-within .ar { opacity: 1; transform: none; }
+.ar:hover { background: var(--accent); color: #fff; border-color: rgba(255, 255, 255, .4); }
+.ar:hover svg { color: #fff; }
+
+.info { padding: 17px 6px 0; }
+.info .eyebrow { font-size: 11px; letter-spacing: .14em; color: var(--muted); margin-bottom: 8px; }
+.title {
+  font-size: 15px; font-weight: 500; line-height: 1.8; min-height: calc(2 * 1.8em);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.meta { display: flex; align-items: center; gap: 9px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.meta .sep { width: 3px; height: 3px; border-radius: 50%; background: rgba(60, 44, 30, .3); }
+.meta .more { color: var(--accent); }
+.meta .more::before { content: '·'; margin-inline-end: 9px; color: rgba(60, 44, 30, .3); }
+.price { margin-top: 12px; display: flex; align-items: baseline; gap: 5px; }
+.price .from { order: -1; font-size: 11.5px; color: var(--muted); }
+.price .num { font-size: 17.5px; font-weight: 600; letter-spacing: -.01em; }
+.price .cur { font-size: 12px; color: var(--muted); }
+.swatches { display: flex; gap: 6px; margin-top: 13px; }
+.swatches i {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .6); box-shadow: 0 1px 4px -1px var(--glass-drop);
+}
+
+/* ---------- footer ---------- */
+.more-row { display: grid; place-items: center; padding-bottom: clamp(56px, 7vw, 100px); }
+.loadmore {
+  padding: 15px 46px; border-radius: 999px; font-size: 14px; color: var(--ink);
+  background: var(--glass-strong); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 16px 32px -20px var(--glass-drop);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), background .4s var(--ease), color .4s;
+}
+.loadmore:hover {
+  transform: translateY(-2px); background: var(--accent); color: #fff; border-color: rgba(255, 255, 255, .35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 22px 40px -20px rgba(140, 90, 20, .7);
+}
+.site-foot {
+  margin: 0 clamp(18px, 5vw, 60px) 120px; padding: clamp(38px, 5vw, 64px) clamp(24px, 4vw, 48px);
+  border-radius: 28px;
+  background: var(--glass); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-lip), 0 20px 44px -30px var(--glass-drop);
+  display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+}
+.site-foot .fa { font-size: 21px; font-weight: 600; }
+.site-foot .lat { font-family: var(--lat); font-size: 11px; letter-spacing: .3em; color: var(--accent); }
+.site-foot .fig { font-size: 11px; letter-spacing: .2em; color: var(--muted); }
+
+/* A translucent surface has no fixed contrast — it borrows whatever scrolls
+   under it. Where the backdrop filter is unavailable the tint alone is far too
+   thin to read text against, so it is opaque instead of pretty. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site, .filters, .chip, .shot, .ar, .loadmore, .site-foot, .kicker {
+    background: rgba(255, 253, 250, .95);
+  }
+}

@@ -1,6 +1,6 @@
-// Shared data + rendering for the four storefront design directions.
+// Shared data + rendering for the storefront design directions.
 // Every direction renders the SAME markup from the SAME real catalogue rows, so
-// what differs between the four pages is design, not content.
+// what differs between the pages is design, not content.
 
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 export const faNum = n => String(n).replace(/\d/g, d => FA_DIGITS[+d]).replace('.', '٫');
@@ -23,6 +23,7 @@ const DIRECTIONS = [
   ['editorial', 'ادیتوریال'],
   ['cinematic', 'سینمایی تاریک'],
   ['material', 'گرم و خاکی'],
+  ['glass', 'شیشه‌ای'],
 ];
 
 // Split for the entrance animations. Each word keeps its own mask so it can
