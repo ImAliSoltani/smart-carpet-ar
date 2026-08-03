@@ -1,5 +1,6 @@
 import { ProductCard } from "@/components/ui/product-card";
 import { AddToCart } from "@/components/toranjan/add-to-cart";
+import { CatalogProbe } from "./catalog-probe";
 
 /**
  * Design-system check.
@@ -7,7 +8,8 @@ import { AddToCart } from "@/components/toranjan/add-to-cart";
  * Not a storefront page — it exists to prove the groundwork holds: that the
  * three latin faces and Vazirmatn all load, that the palette reaches a
  * component imported from the catalogue without that component bringing its
- * own colours, and that RTL is clean. The real home page replaces it.
+ * own colours, that RTL is clean, and that the API client returns real carpets.
+ * The real home page replaces it.
  */
 
 const TOKENS: [string, string, string][] = [
@@ -138,6 +140,15 @@ export default function DesignCheck() {
             sizes={["150×225", "200×300", "250×350"]}
           />
         </div>
+      </Section>
+
+      <Section n="05" title="داده‌ی واقعی از بک‌اند">
+        <p className="mb-6 max-w-prose text-sm leading-loose text-muted">
+          این بخش از دیتابیس محلی می‌خواند، نه از داده‌ی ثابت. اگر بک‌اند بالا
+          نباشد، همین‌جا حالت خطا با پیام فارسی و دکمه‌ی تلاش دوباره دیده می‌شود —
+          که خودش بخشی از چیزی است که باید ثابت شود.
+        </p>
+        <CatalogProbe />
       </Section>
     </main>
   );
