@@ -23,7 +23,8 @@ const DIRECTIONS = [
   ['editorial', 'ادیتوریال'],
   ['cinematic', 'سینمایی تاریک'],
   ['material', 'گرم و خاکی'],
-  ['glass', 'شیشه‌ای'],
+  ['glass', 'شیشه‌ای رنگی'],
+  ['glass-light', 'شیشه‌ای گچی'],
 ];
 
 // Split for the entrance animations. Each word keeps its own mask so it can
@@ -61,8 +62,14 @@ function cardHTML(c, i) {
   const s = sizes[Math.min(1, sizes.length - 1)];
   const cheapest = sizes.reduce((a, b) => (a.p <= b.p ? a : b), sizes[0]);
   const href = `product.html?c=${encodeURIComponent(c.slug)}`;
+  // The rug's own two leading colours, published as custom properties. Only the
+  // chalk-glass direction reads them — a frosted surface needs something with
+  // colour behind it, and taking that colour from the rug itself is the one
+  // source that cannot end up arguing with the rug. The other directions ignore
+  // them, so the markup stays identical everywhere.
+  const [c1, c2] = [(c.colors || [])[0] || '#D6D6DA', (c.colors || [])[1] || (c.colors || [])[0] || '#D6D6DA'];
   return `
-<article class="card reveal" style="--i:${i}">
+<article class="card reveal" style="--i:${i};--c1:${c1};--c2:${c2}">
   <a class="shot" href="${href}" aria-label="${c.name}">
     <img src="${toSrc(c.img)}" alt="${c.name}" loading="lazy" decoding="async">
     <span class="shot-veil" aria-hidden="true"></span>
