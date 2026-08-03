@@ -8,9 +8,11 @@
     held open by one detached process that does nothing but stay alive; closing
     it (or running this script with -Stop) releases the distribution.
 
-    Run once per working session:
+    Run once per working session, from the repository root:
 
-        pwsh scripts/dev-db.ps1
+        .\scripts\dev-db.ps1
+
+    (Windows PowerShell 5.1; `pwsh` is PowerShell 7 and is not installed here.)
 
 .PARAMETER Stop
     Shut the distribution down instead of starting it.
