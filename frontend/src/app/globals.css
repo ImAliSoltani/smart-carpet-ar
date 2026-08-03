@@ -153,6 +153,93 @@ body {
   }
 }
 
+/* ============================================================
+   Overlay motion — the navigation panel and the mobile drawer.
+
+   Written here rather than pulled in with `tailwindcss-animate`, which is what
+   the catalogue components assume. That plugin would add a second motion
+   vocabulary beside the one section 3 of the roadmap already fixes, and these
+   are four keyframes. Both sit in the state-feedback band; the drawer is a
+   little longer because it crosses the whole screen.
+   ============================================================ */
+
+@keyframes toranjan-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes toranjan-menu-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.98);
+  }
+}
+
+.toranjan-menu-viewport[data-state="open"] {
+  animation: toranjan-menu-in 260ms var(--ease) both;
+}
+.toranjan-menu-viewport[data-state="closed"] {
+  animation: toranjan-menu-out 160ms var(--ease-io) both;
+}
+
+@keyframes toranjan-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes toranjan-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.toranjan-sheet-overlay[data-state="open"] {
+  animation: toranjan-fade-in 320ms var(--ease) both;
+}
+.toranjan-sheet-overlay[data-state="closed"] {
+  animation: toranjan-fade-out 200ms var(--ease-io) both;
+}
+
+/* The drawer travels along the inline axis, but `translate` is physical: on an
+   RTL page the inline-start edge is the right one, so a drawer anchored there
+   has to start off-screen to the right. `:dir()` keeps the offset tied to the
+   document's direction instead of to whichever one was written first. */
+@keyframes toranjan-sheet-in {
+  from {
+    translate: var(--sheet-from) 0;
+  }
+}
+@keyframes toranjan-sheet-out {
+  to {
+    translate: var(--sheet-from) 0;
+  }
+}
+
+.toranjan-sheet {
+  --sheet-from: -100%;
+}
+.toranjan-sheet:dir(rtl) {
+  --sheet-from: 100%;
+}
+.toranjan-sheet[data-side="end"] {
+  --sheet-from: 100%;
+}
+.toranjan-sheet[data-side="end"]:dir(rtl) {
+  --sheet-from: -100%;
+}
+.toranjan-sheet[data-state="open"] {
+  animation: toranjan-sheet-in 420ms var(--ease) both;
+}
+.toranjan-sheet[data-state="closed"] {
+  animation: toranjan-sheet-out 260ms var(--ease-io) both;
+}
+
 /* Latin strings inside an RTL page reorder unpredictably once they mix
    letters, figures and punctuation — or once they are split per character
    for an animation. "TORANJAN" rendered as "NAJNAROT" before this existed. */
