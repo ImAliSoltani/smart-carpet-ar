@@ -37,6 +37,18 @@
   --destructive: #b91c1c;
   --on-destructive: #ffffff;
 
+  /* -- confirmation --
+     A momentary state, which is why it may take the gold at full strength
+     without breaking the rule that gold stays a detail: it holds for about
+     two seconds and then the surface returns to charcoal. Green was the
+     obvious alternative and was rejected — it would be the only green on
+     the site, and a hue that belongs to nothing else reads as a system
+     message rather than as this shop confirming something. */
+  --confirm: #a16207;
+  --on-confirm: #ffffff;
+  --confirm-tint: #f6eedf;
+  --confirm-tint-ink: #8a5406;
+
   /* -- motion --
      Two bands, per ROADMAP section 3: state feedback stays short enough
      to feel immediate, entrances and transitions are allowed to breathe. */
@@ -79,6 +91,10 @@
   --color-accent-foreground: var(--on-cta);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--on-destructive);
+  --color-confirm: var(--confirm);
+  --color-on-confirm: var(--on-confirm);
+  --color-confirm-tint: var(--confirm-tint);
+  --color-confirm-tint-ink: var(--confirm-tint-ink);
   --color-border: var(--line);
   --color-input: var(--line-2);
   --color-ring: var(--accent);

@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/ui/product-card";
+import { AddToCart } from "@/components/toranjan/add-to-cart";
 
 /**
  * Design-system check.
@@ -88,7 +89,38 @@ export default function DesignCheck() {
         </ul>
       </Section>
 
-      <Section n="03" title="کامپوننت واردشده، با پالت ما">
+      <Section n="03" title="حالت تأیید — کدام؟">
+        <p className="mb-7 max-w-prose text-sm leading-loose text-muted">
+          روی هر سه بزن. حالت پیش از انتخاب یکی است؛ فقط لحظه‌ی تأیید فرق می‌کند و
+          حدود دو ثانیه می‌ماند. رنگ از لبه می‌آید، نه با یک پرش.
+        </p>
+        <div className="grid gap-7 sm:grid-cols-3">
+          {(
+            [
+              ["الف", "solid", "طلایی توپر — گرم‌ترین و صریح‌ترین"],
+              ["ب", "tint", "طلایی کم‌رنگ — همان گرما، آرام‌تر"],
+              ["ج", "quiet", "زغالی، فقط تیک طلایی — ساکت‌ترین"],
+            ] as const
+          ).map(([tag, style, note]) => (
+            <div key={style}>
+              <p className="mb-3 flex items-baseline gap-2 text-xs text-muted">
+                <span className="text-accent">{tag}</span>
+                <span>{note}</span>
+              </p>
+              <AddToCart confirmStyle={style} />
+              <div className="mt-3">
+                <AddToCart confirmStyle={style} holdConfirmed />
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-5 text-xs leading-loose text-muted">
+          ردیف بالا زنده است — بزن تا کل توالی را ببینی. ردیف پایین همان حالت تأیید
+          را باز نگه داشته تا بشود سه‌تا را کنار هم مقایسه کرد.
+        </p>
+      </Section>
+
+      <Section n="04" title="کامپوننت واردشده، با پالت ما">
         <p className="mb-6 max-w-prose text-sm leading-loose text-muted">
           کارت زیر دست‌نخورده از کاتالوگ ۲۱st آمده و هنوز به فارسی و راست‌به‌چپ
           تطبیق داده نشده. آنچه اینجا اثبات می‌شود این است که رنگ‌هایش از
