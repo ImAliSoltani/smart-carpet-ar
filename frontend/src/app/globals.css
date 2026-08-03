@@ -1,4 +1,18 @@
 @import "tailwindcss";
+/* The animation utilities every shadcn/21st component is written against —
+   `animate-in`, `fade-in`, `zoom-in-95`, `slide-in-from-*`. Installed so a
+   component can be taken whole and adapted rather than rebuilt: hand-porting
+   its motion is how the navigation menu lost its choreography the first time.
+   (`tw-animate-css` is the Tailwind v4 replacement for `tailwindcss-animate`,
+   which is v3-only.)
+
+   Two standing rules when using them, both from ROADMAP §3-5:
+   - Always set duration and easing explicitly from our scale. The defaults are
+     the plugin's, not ours.
+   - `slide-in-from-left/right` are physical. This site is RTL, so any
+     directional travel that should follow the reading order needs `:dir()` or
+     a logical equivalent — see the navigation panels below. */
+@import "tw-animate-css";
 
 /* ============================================================
    Toranjan design tokens — "chalk and charcoal", with the gold

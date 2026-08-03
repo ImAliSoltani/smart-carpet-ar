@@ -62,11 +62,11 @@ const NavigationMenuItem = NavigationMenuPrimitive.Item;
  * panel is open, so the bar always says which panel you are looking at.
  */
 const navigationMenuTriggerStyle = cva(
-  "group relative inline-flex h-9 w-max items-center justify-center rounded-full px-3.5 py-2 text-sm text-ink-2 " +
+  "group relative inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm text-ink-2 " +
     "transition-[color,background-color] duration-[--dur-feedback] ease-[cubic-bezier(.65,0,.35,1)] " +
     "hover:bg-paper hover:text-ink focus-visible:text-ink " +
     "data-[state=open]:bg-paper data-[state=open]:text-ink " +
-    "after:absolute after:inset-x-3.5 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink " +
+    "after:absolute after:inset-x-4 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink " +
     "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] " +
     "hover:after:scale-x-100 data-[state=open]:after:scale-x-100 " +
     "disabled:pointer-events-none disabled:opacity-50",
@@ -113,9 +113,12 @@ function NavigationMenuViewport({
     <div className="absolute start-0 top-full flex justify-center">
       <NavigationMenuPrimitive.Viewport
         className={cn(
-          "toranjan-menu-viewport relative mt-3 h-[var(--radix-navigation-menu-viewport-height)]",
-          "w-full origin-top overflow-hidden border border-line bg-paper",
-          "shadow-[0_30px_60px_-40px_rgba(24,24,27,0.45)]",
+          "toranjan-menu-viewport relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)]",
+          // Rounded and softly raised, as the catalogue component is. Squaring
+          // it off was a reading of the design system applied over the top of a
+          // component that had already answered the question.
+          "w-full origin-top overflow-hidden rounded-md border border-line bg-paper",
+          "shadow-[0_1px_2px_rgba(24,24,27,0.05),0_24px_48px_-32px_rgba(24,24,27,0.35)]",
           "md:w-[var(--radix-navigation-menu-viewport-width)]",
           className,
         )}

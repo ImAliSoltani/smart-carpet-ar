@@ -123,7 +123,7 @@ function FeaturedPattern({ enabled }: { enabled: boolean }) {
       >
         <span
           className={cn(
-            "relative block aspect-4/3 w-full overflow-hidden border border-line bg-bg",
+            "relative block aspect-4/3 w-full overflow-hidden rounded border border-line bg-bg",
             // A frame that is briefly empty reads as broken; a frame that is
             // briefly breathing reads as loading.
             isPending && "animate-pulse",
@@ -169,7 +169,7 @@ function PanelLink({
     <NavigationMenuLink asChild>
       <Link
         href={href}
-        className="toranjan-row group/r block rounded-sm px-3 py-2.5 text-sm text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-bg hover:text-ink focus-visible:bg-bg"
+        className="toranjan-row group/r block rounded-md p-3 text-sm text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-bg hover:text-ink focus-visible:bg-bg"
         style={{ "--stagger": index * 38 } as React.CSSProperties}
       >
         <span className="inline-block transition-transform duration-[350ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/r:-translate-x-1 rtl:group-hover/r:translate-x-1">
@@ -341,7 +341,7 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
                     <NavigationMenuLink asChild>
                       <Link
                         href={link.href}
-                        className="toranjan-row group/r block rounded-sm px-3 py-3 transition-colors duration-[--dur-feedback] hover:bg-bg"
+                        className="toranjan-row group/r block rounded-md p-3 transition-colors duration-[--dur-feedback] hover:bg-bg"
                         style={{ "--stagger": (i + 1) * 55 } as React.CSSProperties}
                       >
                         <span className="block text-sm transition-transform duration-[350ms] ease-[cubic-bezier(.16,1,.3,1)] rtl:group-hover/r:translate-x-1">
