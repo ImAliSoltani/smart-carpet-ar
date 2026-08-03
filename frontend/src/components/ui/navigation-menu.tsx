@@ -55,15 +55,21 @@ function NavigationMenuList({
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 /**
- * A menu entry reads as text, not as a control: the gallery direction asks the
- * interface to recede, so the resting state has no surface at all and the
- * underline is what answers the pointer — the same gesture the rest of the
- * site uses for links.
+ * A menu entry at rest is only text — the gallery direction asks the interface
+ * to recede. What answers the pointer is movement: a rule that draws itself in
+ * from the trailing edge, the same gesture every other link on the site uses,
+ * over a surface that fades up underneath it. Both stay put while the entry's
+ * panel is open, so the bar always says which panel you are looking at.
  */
 const navigationMenuTriggerStyle = cva(
-  "group relative inline-flex h-9 w-max items-center justify-center px-1 py-2 text-sm text-ink-2 " +
-    "transition-colors duration-[--dur-feedback] hover:text-ink focus-visible:text-ink " +
-    "disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-ink",
+  "group relative inline-flex h-9 w-max items-center justify-center rounded-full px-3.5 py-2 text-sm text-ink-2 " +
+    "transition-[color,background-color] duration-[--dur-feedback] ease-[cubic-bezier(.65,0,.35,1)] " +
+    "hover:bg-paper hover:text-ink focus-visible:text-ink " +
+    "data-[state=open]:bg-paper data-[state=open]:text-ink " +
+    "after:absolute after:inset-x-3.5 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink " +
+    "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] " +
+    "hover:after:scale-x-100 data-[state=open]:after:scale-x-100 " +
+    "disabled:pointer-events-none disabled:opacity-50",
 );
 
 function NavigationMenuTrigger({
@@ -78,7 +84,7 @@ function NavigationMenuTrigger({
     >
       {children}
       <ChevronDown
-        className="size-3.5 transition-transform duration-[--dur-feedback] group-data-[state=open]:rotate-180"
+        className="size-3.5 transition-transform duration-[350ms] ease-[cubic-bezier(.16,1,.3,1)] group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     </NavigationMenuPrimitive.Trigger>
@@ -91,7 +97,7 @@ function NavigationMenuContent({
 }: React.ComponentProps<typeof NavigationMenuPrimitive.Content>) {
   return (
     <NavigationMenuPrimitive.Content
-      className={cn("start-0 top-0 w-full md:absolute md:w-auto", className)}
+      className={cn("toranjan-menu-content start-0 top-0 w-full md:absolute md:w-auto", className)}
       {...props}
     />
   );
@@ -113,6 +119,13 @@ function NavigationMenuViewport({
           "md:w-[var(--radix-navigation-menu-viewport-width)]",
           className,
         )}
+        /* Nothing may be passed as `style` here. Radix publishes the measured
+           panel size as inline custom properties on this very element, and the
+           primitive spreads incoming props after its own — so a style object,
+           even a one-line one, replaces the attribute and takes the size
+           variables with it. The frame then collapses to its border while the
+           panel renders at full size behind `overflow-hidden`, which looks
+           exactly like a menu that does not open. */
         {...props}
       />
     </div>

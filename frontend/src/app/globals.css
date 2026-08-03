@@ -166,7 +166,7 @@ body {
 @keyframes toranjan-menu-in {
   from {
     opacity: 0;
-    transform: translateY(-6px) scaleY(0.96);
+    transform: translateY(-8px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -177,15 +177,89 @@ body {
 @keyframes toranjan-menu-out {
   to {
     opacity: 0;
-    transform: translateY(-4px) scaleY(0.98);
+    transform: translateY(-5px) scale(0.985);
   }
 }
 
 .toranjan-menu-viewport[data-state="open"] {
-  animation: toranjan-menu-in 260ms var(--ease) both;
+  animation: toranjan-menu-in 320ms var(--ease) both;
 }
 .toranjan-menu-viewport[data-state="closed"] {
-  animation: toranjan-menu-out 160ms var(--ease-io) both;
+  animation: toranjan-menu-out 180ms var(--ease-io) both;
+}
+
+/* The frame resizes to whichever panel is showing rather than jumping to it.
+   Radix publishes the measured size as custom properties; transitioning them
+   is what turns two panels into one object that changes shape. Without it the
+   menu reads as two separate boxes taking turns. */
+.toranjan-menu-viewport {
+  transition:
+    width 420ms var(--ease),
+    height 420ms var(--ease);
+}
+
+/* Panels travel in the direction the pointer moved along the menu bar, so the
+   content follows the visitor instead of appearing where they were not
+   looking. Radix's start/end are logical, but `translate` is not — `--dir`
+   flips the sign on an RTL page. */
+.toranjan-menu-content {
+  --dir: 1;
+}
+.toranjan-menu-content:dir(rtl) {
+  --dir: -1;
+}
+
+@keyframes toranjan-panel-from-start {
+  from {
+    opacity: 0;
+    translate: calc(-44px * var(--dir)) 0;
+  }
+}
+@keyframes toranjan-panel-from-end {
+  from {
+    opacity: 0;
+    translate: calc(44px * var(--dir)) 0;
+  }
+}
+@keyframes toranjan-panel-to-start {
+  to {
+    opacity: 0;
+    translate: calc(-44px * var(--dir)) 0;
+  }
+}
+@keyframes toranjan-panel-to-end {
+  to {
+    opacity: 0;
+    translate: calc(44px * var(--dir)) 0;
+  }
+}
+
+.toranjan-menu-content[data-motion="from-start"] {
+  animation: toranjan-panel-from-start 380ms var(--ease) both;
+}
+.toranjan-menu-content[data-motion="from-end"] {
+  animation: toranjan-panel-from-end 380ms var(--ease) both;
+}
+.toranjan-menu-content[data-motion="to-start"] {
+  animation: toranjan-panel-to-start 240ms var(--ease-io) both;
+}
+.toranjan-menu-content[data-motion="to-end"] {
+  animation: toranjan-panel-to-end 240ms var(--ease-io) both;
+}
+
+/* Rows arrive one after another, the same staircase the page entrance uses.
+   `--stagger` is set per row where the list is built, because CSS cannot know
+   an item's position in a mapped array. */
+@keyframes toranjan-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+}
+
+.toranjan-row {
+  animation: toranjan-row-in 520ms var(--ease) both;
+  animation-delay: calc(var(--stagger, 0) * 1ms);
 }
 
 @keyframes toranjan-fade-in {

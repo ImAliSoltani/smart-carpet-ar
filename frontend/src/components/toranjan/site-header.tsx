@@ -99,12 +99,15 @@ function useScrolled() {
  * The rug that stands in the wide panel.
  *
  * Fetched rather than hardcoded: a pasted image URL is content-addressed and
- * would break the day that carpet is re-photographed. Held until the menu is
- * first opened, so a header on every page does not cost a request on every
- * page.
+ * would break the day that carpet is re-photographed. It waits until the
+ * pointer reaches the menu bar rather than until a panel opens — Radix opens
+ * on hover after a short delay, so asking a moment earlier means the picture is
+ * there when the panel arrives instead of dropping into an empty frame. A
+ * header that appears on every page still costs nothing until someone reaches
+ * for it.
  */
 function FeaturedPattern({ enabled }: { enabled: boolean }) {
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     ...carpetListQuery({ pattern: "lachak_toranj", page_size: 1, sort: "price_desc" }),
     enabled,
   });
@@ -113,8 +116,19 @@ function FeaturedPattern({ enabled }: { enabled: boolean }) {
 
   return (
     <NavigationMenuLink asChild>
-      <Link href="/carpets?pattern=lachak_toranj" className="group/f block">
-        <span className="relative block aspect-4/3 w-full overflow-hidden border border-line bg-bg">
+      <Link
+        href="/carpets?pattern=lachak_toranj"
+        className="toranjan-row group/f block"
+        style={{ "--stagger": 240 } as React.CSSProperties}
+      >
+        <span
+          className={cn(
+            "relative block aspect-4/3 w-full overflow-hidden border border-line bg-bg",
+            // A frame that is briefly empty reads as broken; a frame that is
+            // briefly breathing reads as loading.
+            isPending && "animate-pulse",
+          )}
+        >
           {image && (
             <Image
               src={image}
@@ -134,14 +148,33 @@ function FeaturedPattern({ enabled }: { enabled: boolean }) {
   );
 }
 
-function PanelLink({ href, children }: { href: string; children: React.ReactNode }) {
+/**
+ * One row of a panel.
+ *
+ * `index` drives the staircase — rows arrive in order rather than as a block,
+ * which is the entrance language the chosen direction uses everywhere else.
+ * The label slides a little toward the reading edge under the pointer, so the
+ * row answers before the colour does.
+ */
+function PanelLink({
+  href,
+  index = 0,
+  children,
+}: {
+  href: string;
+  index?: number;
+  children: React.ReactNode;
+}) {
   return (
     <NavigationMenuLink asChild>
       <Link
         href={href}
-        className="block rounded-sm px-3 py-2.5 text-sm text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-bg hover:text-ink focus-visible:bg-bg"
+        className="toranjan-row group/r block rounded-sm px-3 py-2.5 text-sm text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-bg hover:text-ink focus-visible:bg-bg"
+        style={{ "--stagger": index * 38 } as React.CSSProperties}
       >
-        {children}
+        <span className="inline-block transition-transform duration-[350ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover/r:-translate-x-1 rtl:group-hover/r:translate-x-1">
+          {children}
+        </span>
       </Link>
     </NavigationMenuLink>
   );
@@ -149,7 +182,7 @@ function PanelLink({ href, children }: { href: string; children: React.ReactNode
 
 function PanelHeading({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-2 px-3 text-[11px] tracking-[0.18em] text-muted">{children}</p>
+    <p className="toranjan-row mb-2 px-3 text-[11px] tracking-[0.18em] text-muted">{children}</p>
   );
 }
 
@@ -249,33 +282,35 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
         </span>
       </Link>
 
-      <NavigationMenu
-        dir="rtl"
-        className="hidden lg:flex"
-        onValueChange={() => setMenuTouched(true)}
-      >
-        <NavigationMenuList className="gap-5">
-          <NavigationMenuItem>
+      <NavigationMenu dir="rtl" className="hidden lg:flex">
+        <NavigationMenuList
+          className="gap-5"
+          onPointerEnter={() => setMenuTouched(true)}
+          onFocusCapture={() => setMenuTouched(true)}
+        >
+          <NavigationMenuItem value="carpets">
             <NavigationMenuTrigger>فرش‌ها</NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[680px] grid-cols-[1fr_1fr_320px] gap-6 p-6">
                 <div>
                   <PanelHeading>طرح</PanelHeading>
-                  {NAV_PATTERNS.map((p) => (
-                    <PanelLink key={p} href={`/carpets?pattern=${p}`}>
+                  {NAV_PATTERNS.map((p, i) => (
+                    <PanelLink key={p} index={i + 1} href={`/carpets?pattern=${p}`}>
                       {PATTERN_LABEL[p]}
                     </PanelLink>
                   ))}
                 </div>
                 <div>
                   <PanelHeading>اتاق</PanelHeading>
-                  {NAV_ROOMS.map((r) => (
-                    <PanelLink key={r} href={`/carpets?room=${r}`}>
+                  {NAV_ROOMS.map((r, i) => (
+                    <PanelLink key={r} index={i + 2} href={`/carpets?room=${r}`}>
                       {ROOM_LABEL[r]}
                     </PanelLink>
                   ))}
                   <span className="my-3 block h-px bg-line" />
-                  <PanelLink href="/carpets">همه‌ی فرش‌ها</PanelLink>
+                  <PanelLink index={NAV_ROOMS.length + 2} href="/carpets">
+                    همه‌ی فرش‌ها
+                  </PanelLink>
                 </div>
                 <FeaturedPattern enabled={menuTouched} />
               </div>
@@ -286,9 +321,11 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
             <NavigationMenuTrigger>جنس</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid w-[360px] grid-cols-2 gap-1 p-5">
-                {NAV_MATERIALS.map((m) => (
+                {NAV_MATERIALS.map((m, i) => (
                   <li key={m}>
-                    <PanelLink href={`/carpets?material=${m}`}>{MATERIAL_LABEL[m]}</PanelLink>
+                    <PanelLink index={i + 1} href={`/carpets?material=${m}`}>
+                      {MATERIAL_LABEL[m]}
+                    </PanelLink>
                   </li>
                 ))}
               </ul>
@@ -299,14 +336,17 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
             <NavigationMenuTrigger>کمک به انتخاب</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="w-[380px] p-5">
-                {HELP_LINKS.map((link) => (
+                {HELP_LINKS.map((link, i) => (
                   <li key={link.href}>
                     <NavigationMenuLink asChild>
                       <Link
                         href={link.href}
-                        className="block rounded-sm px-3 py-3 transition-colors duration-[--dur-feedback] hover:bg-bg"
+                        className="toranjan-row group/r block rounded-sm px-3 py-3 transition-colors duration-[--dur-feedback] hover:bg-bg"
+                        style={{ "--stagger": (i + 1) * 55 } as React.CSSProperties}
                       >
-                        <span className="block text-sm">{link.label}</span>
+                        <span className="block text-sm transition-transform duration-[350ms] ease-[cubic-bezier(.16,1,.3,1)] rtl:group-hover/r:translate-x-1">
+                          {link.label}
+                        </span>
                         <span className="mt-1 block text-xs leading-loose text-muted">
                           {link.note}
                         </span>
