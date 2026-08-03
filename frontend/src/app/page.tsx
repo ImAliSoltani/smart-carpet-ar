@@ -1,65 +1,110 @@
-import Image from "next/image";
+import { ProductCard } from "@/components/ui/product-card";
 
-export default function Home() {
+/**
+ * Design-system check.
+ *
+ * Not a storefront page — it exists to prove the groundwork holds: that the
+ * three latin faces and Vazirmatn all load, that the palette reaches a
+ * component imported from the catalogue without that component bringing its
+ * own colours, and that RTL is clean. The real home page replaces it.
+ */
+
+const TOKENS: [string, string, string][] = [
+  ["زمینه", "--bg", "#FAFAFA"],
+  ["کاغذ", "--paper", "#FFFFFF"],
+  ["متن", "--ink", "#18181B"],
+  ["متن دوم", "--ink-2", "#3F3F46"],
+  ["متن ثانویه", "--muted", "#72727A"],
+  ["خط", "--line", "#E9E9EB"],
+  ["تأکید", "--accent", "#A16207"],
+  ["سطح اقدام", "--cta", "#18181B"],
+];
+
+function Section({
+  n,
+  title,
+  children,
+}: {
+  n: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <section className="border-t border-line py-10">
+      <p className="mb-6 flex items-baseline gap-3 text-xs text-muted">
+        <span className="ltr-isolate font-figure tracking-widest text-accent">
+          {n}
+        </span>
+        <span className="tracking-widest">{title}</span>
+      </p>
+      {children}
+    </section>
+  );
+}
+
+export default function DesignCheck() {
+  return (
+    <main className="mx-auto w-full max-w-5xl px-5 py-14 sm:px-8">
+      <p className="ltr-isolate mb-5 font-label text-[10.5px] uppercase tracking-[0.42em] text-muted">
+        Toranjan · Design system check
+      </p>
+      <h1 className="text-4xl font-light tracking-tight sm:text-5xl">ترنجان</h1>
+      <p className="mt-4 max-w-prose leading-loose text-muted">
+        این صفحه بخشی از فروشگاه نیست. فقط بررسی می‌کند که قلم‌ها، توکن‌های رنگ و
+        راست‌به‌چپ درست نشسته‌اند.
+      </p>
+
+      <Section n="01" title="قلم‌ها">
+        <div className="space-y-5">
+          <p className="text-2xl">
+            وزیرمتن — فرش دستباف اصفهان نقش لچک‌ترنج، ۲۴٫۸۰۰٫۰۰۰ تومان
+          </p>
+          <p className="ltr-isolate font-display text-3xl">
+            Playfair Display — TORANJAN
+          </p>
+          <p className="ltr-isolate font-label text-sm uppercase tracking-[0.3em]">
+            Inter — collection · hand-knotted
+          </p>
+          <p className="ltr-isolate font-figure text-2xl tracking-wider">
+            Satoshi — 0123456789 · 300 × 400 CM
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </Section>
+
+      <Section n="02" title="توکن‌های رنگ">
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {TOKENS.map(([label, name, hex]) => (
+            <li key={name} className="rounded-lg border border-line p-3">
+              <span
+                className="mb-3 block h-12 w-full rounded border border-line-2"
+                style={{ background: `var(${name})` }}
+              />
+              <p className="text-sm">{label}</p>
+              <p className="ltr-isolate font-figure text-[11px] text-muted">
+                {hex}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section n="03" title="کامپوننت واردشده، با پالت ما">
+        <p className="mb-6 max-w-prose text-sm leading-loose text-muted">
+          کارت زیر دست‌نخورده از کاتالوگ ۲۱st آمده و هنوز به فارسی و راست‌به‌چپ
+          تطبیق داده نشده. آنچه اینجا اثبات می‌شود این است که رنگ‌هایش از
+          توکن‌های ترنجان می‌آید، نه از پیش‌فرض‌های خودش.
+        </p>
+        <div className="ltr-isolate">
+          <ProductCard
+            name="Isfahan Lachak-Toranj"
+            price={24.8}
+            originalPrice={29.9}
+            images={["/next.svg", "/vercel.svg"]}
+            colors={["#18181B", "#A16207", "#72727A"]}
+            sizes={["150×225", "200×300", "250×350"]}
+          />
         </div>
-      </main>
-    </div>
+      </Section>
+    </main>
   );
 }

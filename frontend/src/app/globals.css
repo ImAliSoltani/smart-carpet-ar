@@ -1,26 +1,120 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Toranjan design tokens — "chalk and charcoal", with the gold
+   confined to small marks.
+
+   Every value is a variable even though only one palette ships today. A
+   second palette, or a dark mode, is then a block of overrides rather
+   than a rewrite. The prototypes in docs/prototypes/storefront proved
+   the mechanism with five palettes swapping live.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* -- ground and ink -- */
+  --bg: #fafafa;
+  --paper: #ffffff;
+  --ink: #18181b;
+  --ink-2: #3f3f46;
+  /* Darker than it looks like it should be: the lighter shade measured
+     3.6:1 against the ground, and this is real content, not decoration. */
+  --muted: #72727a;
+  --line: #e9e9eb;
+  --line-2: #d6d6da;
+
+  /* -- accent, in two roles --
+     `accent` marks small things: the size count on a card, the AR icon,
+     the cart badge, the focus ring. It measures 4.72:1 on the ground, so
+     it is legible as text.
+     `cta` fills the one large action surface, and stays charcoal — a
+     block of gold that size would stop reading as a detail. */
+  --accent: #a16207;
+  --accent-strong: #8a5406;
+  --cta: #18181b;
+  --cta-hover: #3f3f46;
+  --on-cta: #fafafa;
+
+  --destructive: #b91c1c;
+  --on-destructive: #ffffff;
+
+  /* -- motion --
+     Two bands, per ROADMAP section 3: state feedback stays short enough
+     to feel immediate, entrances and transitions are allowed to breathe. */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-feedback: 220ms;
+  --dur-entrance: 700ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Toranjan's own names */
+  --color-bg: var(--bg);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-cta: var(--cta);
+  --color-cta-hover: var(--cta-hover);
+  --color-on-cta: var(--on-cta);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* The shadcn/ui vocabulary, mapped onto the same tokens. Components
+     pulled from the catalogue use these names, and mapping them here
+     means an imported component lands in Toranjan's palette instead of
+     shipping its own. */
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-card: var(--paper);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--paper);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--cta);
+  --color-primary-foreground: var(--on-cta);
+  --color-secondary: var(--line);
+  --color-secondary-foreground: var(--ink-2);
+  --color-muted-foreground: var(--muted);
+  --color-accent-foreground: var(--on-cta);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--on-destructive);
+  --color-border: var(--line);
+  --color-input: var(--line-2);
+  --color-ring: var(--accent);
+
+  --font-sans: var(--font-fa), system-ui, sans-serif;
+  --font-display: var(--font-lat-display), serif;
+  --font-label: var(--font-lat-body), sans-serif;
+  --font-figure: "Satoshi", var(--font-lat-body), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-fa), system-ui, sans-serif;
+}
+
+/* Latin strings inside an RTL page reorder unpredictably once they mix
+   letters, figures and punctuation — or once they are split per character
+   for an animation. "TORANJAN" rendered as "NAJNAROT" before this existed. */
+.ltr-isolate {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
