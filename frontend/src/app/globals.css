@@ -111,6 +111,48 @@ body {
   font-family: var(--font-fa), system-ui, sans-serif;
 }
 
+/* ============================================================
+   Confirmation choreography.
+
+   The moment something is added to the cart is the shop answering, and an
+   answer that is only a colour change reads as dry. Four beats, staggered
+   so they land as one gesture rather than four effects:
+   the surface sweeps in, the old words leave, the new words arrive, the
+   tick draws itself, and a single ring opens outward and is gone.
+   ============================================================ */
+
+@keyframes toranjan-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes toranjan-ring {
+  from {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1.14);
+    opacity: 0;
+  }
+}
+
+@keyframes toranjan-settle {
+  0% {
+    transform: scale(1);
+  }
+  38% {
+    transform: scale(1.022);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* Latin strings inside an RTL page reorder unpredictably once they mix
    letters, figures and punctuation — or once they are split per character
    for an animation. "TORANJAN" rendered as "NAJNAROT" before this existed. */

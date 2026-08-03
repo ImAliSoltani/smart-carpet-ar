@@ -1,27 +1,86 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, ShoppingBag } from "lucide-react";
+import { Loader2, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** How the confirmed state is dressed. Three candidates, one to be chosen. */
-export type ConfirmStyle = "solid" | "tint" | "quiet";
+/** How the confirmed state is dressed. `tint` is the chosen one. */
+export type ConfirmStyle = "tint" | "solid" | "quiet";
 
 type Phase = "idle" | "adding" | "done";
 
-const CONFIRM_HOLD_MS = 2200;
+const WORK_MS = 650;
+const CONFIRM_HOLD_MS = 2400;
 
-const CONFIRM_CLASSES: Record<ConfirmStyle, string> = {
-  // Warmest and loudest. The one warm colour in the system, held briefly.
-  solid: "bg-confirm text-on-confirm border-confirm",
-  // The same warmth at a whisper, for a shop that stays quiet.
-  tint: "bg-confirm-tint text-confirm-tint-ink border-confirm-tint-ink/25",
-  // Surface never changes; only the mark and the words do.
-  quiet: "bg-cta text-on-cta border-cta",
+const CONFIRM_SURFACE: Record<ConfirmStyle, string> = {
+  tint: "bg-confirm-tint",
+  solid: "bg-confirm",
+  quiet: "bg-cta",
 };
 
+const CONFIRM_TEXT: Record<ConfirmStyle, string> = {
+  tint: "text-confirm-tint-ink border-confirm-tint-ink/25",
+  solid: "text-on-confirm border-confirm",
+  quiet: "text-on-cta border-cta",
+};
+
+/**
+ * The tick is drawn rather than faded in: a stroke that completes reads as
+ * "this finished", where an icon that simply appears reads as "an icon
+ * appeared". `pathLength={1}` normalises the dash maths so the geometry can
+ * change without retuning the animation.
+ */
+function DrawnCheck({ play }: { play: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.1}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-[18px]"
+      aria-hidden
+    >
+      <path
+        d="M4.5 12.6 9.6 17.7 19.5 6.9"
+        pathLength={1}
+        strokeDasharray={1}
+        // Always the drawn end state; the keyframe supplies the undrawn start.
+        // Setting it the other way leaves the tick invisible whenever the
+        // animation is skipped — held open for review, or reduced motion.
+        strokeDashoffset={0}
+        style={
+          play
+            ? {
+                animation:
+                  "toranjan-draw 420ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both",
+              }
+            : undefined
+        }
+      />
+    </svg>
+  );
+}
+
+/** One label swapped for another, each leaving and arriving behind a mask. */
+function SwapLabel({ show, children }: { show: boolean; children: React.ReactNode }) {
+  return (
+    <span
+      className={cn(
+        "col-start-1 row-start-1 flex items-center gap-2.5",
+        "transition-[transform,opacity] duration-[420ms] ease-[var(--ease)]",
+        show ? "translate-y-0 opacity-100" : "pointer-events-none opacity-0",
+        !show && "translate-y-[115%]",
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function AddToCart({
-  confirmStyle = "solid",
+  confirmStyle = "tint",
   onAdd,
   className,
   /** Holds the confirmed state open. Only the design-review page uses it —
@@ -51,65 +110,85 @@ export function AddToCart({
         setPhase("done");
         onAdd?.();
         timers.current.push(setTimeout(() => setPhase("idle"), CONFIRM_HOLD_MS));
-      }, 650),
+      }, WORK_MS),
     );
   };
 
   const done = phase === "done";
+  const working = phase === "adding";
 
   return (
     <button
       type="button"
       onClick={start}
-      // The live region announces the confirmation, because a colour change
-      // and a tick say nothing to a screen reader.
+      disabled={phase !== "idle"}
+      // A colour change and a tick say nothing to a screen reader, so the
+      // outcome is announced in words.
       aria-live="polite"
       className={cn(
-        "relative inline-flex w-full items-center justify-center gap-2.5 overflow-hidden",
+        "relative isolate inline-flex w-full items-center justify-center overflow-hidden",
         "rounded-full border px-6 py-3.5 text-[15px] font-medium",
-        "transition-[background-color,color,border-color,transform] duration-[var(--dur-feedback)] ease-[var(--ease-io)]",
+        "transition-[color,border-color] duration-[var(--dur-feedback)] ease-[var(--ease-io)]",
         "active:scale-[.985] disabled:cursor-default",
-        done
-          ? CONFIRM_CLASSES[confirmStyle]
-          : "border-cta bg-cta text-on-cta hover:bg-cta-hover",
+        done ? CONFIRM_TEXT[confirmStyle] : "border-cta text-on-cta",
         className,
       )}
-      disabled={phase !== "idle"}
+      style={
+        done
+          ? { animation: "toranjan-settle 520ms cubic-bezier(0.16, 1, 0.3, 1) both" }
+          : undefined
+      }
     >
-      {/* The confirmed colour arrives as a sweep from the leading edge rather
-          than a straight swap — a hard cut reads as a glitch at this size. */}
+      {/* Resting surface. Sits under the confirmed one so the sweep has
+          something to cover rather than something to replace. */}
       <span
         aria-hidden
         className={cn(
-          "absolute inset-0 origin-right transition-transform duration-[420ms] ease-[var(--ease)]",
-          done ? "scale-x-100" : "scale-x-0",
-          confirmStyle === "solid" && "bg-confirm",
-          confirmStyle === "tint" && "bg-confirm-tint",
-          confirmStyle === "quiet" && "bg-cta",
+          "absolute inset-0 -z-20 bg-cta transition-colors duration-[var(--dur-feedback)]",
+          working && "bg-cta-hover",
         )}
       />
 
-      <span className="relative flex items-center gap-2.5">
-        {phase === "adding" ? (
-          <Loader2 className="size-[18px] animate-spin" />
-        ) : done ? (
-          <Check
-            className={cn(
-              "size-[18px]",
-              // in the quiet treatment the tick is the only gold on the button
-              confirmStyle === "quiet" && "text-accent",
-            )}
-          />
-        ) : (
-          <ShoppingBag className="size-[18px]" />
+      {/* The confirmed surface arrives as a sweep from the leading edge. A
+          straight swap reads as a glitch at this size. */}
+      <span
+        aria-hidden
+        className={cn(
+          "absolute inset-0 -z-10 origin-right transition-transform duration-[460ms] ease-[var(--ease)]",
+          CONFIRM_SURFACE[confirmStyle],
+          done ? "scale-x-100" : "scale-x-0",
         )}
-        <span>
-          {phase === "adding"
-            ? "در حال افزودن…"
-            : done
-              ? "به سبد اضافه شد"
-              : "افزودن به سبد"}
-        </span>
+      />
+
+      {/* One ring, opening outward and gone. The beat that says it landed. */}
+      {done && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 rounded-full border border-confirm-tint-ink/40"
+          style={{
+            animation:
+              "toranjan-ring 620ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both",
+          }}
+        />
+      )}
+
+      {/* Both labels are stacked in one grid cell so the button never changes
+          width as the words change. */}
+      <span className="grid place-items-center">
+        <SwapLabel show={!done && !working}>
+          <ShoppingBag className="size-[18px]" />
+          <span>افزودن به سبد</span>
+        </SwapLabel>
+
+        <SwapLabel show={working}>
+          <Loader2 className="size-[18px] animate-spin" />
+          <span>در حال افزودن…</span>
+        </SwapLabel>
+
+        <SwapLabel show={done}>
+          <DrawnCheck play={done && !holdConfirmed} />
+          <span>به سبد اضافه شد</span>
+        </SwapLabel>
       </span>
     </button>
   );
