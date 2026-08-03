@@ -20,9 +20,22 @@ import { formatNumber, formatToman } from "@/lib/format";
  * pattern is the same everywhere.
  */
 export function CatalogProbe() {
-  const { data, error, isPending, isFetching, refetch } = useQuery(
+  const { data, error, isPending, isPaused, isFetching, refetch } = useQuery(
     carpetListQuery({ page_size: 6, sort: "price_desc" }),
   );
+
+  // A held request is not a slow one, and a skeleton would say the wrong thing
+  // about it: the query layer parks a retry while the browser reports itself
+  // offline or the tab is in the background, and it stays parked — with no
+  // error and no data — until that changes. Without its own branch the page
+  // loads forever and never explains why.
+  if (isPaused) {
+    return (
+      <p className="rounded-lg border border-line bg-paper p-6 text-sm leading-loose">
+        ارتباط با سرور در دسترس نیست. به‌محض برقراری اتصال، خودش ادامه می‌دهد.
+      </p>
+    );
+  }
 
   if (isPending) {
     return (
