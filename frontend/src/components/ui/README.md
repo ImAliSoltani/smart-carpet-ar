@@ -6,6 +6,7 @@
 |---|---|
 | `button.tsx`، `badge.tsx`، `card.tsx` | وابستگی‌های رجیستری کارت محصول |
 | `navigation-menu.tsx`، `sheet.tsx` | وابستگی‌های رجیستری [bundui/navigation-menu4](https://21st.dev/@bundui/components/navigation-menu4) |
+| `zoomable-image.tsx` | [inference-sh/zoomable-image](https://21st.dev/@inference-sh/components/zoomable-image) — تگ `img` خام به `next/image` تبدیل شد و ظاهر لایت‌باکس در `globals.css` به پالت خودمان آمد |
 
 ## روش کار (تصمیم ۱۴۰۵/۰۵/۱۳)
 

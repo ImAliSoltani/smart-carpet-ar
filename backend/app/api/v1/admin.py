@@ -211,6 +211,9 @@ async def upload_image(
     record = CarpetImage(
         carpet_id=carpet_id,
         url=image_set.urls["card"],
+        thumb_url=image_set.urls["thumb"],
+        full_url=image_set.urls["full"],
+        texture_url=image_set.urls["texture"],
         position=count,
         is_primary=count == 0,
         embedding=embedder.embed_image(data),

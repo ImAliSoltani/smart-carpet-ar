@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Camera, ChevronRight, Cuboid, Heart, Info, Ruler, Share2, Tag, Users } from "lucide-react";
 
 import { AddToCart } from "@/components/toranjan/add-to-cart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ZoomableImage } from "@/components/ui/zoomable-image";
 import { mediaUrl } from "@/lib/api/client";
 import type { CarpetDetail, VariantOut } from "@/lib/api/types";
 import { formatNumber, formatSize, formatToman } from "@/lib/format";
@@ -38,6 +38,10 @@ import { cn } from "@/lib/utils";
  *   were already doing — pattern, material, origin, the rooms a rug suits.
  * - **«Find Similar» keeps its position** and now does the real thing: the
  *   neighbours of this rug's own embedding, further down the page.
+ * - **The gallery zooms** (§6-3), through
+ *   [ui/zoomable-image](../ui/zoomable-image.tsx). The cross-fade and the row
+ *   of dots are untouched; a click on the photograph now opens it full-screen
+ *   at the 1600px derivative instead of doing nothing.
  *
  * Removed, because §6 of the roadmap closes the scope: the seller block with
  * its avatar and stars (this is one shop, and there are no reviews) and the
@@ -53,9 +57,16 @@ export function ProductDetail({
 }) {
   const reduced = useReducedMotion();
 
+  // Each photograph twice over: the 800px derivative for the page, and the
+  // 1600px one for the lightbox. `full_url` is null on rows ingested before the
+  // derivative columns existed, and there the card file has to stand in — a
+  // soft zoom is worse than a sharp one but far better than a 404.
   const gallery = carpet.images
-    .map((image) => mediaUrl(image.url))
-    .filter((url): url is string => Boolean(url));
+    .map((image) => ({
+      src: mediaUrl(image.url),
+      zoomSrc: mediaUrl(image.full_url ?? image.url),
+    }))
+    .filter((entry): entry is { src: string; zoomSrc: string } => Boolean(entry.src));
 
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
@@ -119,11 +130,12 @@ export function ProductDetail({
               animate={{ opacity: 1, y: 0 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: -20 }}
               transition={{ duration: reduced ? 0 : 0.3 }}
-              className="relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg"
+              className="toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg"
             >
               {gallery[currentImageIndex] && (
-                <Image
-                  src={gallery[currentImageIndex]}
+                <ZoomableImage
+                  src={gallery[currentImageIndex].src}
+                  zoomSrc={gallery[currentImageIndex].zoomSrc}
                   alt={`${carpet.name} — تصویر ${formatNumber(currentImageIndex + 1)}`}
                   fill
                   sizes="(min-width: 1024px) 45vw, 100vw"

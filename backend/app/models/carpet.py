@@ -120,7 +120,14 @@ class CarpetImage(Base, TimestampMixin):
         ForeignKey("carpets.id", ondelete="CASCADE"), index=True
     )
 
+    # The card-sized (800px) derivative — the one nearly every surface wants.
     url: Mapped[str] = mapped_column(String(500))
+    # Its siblings from the same upload: 400px for dense rows, 1600px for the
+    # gallery and its zoom, 2048px as the AR pipeline's input. Null on rows
+    # written before these columns existed; callers fall back to `url`.
+    thumb_url: Mapped[str | None] = mapped_column(String(500))
+    full_url: Mapped[str | None] = mapped_column(String(500))
+    texture_url: Mapped[str | None] = mapped_column(String(500))
     # Perspective-corrected top-down version, produced by the AR pipeline and
     # used as the texture. Null until that step runs.
     rectified_url: Mapped[str | None] = mapped_column(String(500))

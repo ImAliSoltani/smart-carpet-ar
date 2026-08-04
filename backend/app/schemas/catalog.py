@@ -26,7 +26,12 @@ class ImageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    # `url` is the 800px derivative and stays the safe default; the other two
+    # are null on rows predating the derivative columns, so a client that wants
+    # a specific size asks for it and falls back to `url` when it is absent.
     url: str
+    thumb_url: str | None = None
+    full_url: str | None = None
     position: int
     is_primary: bool
 

@@ -139,6 +139,9 @@ async def ingest(folder: Path, activate: bool) -> None:
                 CarpetImage(
                     carpet_id=carpet.id,
                     url=image_set.urls["card"],
+                    thumb_url=image_set.urls["thumb"],
+                    full_url=image_set.urls["full"],
+                    texture_url=image_set.urls["texture"],
                     position=0,
                     is_primary=True,
                     embedding=embedder.embed_image(data),

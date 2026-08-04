@@ -58,6 +58,18 @@ def test_full_shop_cycle(admin_client):
     assert response.status_code == 201, response.text
     assert response.json()["is_primary"] is True
 
+    # Every derivative the pipeline wrote is reachable, not just the card one.
+    # They were all produced from the first upload and then dropped on the floor
+    # for want of a column; the gallery's zoom is the first caller that needs a
+    # bigger file than the one the grid uses.
+    uploaded = response.json()
+    assert uploaded["thumb_url"] and uploaded["full_url"]
+    # Three separate files, not one URL echoed three times.
+    assert len({uploaded["thumb_url"], uploaded["url"], uploaded["full_url"]}) == 3
+    assert "/thumb/" in uploaded["thumb_url"]
+    assert "/card/" in uploaded["url"]
+    assert "/full/" in uploaded["full_url"]
+
     # a second, visually different carpet to make search results meaningful
     other = _create_carpet(admin_client, slug="blue-modern", name="فرش مدرن آبی")
     admin_client.post(

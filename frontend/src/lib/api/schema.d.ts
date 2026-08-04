@@ -602,12 +602,16 @@ export interface components {
         };
         /** ImageOut */
         ImageOut: {
+            /** Full Url */
+            full_url?: string | null;
             /** Id */
             id: number;
             /** Is Primary */
             is_primary: boolean;
             /** Position */
             position: number;
+            /** Thumb Url */
+            thumb_url?: string | null;
             /** Url */
             url: string;
         };
