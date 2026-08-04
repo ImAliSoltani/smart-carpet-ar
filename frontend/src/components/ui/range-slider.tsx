@@ -1,0 +1,237 @@
+"use client";
+
+/**
+ * Range slider with a distribution histogram.
+ *
+ * From [ravikatiyar162/range-slider](https://21st.dev/@ravikatiyar162/components/range-slider),
+ * kept whole: the pointer maths, the two-thumb clamping, the keyboard handling
+ * and the histogram that colours the bars inside the selected span are the
+ * component's own. The histogram is why it was chosen — this catalogue runs
+ * from about five million toman to nearly two hundred and fifty, and a bare
+ * track over that spread tells a shopper nothing about where the carpets
+ * actually are.
+ *
+ * Edited:
+ * - money is formatted by `lib/format`, so it reads in toman and Persian
+ *   figures instead of `Intl` dollars.
+ * - the track is marked `dir="ltr"` even on this RTL page. Its maths are
+ *   physical — `clientX - rect.left`, `left: %` — and mirroring the box
+ *   without mirroring the arithmetic puts the thumb where the pointer is not.
+ *   A numeric axis reading low-to-high left-to-right is the usual reading for
+ *   a range control anyway, the same as a video scrubber; the labels around it
+ *   stay in the page's direction.
+ * - `touch-action: none` on the track. The original listens for `touchmove` on
+ *   the document without ever preventing the default, so dragging a thumb on a
+ *   phone scrolls the page underneath it.
+ * - `aria-valuetext` on both thumbs, or a screen reader announces «۶۷۴۰۰۰۰۰»
+ *   rather than a price.
+ */
+
+import * as React from "react";
+
+import { formatToman } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
+const valueToPercent = (value: number, min: number, max: number) =>
+  ((value - min) / (max - min)) * 100;
+
+export interface RangeSliderProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
+  /** One bar per bucket, each already normalised to 0…1. */
+  data: number[];
+  min?: number;
+  max?: number;
+  step?: number;
+  value?: [number, number];
+  defaultValue?: [number, number];
+  onValueChange?: (value: [number, number]) => void;
+  /** Fired once when a drag ends, so a filter is not refetched per pixel. */
+  onValueCommit?: (value: [number, number]) => void;
+  minLabel?: string;
+  maxLabel?: string;
+  format?: (value: number) => string;
+}
+
+export const RangeSlider = React.forwardRef<HTMLDivElement, RangeSliderProps>(
+  (
+    {
+      className,
+      data,
+      min = 0,
+      max = 100,
+      step = 1,
+      value: controlled,
+      defaultValue = [min, max],
+      onValueChange,
+      onValueCommit,
+      minLabel = "کمترین",
+      maxLabel = "بیشترین",
+      format = formatToman,
+      ...props
+    },
+    ref,
+  ) => {
+    const [uncontrolled, setUncontrolled] = React.useState<[number, number]>(defaultValue);
+    const values = controlled ?? uncontrolled;
+    const [dragging, setDragging] = React.useState<"min" | "max" | null>(null);
+
+    const sliderRef = React.useRef<HTMLDivElement>(null);
+    const latest = React.useRef(values);
+    latest.current = values;
+
+    const [minVal, maxVal] = values;
+    const minPercent = valueToPercent(minVal, min, max);
+    const maxPercent = valueToPercent(maxVal, min, max);
+
+    const change = React.useCallback(
+      (next: [number, number]) => {
+        setUncontrolled(next);
+        onValueChange?.(next);
+      },
+      [onValueChange],
+    );
+
+    React.useEffect(() => {
+      if (!dragging) return;
+
+      const onMove = (event: MouseEvent | TouchEvent) => {
+        const el = sliderRef.current;
+        if (!el) return;
+        const clientX = "touches" in event ? event.touches[0]?.clientX : event.clientX;
+        if (clientX == null) return;
+
+        const rect = el.getBoundingClientRect();
+        const percent = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+        const raw = min + (percent / 100) * (max - min);
+        const next = Math.round(raw / step) * step;
+        const [lo, hi] = latest.current;
+
+        if (dragging === "min") change([Math.min(next, hi - step), hi]);
+        else change([lo, Math.max(next, lo + step)]);
+      };
+
+      const onUp = () => {
+        setDragging(null);
+        onValueCommit?.(latest.current);
+      };
+
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("touchmove", onMove, { passive: false });
+      document.addEventListener("mouseup", onUp);
+      document.addEventListener("touchend", onUp);
+
+      return () => {
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("touchmove", onMove);
+        document.removeEventListener("mouseup", onUp);
+        document.removeEventListener("touchend", onUp);
+      };
+    }, [dragging, min, max, step, change, onValueCommit]);
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, thumb: "min" | "max") => {
+      let [lo, hi] = values;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+        e.preventDefault();
+        if (thumb === "min") lo = Math.max(min, lo - step);
+        else hi = Math.max(lo + step, hi - step);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+        e.preventDefault();
+        if (thumb === "min") lo = Math.min(hi - step, lo + step);
+        else hi = Math.min(max, hi + step);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        if (thumb === "min") lo = min;
+        else hi = lo + step;
+      } else if (e.key === "End") {
+        e.preventDefault();
+        if (thumb === "min") lo = hi - step;
+        else hi = max;
+      } else {
+        return;
+      }
+
+      change([lo, hi]);
+      onValueCommit?.([lo, hi]);
+    };
+
+    const thumb =
+      "absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full " +
+      "border-2 border-ink bg-paper shadow-sm transition-shadow active:cursor-grabbing " +
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
+
+    return (
+      <div ref={ref} className={cn("w-full", className)} {...props}>
+        <div
+          dir="ltr"
+          ref={sliderRef}
+          className="relative h-20 w-full touch-none select-none"
+        >
+          <div className="absolute inset-0 flex items-end gap-px" aria-hidden="true">
+            {data.map((v, i) => {
+              const at = (i / Math.max(1, data.length - 1)) * 100;
+              const inRange = at >= minPercent && at <= maxPercent;
+              return (
+                <span
+                  key={i}
+                  className={cn(
+                    "w-full rounded-t-sm transition-colors duration-300",
+                    inRange ? "bg-ink/70" : "bg-line-2",
+                  )}
+                  style={{ height: `${Math.max(2, v * 100)}%` }}
+                />
+              );
+            })}
+          </div>
+
+          <div className="relative h-full">
+            <button
+              type="button"
+              role="slider"
+              aria-valuemin={min}
+              aria-valuemax={maxVal - step}
+              aria-valuenow={minVal}
+              aria-valuetext={format(minVal)}
+              aria-label={minLabel}
+              onMouseDown={() => setDragging("min")}
+              onTouchStart={() => setDragging("min")}
+              onKeyDown={(e) => onKeyDown(e, "min")}
+              className={thumb}
+              style={{ left: `${minPercent}%` }}
+            />
+            <button
+              type="button"
+              role="slider"
+              aria-valuemin={minVal + step}
+              aria-valuemax={max}
+              aria-valuenow={maxVal}
+              aria-valuetext={format(maxVal)}
+              aria-label={maxLabel}
+              onMouseDown={() => setDragging("max")}
+              onTouchStart={() => setDragging("max")}
+              onKeyDown={(e) => onKeyDown(e, "max")}
+              className={thumb}
+              style={{ left: `${maxPercent}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 items-center gap-3">
+          {(
+            [
+              [minLabel, minVal],
+              [maxLabel, maxVal],
+            ] as const
+          ).map(([label, v]) => (
+            <div key={label} className="rounded-md border border-line bg-paper p-3 text-center">
+              <p className="text-[11.5px] text-muted">{label}</p>
+              <p className="mt-1 text-[15px] font-semibold tracking-tight">{format(v)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  },
+);
+
+RangeSlider.displayName = "RangeSlider";
