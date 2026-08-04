@@ -1,4 +1,3 @@
-import { ProductCard } from "@/components/ui/product-card";
 import { AddToCart } from "@/components/toranjan/add-to-cart";
 import { CatalogProbe } from "./catalog-probe";
 
@@ -124,22 +123,15 @@ export default function DesignCheck() {
         </p>
       </Section>
 
-      <Section n="04" title="کامپوننت واردشده، با پالت ما">
-        <p className="mb-6 max-w-prose text-sm leading-loose text-muted">
-          کارت زیر دست‌نخورده از کاتالوگ ۲۱st آمده و هنوز به فارسی و راست‌به‌چپ
-          تطبیق داده نشده. آنچه اینجا اثبات می‌شود این است که رنگ‌هایش از
-          توکن‌های ترنجان می‌آید، نه از پیش‌فرض‌های خودش.
+      <Section n="04" title="کامپوننت واردشده، پس از تطبیق">
+        <p className="max-w-prose text-sm leading-loose text-muted">
+          کارت محصول ۲۱st دیگر اینجا نیست: تطبیق داده شد و به{" "}
+          <a href="/carpets" className="text-accent underline underline-offset-4">
+            صفحه‌ی فرش‌ها
+          </a>{" "}
+          رفت. نسخه‌ی دست‌نخورده هم نگه داشته نشد — تاریخچه‌ی گیت همان کار را
+          می‌کند و فایلی که هیچ‌وقت اجرا نمی‌شود فقط هزینه‌ی نگهداری دارد.
         </p>
-        <div className="ltr-isolate">
-          <ProductCard
-            name="Isfahan Lachak-Toranj"
-            price={24.8}
-            originalPrice={29.9}
-            images={["/next.svg", "/vercel.svg"]}
-            colors={["#18181B", "#A16207", "#72727A"]}
-            sizes={["150×225", "200×300", "250×350"]}
-          />
-        </div>
       </Section>
 
       <Section n="05" title="داده‌ی واقعی از بک‌اند">
