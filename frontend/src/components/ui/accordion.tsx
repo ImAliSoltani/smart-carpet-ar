@@ -244,6 +244,15 @@ export type AccordionProps = {
   open?: readonly string[];
   onOpenChange?: (open: string[]) => void;
   collapsible?: boolean;
+  /**
+   * Cap a panel's height and let it scroll inside itself.
+   *
+   * Off unless asked for. A capped panel is a scroll trap: the wheel or the
+   * thumb moves the panel's own content and then stops dead, so the page will
+   * not move until the pointer is taken outside the box. That is worth it only
+   * for a panel long enough that letting it push the page around is worse —
+   * never for a handful of chips.
+   */
   maxPanelHeight?: number;
   headingLevel?: number;
   className?: string;
@@ -256,7 +265,7 @@ export function Accordion({
   open: controlled,
   onOpenChange,
   collapsible = true,
-  maxPanelHeight = 220,
+  maxPanelHeight,
   headingLevel = 3,
   className = "",
 }: AccordionProps) {
@@ -305,7 +314,7 @@ function AccordionRow({
   item: AccordionItem;
   open: boolean;
   reduced: boolean;
-  maxPanelHeight: number;
+  maxPanelHeight: number | undefined;
   headingLevel: number;
   header: AccordionHeaderProps;
   panel: AccordionPanelProps;
@@ -371,12 +380,15 @@ function AccordionRow({
           {...panel}
           ref={ref}
           className="border-t border-line bg-bg"
-          style={{
-            maxHeight: maxPanelHeight,
-            overflowY: "auto",
-            overscrollBehavior: "contain",
-            scrollbarGutter: "stable",
-          }}
+          // No cap means no inner scroll area at all, so the page keeps the
+          // wheel. When there is a cap the panel scrolls and then hands the
+          // rest on — the registry set `overscroll-behavior: contain` here,
+          // which swallows it instead and strands the page under the pointer.
+          style={
+            maxPanelHeight
+              ? { maxHeight: maxPanelHeight, overflowY: "auto", scrollbarGutter: "stable" }
+              : undefined
+          }
         >
           <motion.div
             initial={false}

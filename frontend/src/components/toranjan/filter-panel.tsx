@@ -371,7 +371,6 @@ export function FilterPanel() {
           type="multiple"
           items={sections}
           defaultOpen={["pattern", "price"]}
-          maxPanelHeight={280}
         />
       )}
     </div>
