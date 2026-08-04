@@ -7,7 +7,8 @@ from sqlalchemy import Select, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Carpet, CarpetImage, CarpetVariant
-from app.schemas.catalog import CarpetListItem, CatalogFilters
+from app.models.enums import RoomType
+from app.schemas.catalog import CarpetListItem, CatalogFacets, CatalogFilters
 
 
 class ListingRow(NamedTuple):
@@ -115,6 +116,88 @@ async def list_carpets(
     stmt = stmt.offset((filters.page - 1) * filters.page_size).limit(filters.page_size)
     rows = (await session.execute(stmt)).all()
     return [row_to_list_item(ListingRow(*row)) for row in rows], total
+
+
+async def facets(session: AsyncSession) -> CatalogFacets:
+    """What the filter panel needs before anyone has filtered anything.
+
+    A chip that says how many carpets it would leave is only useful if the
+    number is true, and a price slider over a range this wide (roughly five to
+    two hundred and fifty million toman) is a bare rail unless it can show
+    where the carpets actually sit. Neither is derivable on the client: a page
+    holds at most sixty rows out of the whole catalogue, so counting what
+    arrived would describe the page rather than the shop.
+
+    Deliberately unfiltered. These are the totals of the catalogue, not of the
+    current selection — recomputing every facet against every other selection
+    is a different and much more expensive feature, and the counts here answer
+    the question a shopper actually asks first: how much of the shop is silk.
+    """
+    active = Carpet.is_active.is_(True)
+
+    async def count_by(column) -> dict[str, int]:
+        rows = await session.execute(
+            select(column, func.count()).where(active).group_by(column)
+        )
+        return {str(getattr(v, "value", v)): n for v, n in rows.all()}
+
+    patterns = await count_by(Carpet.pattern)
+    materials = await count_by(Carpet.material)
+
+    # `suitable_rooms` is an array column, so a carpet counts once per room it
+    # suits; unnest first or the group key is the whole array.
+    #
+    # Unnesting steps outside the Enum type, so what comes back is the stored
+    # name — `OFFICE` — while every other facet here reports the value the API
+    # speaks, `office`. Shipping both cases in one payload would have handed the
+    # storefront a key it cannot look a label up by, silently, for rooms only.
+    room_col = func.unnest(Carpet.suitable_rooms).label("room")
+    room_rows = await session.execute(
+        select(room_col, func.count()).where(active).group_by(room_col)
+    )
+    rooms = {RoomType[str(name)].value: n for name, n in room_rows.all()}
+
+    # No colour facet, deliberately. The dominant colours are exact hex values
+    # taken off each photograph, so they are very nearly unique: grouping the
+    # whole catalogue by colour returns twenty-four buckets holding one carpet
+    # each. A facet like that teaches nothing, and the `color` filter it would
+    # feed matches hex exactly, so it barely works either. Both need colours
+    # bucketed into families first — recorded as a debt of this phase.
+
+    price_stmt = (
+        select(func.min(CarpetVariant.price), func.max(CarpetVariant.price))
+        .select_from(CarpetVariant)
+        .join(Carpet, Carpet.id == CarpetVariant.carpet_id)
+        .where(active)
+    )
+    lo, hi = (await session.execute(price_stmt)).one()
+
+    histogram: list[int] = []
+    if lo is not None and hi is not None and hi > lo:
+        buckets = 32
+        # width_bucket clamps to [1, buckets]; the top price lands in an extra
+        # bucket without the min(), which would shorten the last bar by one.
+        bucket = func.least(
+            func.width_bucket(CarpetVariant.price, lo, hi, buckets), buckets
+        ).label("b")
+        rows = await session.execute(
+            select(bucket, func.count())
+            .select_from(CarpetVariant)
+            .join(Carpet, Carpet.id == CarpetVariant.carpet_id)
+            .where(active)
+            .group_by(text("b"))
+        )
+        counts = dict(rows.all())
+        histogram = [counts.get(i, 0) for i in range(1, buckets + 1)]
+
+    return CatalogFacets(
+        patterns=patterns,
+        materials=materials,
+        rooms=rooms,
+        min_price=lo,
+        max_price=hi,
+        price_histogram=histogram,
+    )
 
 
 async def get_carpet_by_slug(session: AsyncSession, slug: str) -> Carpet | None:

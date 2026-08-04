@@ -518,6 +518,73 @@
         "title": "CarpetUpdate",
         "type": "object"
       },
+      "CatalogFacets": {
+        "description": "Counts and ranges the filter panel needs before any filter is applied.\n\nKeys are the enum *values* the API speaks (`silk`, `lachak_toranj`), so the\nstorefront can look a count up by the same string it puts in the query.\nMembers with no stock are simply absent rather than present with a zero.",
+        "properties": {
+          "materials": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Materials",
+            "type": "object"
+          },
+          "max_price": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Price"
+          },
+          "min_price": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Price"
+          },
+          "patterns": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Patterns",
+            "type": "object"
+          },
+          "price_histogram": {
+            "description": "۳۲ سطل هم‌عرض بین min_price و max_price؛ تعداد سایزهای فروشی در هر سطل",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Price Histogram",
+            "type": "array"
+          },
+          "rooms": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Rooms",
+            "type": "object"
+          }
+        },
+        "required": [
+          "patterns",
+          "materials",
+          "rooms",
+          "min_price",
+          "max_price"
+        ],
+        "title": "CatalogFacets",
+        "type": "object"
+      },
       "CornerPoint": {
         "properties": {
           "x": {
@@ -2326,6 +2393,28 @@
           }
         },
         "summary": "List Carpets",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/api/v1/carpets/facets": {
+      "get": {
+        "description": "شمارش هر فیلتر و توزیع قیمت — ورودی پنل فیلتر.\n\nپیش از `/{slug}` تعریف شده، وگرنه «facets» به‌عنوان اسلاگ یک فرش خوانده\nمی‌شود و همیشه ۴۰۴ می‌دهد.",
+        "operationId": "catalog_facets_api_v1_carpets_facets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogFacets"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Catalog Facets",
         "tags": [
           "catalog"
         ]

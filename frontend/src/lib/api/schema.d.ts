@@ -270,6 +270,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/carpets/facets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Catalog Facets
+         * @description شمارش هر فیلتر و توزیع قیمت — ورودی پنل فیلتر.
+         *
+         *     پیش از `/{slug}` تعریف شده، وگرنه «facets» به‌عنوان اسلاگ یک فرش خوانده
+         *     می‌شود و همیشه ۴۰۴ می‌دهد.
+         */
+        get: operations["catalog_facets_api_v1_carpets_facets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/carpets/{carpet_id}/similar": {
         parameters: {
             query?: never;
@@ -533,6 +556,37 @@ export interface components {
             pattern?: components["schemas"]["CarpetPattern"] | null;
             /** Suitable Rooms */
             suitable_rooms?: components["schemas"]["RoomType"][] | null;
+        };
+        /**
+         * CatalogFacets
+         * @description Counts and ranges the filter panel needs before any filter is applied.
+         *
+         *     Keys are the enum *values* the API speaks (`silk`, `lachak_toranj`), so the
+         *     storefront can look a count up by the same string it puts in the query.
+         *     Members with no stock are simply absent rather than present with a zero.
+         */
+        CatalogFacets: {
+            /** Materials */
+            materials: {
+                [key: string]: number;
+            };
+            /** Max Price */
+            max_price: string | null;
+            /** Min Price */
+            min_price: string | null;
+            /** Patterns */
+            patterns: {
+                [key: string]: number;
+            };
+            /**
+             * Price Histogram
+             * @description ۳۲ سطل هم‌عرض بین min_price و max_price؛ تعداد سایزهای فروشی در هر سطل
+             */
+            price_histogram?: number[];
+            /** Rooms */
+            rooms: {
+                [key: string]: number;
+            };
         };
         /** CornerPoint */
         CornerPoint: {
@@ -1325,6 +1379,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    catalog_facets_api_v1_carpets_facets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogFacets"];
                 };
             };
         };

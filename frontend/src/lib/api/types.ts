@@ -14,6 +14,7 @@ type Schemas = components["schemas"];
 export type CarpetListItem = Schemas["CarpetListItem"];
 export type CarpetDetail = Schemas["CarpetDetail"];
 export type CarpetPage = Schemas["Page_CarpetListItem_"];
+export type CatalogFacets = Schemas["CatalogFacets"];
 export type VariantOut = Schemas["VariantOut"];
 export type ImageOut = Schemas["ImageOut"];
 export type SimilarItem = Schemas["SimilarItem"];

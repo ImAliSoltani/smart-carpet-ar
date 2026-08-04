@@ -3,7 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import DbSession
-from app.schemas.catalog import CarpetDetail, CarpetListItem, CatalogFilters, Page
+from app.schemas.catalog import (
+    CarpetDetail,
+    CarpetListItem,
+    CatalogFacets,
+    CatalogFilters,
+    Page,
+)
 from app.services import catalog as catalog_service
 
 router = APIRouter(prefix="/carpets", tags=["catalog"])
@@ -15,6 +21,16 @@ async def list_carpets(
 ) -> Page[CarpetListItem]:
     items, total = await catalog_service.list_carpets(session, filters)
     return Page(items=items, total=total, page=filters.page, page_size=filters.page_size)
+
+
+@router.get("/facets", response_model=CatalogFacets)
+async def catalog_facets(session: DbSession) -> CatalogFacets:
+    """شمارش هر فیلتر و توزیع قیمت — ورودی پنل فیلتر.
+
+    پیش از `/{slug}` تعریف شده، وگرنه «facets» به‌عنوان اسلاگ یک فرش خوانده
+    می‌شود و همیشه ۴۰۴ می‌دهد.
+    """
+    return await catalog_service.facets(session)
 
 
 @router.get("/{slug}", response_model=CarpetDetail)

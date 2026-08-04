@@ -14,6 +14,7 @@ import type {
   CarpetDetail,
   CarpetFilters,
   CarpetPage,
+  CatalogFacets,
   VisualSearchResponse,
 } from "./types";
 
@@ -21,6 +22,7 @@ export const catalogKeys = {
   all: ["catalog"] as const,
   list: (filters: CarpetFilters) => ["catalog", "list", filters] as const,
   detail: (slug: string) => ["catalog", "detail", slug] as const,
+  facets: () => ["catalog", "facets"] as const,
   similar: (carpetId: number, limit: number) =>
     ["catalog", "similar", carpetId, limit] as const,
 };
@@ -45,6 +47,21 @@ export function getSimilarCarpets(
   return request<VisualSearchResponse>(`/api/v1/carpets/${carpetId}/similar`, {
     query: { limit },
     signal,
+  });
+}
+
+/** Counts per filter and the price distribution — the filter panel's input. */
+export function getFacets(signal?: AbortSignal): Promise<CatalogFacets> {
+  return request<CatalogFacets>("/api/v1/carpets/facets", { signal });
+}
+
+export function facetsQuery() {
+  return queryOptions({
+    queryKey: catalogKeys.facets(),
+    queryFn: ({ signal }) => getFacets(signal),
+    // Only moves when the shopkeeper adds a carpet, and every filter
+    // interaction would otherwise re-ask for numbers that did not change.
+    staleTime: 15 * 60 * 1000,
   });
 }
 

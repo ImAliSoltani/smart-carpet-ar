@@ -86,6 +86,25 @@ class CatalogFilters(BaseModel):
     page_size: int = Field(default=24, ge=1, le=60)
 
 
+class CatalogFacets(BaseModel):
+    """Counts and ranges the filter panel needs before any filter is applied.
+
+    Keys are the enum *values* the API speaks (`silk`, `lachak_toranj`), so the
+    storefront can look a count up by the same string it puts in the query.
+    Members with no stock are simply absent rather than present with a zero.
+    """
+
+    patterns: dict[str, int]
+    materials: dict[str, int]
+    rooms: dict[str, int]
+    min_price: Decimal | None
+    max_price: Decimal | None
+    price_histogram: list[int] = Field(
+        default_factory=list,
+        description="۳۲ سطل هم‌عرض بین min_price و max_price؛ تعداد سایزهای فروشی در هر سطل",
+    )
+
+
 class SimilarItem(BaseModel):
     carpet: CarpetListItem
     similarity: float = Field(description="1 = عین هم؛ بر اساس فاصله‌ی کسینوسی")
