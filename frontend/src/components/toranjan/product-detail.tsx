@@ -42,6 +42,11 @@ import { cn } from "@/lib/utils";
  *   [ui/zoomable-image](../ui/zoomable-image.tsx). The cross-fade and the row
  *   of dots are untouched; a click on the photograph now opens it full-screen
  *   at the 1600px derivative instead of doing nothing.
+ * - **And it can be swiped or stepped through.** The dots alone left a reader
+ *   who had pinched into the weave with nothing to reach but a target below
+ *   the photograph. A horizontal drag and, on pointer devices, a pair of
+ *   arrows at the frame's edges now do the same job without leaving the
+ *   photograph.
  *
  * Removed, because §6 of the roadmap closes the scope: the seller block with
  * its avatar and stars (this is one shop, and there are no reviews) and the
@@ -69,6 +74,41 @@ export function ProductDetail({
     .filter((entry): entry is { src: string; zoomSrc: string } => Boolean(entry.src));
 
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+
+  /* ---- moving between photographs -------------------------------------
+     The row of dots was the only way through the gallery, and it is the
+     wrong only-way on a phone: it sits under the photograph, so a reader who
+     has pinch-zoomed in on the weave has to zoom back out to reach it. A
+     swipe stays where the eye already is. On a pointer device there is no
+     swipe, so the same move is a pair of arrows at the edges of the frame.
+
+     The dots stay. They are the only control a screen reader or a keyboard
+     can address by position, and they are the only one that says how many
+     photographs there are. */
+  const imageCount = gallery.length;
+
+  const goToImage = React.useCallback(
+    (index: number) => {
+      if (imageCount === 0) return;
+      // wraps both ways, so the last photograph leads back to the first
+      setCurrentImageIndex(((index % imageCount) + imageCount) % imageCount);
+    },
+    [imageCount],
+  );
+
+  /* Which way is «next». The page is RTL, so the gallery runs right to left:
+     photograph two sits to the left of photograph one. Bringing it into view
+     means moving the strip rightwards, so a drag towards +x advances — the
+     mirror of what the same gesture does in an LTR carousel. The arrow keys
+     flip with it, which is the rule this repo already learned the hard way. */
+  const NEXT_DRAG_SIGN = 1;
+  const SWIPE_DISTANCE = 60; // px
+  const SWIPE_VELOCITY = 400; // px/s — a flick that never travels far
+
+  // A drag that ends over the photograph still fires a click, and the click
+  // would open the lightbox. Measure the pointer's travel and swallow it.
+  const pointerStartX = React.useRef<number | null>(null);
+  const swallowNextClick = React.useRef(false);
 
   // Cheapest first: the number under the title should be the one the card in
   // the grid promised, and that card shows the lowest price.
@@ -114,6 +154,25 @@ export function ProductDetail({
 
       <main className="grid grid-cols-1 gap-8 lg:grid-cols-2 md:gap-12">
         <div className="flex flex-col gap-4">
+          {/* The frame re-mounts on every change of photograph — that is what
+              drives the cross-fade — so the arrows live on a stable wrapper
+              outside it, or they would re-enter with each one. */}
+          <div
+            className="relative"
+            role="group"
+            aria-label="تصویرهای فرش"
+            onKeyDown={(event) => {
+              if (imageCount < 2) return;
+              // RTL: the left arrow travels the way the gallery reads.
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                goToImage(currentImageIndex + 1);
+              } else if (event.key === "ArrowRight") {
+                event.preventDefault();
+                goToImage(currentImageIndex - 1);
+              }
+            }}
+          >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentImageIndex}
@@ -130,7 +189,47 @@ export function ProductDetail({
               animate={{ opacity: 1, y: 0 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: -20 }}
               transition={{ duration: reduced ? 0 : 0.3 }}
-              className="toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg"
+              // Horizontal drag only, and framer-motion answers it with
+              // `touch-action: pan-y`, so the page still scrolls under the
+              // finger. A carousel that eats the vertical scroll is the
+              // gesture conflict this would otherwise introduce.
+              drag={imageCount > 1 ? "x" : false}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              dragMomentum={false}
+              onPointerDownCapture={(event) => {
+                pointerStartX.current = event.clientX;
+                swallowNextClick.current = false;
+              }}
+              onPointerUpCapture={(event) => {
+                if (
+                  pointerStartX.current !== null &&
+                  Math.abs(event.clientX - pointerStartX.current) > 8
+                ) {
+                  swallowNextClick.current = true;
+                }
+              }}
+              onClickCapture={(event) => {
+                if (!swallowNextClick.current) return;
+                // The lightbox listens on the photograph itself, below this
+                // handler, so the native event has to be stopped too.
+                event.preventDefault();
+                event.stopPropagation();
+                event.nativeEvent.stopImmediatePropagation();
+              }}
+              onDragEnd={(_, info) => {
+                if (imageCount < 2) return;
+                const travelled =
+                  Math.abs(info.offset.x) > SWIPE_DISTANCE ||
+                  Math.abs(info.velocity.x) > SWIPE_VELOCITY;
+                if (!travelled) return;
+                const forward = Math.sign(info.offset.x) === NEXT_DRAG_SIGN;
+                goToImage(currentImageIndex + (forward ? 1 : -1));
+              }}
+              className={cn(
+                "toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg",
+                imageCount > 1 && "touch-pan-y",
+              )}
             >
               {gallery[currentImageIndex] && (
                 <ZoomableImage
@@ -148,13 +247,42 @@ export function ProductDetail({
             </motion.div>
           </AnimatePresence>
 
+          {/* Pointer devices have no swipe. Hidden below `sm`, where the
+              swipe is the gesture and an overlay this size would sit on the
+              photograph instead of beside it — the dots still cover anyone
+              on a phone who cannot swipe. */}
+          {imageCount > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goToImage(currentImageIndex - 1)}
+                aria-label="تصویر قبلی"
+                // Inline-start — the right, in this page's direction. The
+                // gallery reads right to left, so «back» is the side already
+                // read and «next» is the side not yet reached.
+                className="absolute start-3 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full border border-line-2 bg-paper/85 text-ink-2 backdrop-blur-sm transition-colors duration-[--dur-feedback] hover:text-ink sm:grid"
+              >
+                <ChevronRight className="size-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => goToImage(currentImageIndex + 1)}
+                aria-label="تصویر بعدی"
+                className="absolute end-3 top-1/2 hidden size-11 -translate-y-1/2 place-items-center rounded-full border border-line-2 bg-paper/85 text-ink-2 backdrop-blur-sm transition-colors duration-[--dur-feedback] hover:text-ink sm:grid"
+              >
+                <ChevronRight className="size-5 rotate-180" />
+              </button>
+            </>
+          )}
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="flex gap-2">
               {gallery.map((_, index) => (
                 <button
                   key={index}
                   type="button"
-                  onClick={() => setCurrentImageIndex(index)}
+                  onClick={() => goToImage(index)}
                   className={cn(
                     "h-2 rounded-full transition-all duration-300",
                     currentImageIndex === index ? "w-5 bg-ink" : "w-2 bg-ink/25 hover:bg-ink/40",
