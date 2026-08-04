@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useCartCount } from "@/lib/store/cart";
 import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
 
 import {
@@ -186,7 +187,12 @@ function PanelHeading({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
+export function SiteHeader({
+  /** Overrides the device's cart. Only the design-review page passes it. */
+  cartCount,
+}: { cartCount?: number } = {}) {
+  const storedCartCount = useCartCount();
+  const count = cartCount ?? storedCartCount;
   const scrolled = useScrolled();
   const pathname = usePathname();
   // The featured rug is only worth fetching once the panel that shows it exists.
@@ -394,15 +400,15 @@ export function SiteHeader({ cartCount = 0 }: { cartCount?: number }) {
         </Link>
         <Link
           href="/cart"
-          aria-label={cartCount > 0 ? `سبد خرید، ${formatNumber(cartCount)} قلم` : "سبد خرید"}
+          aria-label={count > 0 ? `سبد خرید، ${formatNumber(count)} قلم` : "سبد خرید"}
           className="relative grid size-11 place-items-center rounded-full text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-line hover:text-ink"
         >
           <ShoppingBag className="size-5" />
           {/* The one piece of gold in the header, and only when it means
               something. An empty cart wearing a badge is decoration. */}
-          {cartCount > 0 && (
+          {count > 0 && (
             <span className="absolute end-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] text-white">
-              {formatNumber(cartCount)}
+              {formatNumber(count)}
             </span>
           )}
         </Link>

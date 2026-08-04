@@ -12,6 +12,8 @@ import { ZoomableImage } from "@/components/ui/zoomable-image";
 import { mediaUrl } from "@/lib/api/client";
 import type { CarpetDetail, VariantOut } from "@/lib/api/types";
 import { formatNumber, formatSize, formatToman } from "@/lib/format";
+import { useCartStore } from "@/lib/store/cart";
+import { useFavorites } from "@/lib/store/favorites";
 import { MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +63,8 @@ export function ProductDetail({
   similar?: React.ReactNode;
 }) {
   const reduced = useReducedMotion();
+  const favorites = useFavorites();
+  const addToCart = useCartStore((state) => state.add);
 
   // Each photograph twice over: the 800px derivative for the page, and the
   // 1600px one for the lightbox. `full_url` is null on rows ingested before the
@@ -144,8 +148,19 @@ export function ProductDetail({
       </nav>
 
       <div className="mb-6 flex items-center justify-end gap-1">
-        <Button variant="ghost" size="icon" className="size-11 rounded-full" aria-label="علاقه‌مندی">
-          <Heart className="size-5" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 rounded-full"
+          aria-label={
+            favorites.has(carpet.id) ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"
+          }
+          aria-pressed={favorites.has(carpet.id)}
+          onClick={() => favorites.toggle(carpet.id)}
+        >
+          <Heart
+            className={cn("size-5", favorites.has(carpet.id) && "fill-accent text-accent")}
+          />
         </Button>
         <Button variant="ghost" size="icon" className="size-11 rounded-full" aria-label="اشتراک‌گذاری">
           <Share2 className="size-5" />
@@ -367,7 +382,24 @@ export function ProductDetail({
               )}
             </Button>
             <div className="flex-1">
-              <AddToCart />
+              <AddToCart
+                // Out of stock is the one case where the button must not
+                // pretend: the order endpoint would refuse the line anyway.
+                key={selected?.id}
+                onAdd={() => {
+                  if (!selected || selected.stock <= 0) return;
+                  addToCart({
+                    variantId: selected.id,
+                    carpetId: carpet.id,
+                    carpetSlug: carpet.slug,
+                    carpetName: carpet.name,
+                    widthCm: selected.width_cm,
+                    lengthCm: selected.length_cm,
+                    unitPrice: selected.price,
+                    imageUrl: carpet.images.find((i) => i.is_primary)?.url ?? null,
+                  });
+                }}
+              />
             </div>
           </div>
 

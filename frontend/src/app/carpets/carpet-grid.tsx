@@ -7,6 +7,7 @@ import { CarpetCard } from "@/components/toranjan/carpet-card";
 import { carpetListQuery } from "@/lib/api/catalog";
 import { ApiError } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
+import { useFavorites } from "@/lib/store/favorites";
 import type { CarpetFilters } from "@/lib/api/types";
 
 /**
@@ -21,6 +22,9 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
   const { data, error, isPending, isPaused, isFetching, refetch } = useQuery(
     carpetListQuery(filters),
   );
+  // The card renders its heart only when something can receive the press, so
+  // this is what makes it appear at all.
+  const favorites = useFavorites();
 
   if (isPaused) {
     return (
@@ -89,7 +93,12 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
       <ul className="grid grid-cols-2 gap-x-5 gap-y-9 md:grid-cols-3 xl:grid-cols-4">
         {data.items.map((carpet, i) => (
           <li key={carpet.id}>
-            <CarpetCard carpet={carpet} index={i} />
+            <CarpetCard
+              carpet={carpet}
+              index={i}
+              isWishlisted={favorites.has(carpet.id)}
+              onWishlistToggle={favorites.toggle}
+            />
           </li>
         ))}
       </ul>
