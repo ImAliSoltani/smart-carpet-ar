@@ -154,3 +154,51 @@ def test_one_facet_takes_several_values_as_alternatives(client, admin_client) ->
         "/api/v1/carpets", params={"room": ["bedroom", "kids_room"]}
     ).json()
     assert rooms["total"] == 2
+
+
+def test_named_ids_are_a_filter_like_any_other(client, admin_client) -> None:
+    """Favourites are a list the device holds, not a query it can describe.
+
+    Without this the storefront's only options are one request per carpet or a
+    second, parallel endpoint. It is a filter, so it composes: an id outside the
+    rest of the query simply does not match.
+    """
+    first = _create(
+        admin_client,
+        "picked-silk",
+        pattern="lachak_toranj",
+        material="silk",
+        rooms=["living_room"],
+        prices=[9_000_000],
+    )
+    second = _create(
+        admin_client,
+        "picked-wool",
+        pattern="afshan",
+        material="wool",
+        rooms=["bedroom"],
+        prices=[4_000_000],
+    )
+    _create(
+        admin_client,
+        "not-picked",
+        pattern="modern",
+        material="acrylic",
+        rooms=["kids_room"],
+        prices=[1_500_000],
+    )
+
+    picked = client.get(
+        "/api/v1/carpets", params={"id": [first["id"], second["id"]]}
+    ).json()
+    assert {item["slug"] for item in picked["items"]} == {"picked-silk", "picked-wool"}
+
+    # Narrows with the rest of the query rather than overriding it.
+    narrowed = client.get(
+        "/api/v1/carpets",
+        params={"id": [first["id"], second["id"]], "material": ["wool"]},
+    ).json()
+    assert [item["slug"] for item in narrowed["items"]] == ["picked-wool"]
+
+    # An id that is not in the catalogue is not an error; it just matches nothing.
+    assert client.get("/api/v1/carpets", params={"id": [10_000_000]}).json()["total"] == 0

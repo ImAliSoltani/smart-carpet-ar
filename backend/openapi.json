@@ -2244,6 +2244,27 @@
             }
           },
           {
+            "description": "چند مقدار، با تکرار همین پارامتر",
+            "in": "query",
+            "name": "id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "چند مقدار، با تکرار همین پارامتر",
+              "title": "Id"
+            }
+          },
+          {
             "in": "query",
             "name": "color",
             "required": false,

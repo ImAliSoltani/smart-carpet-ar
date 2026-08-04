@@ -1354,6 +1354,8 @@ export interface operations {
                 material?: components["schemas"]["CarpetMaterial"][] | null;
                 /** @description چند مقدار، با تکرار همین پارامتر */
                 room?: components["schemas"]["RoomType"][] | null;
+                /** @description چند مقدار، با تکرار همین پارامتر */
+                id?: number[] | null;
                 color?: string | null;
                 min_width_cm?: number | null;
                 max_width_cm?: number | null;

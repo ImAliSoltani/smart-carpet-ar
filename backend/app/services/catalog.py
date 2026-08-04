@@ -58,6 +58,8 @@ def _apply_filters(stmt: Select, filters: CatalogFilters) -> Select:
     # Within one facet the values are alternatives (silk OR wool); across
     # facets they narrow (silk AND for a bedroom). That is what a shopper
     # means by ticking two boxes in the same group.
+    if filters.id:
+        stmt = stmt.where(Carpet.id.in_(filters.id))
     if filters.pattern:
         stmt = stmt.where(Carpet.pattern.in_(filters.pattern))
     if filters.material:

@@ -18,6 +18,8 @@
 |---|---|
 | `toranjan/carpet-card.tsx` | [beratberkayg/product-card-1](https://21st.dev/@beratberkayg/components/product-card-1) |
 | `toranjan/site-header.tsx` | [bundui/navigation-menu4](https://21st.dev/@bundui/components/navigation-menu4) |
+| `toranjan/product-detail.tsx` | [kavikatiyar/product-detail-page](https://21st.dev/@kavikatiyar/components/product-detail-page) |
+| `toranjan/cart-view.tsx` | [kokonutd/interactive-checkout](https://21st.dev/@kokonutd/components/interactive-checkout) — ستون چپش از کاتالوگ به خود سبد تبدیل شد؛ `NumberFlow` حذف شد چون با ارقام فارسی `NaN` می‌دهد |
 
 ## چرا فایل‌ها در مخزن‌اند و با `shadcn add` نصب نمی‌شوند
 

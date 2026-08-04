@@ -88,6 +88,11 @@ class CatalogFilters(BaseModel):
     pattern: Annotated[list[CarpetPattern] | None, Query(description=_repeat)] = None
     material: Annotated[list[CarpetMaterial] | None, Query(description=_repeat)] = None
     room: Annotated[list[RoomType] | None, Query(description=_repeat)] = None
+    # Named carpets, for a list the device is holding rather than one the
+    # shopper is narrowing: favourites and comparison (§6-11) keep ids and have
+    # no other way to ask for them. It composes with the rest like any other
+    # filter — an id outside the set simply does not match.
+    id: Annotated[list[int] | None, Query(description=_repeat)] = None
     color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     min_width_cm: int | None = Field(default=None, ge=1)
     max_width_cm: int | None = Field(default=None, ge=1)

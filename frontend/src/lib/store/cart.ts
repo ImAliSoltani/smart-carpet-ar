@@ -51,6 +51,13 @@ interface CartState {
   /** Adds, or raises the quantity if this size is already in the cart. */
   add: (line: Omit<CartLine, "quantity">, quantity?: number) => void;
   setQuantity: (variantId: number, quantity: number) => void;
+  /**
+   * Moves a quantity by a step. Not the same thing as `setQuantity(n + 1)`
+   * from a component: the component's `n` is whatever the last render saw, so
+   * two presses inside one tick both compute the same answer and one of them
+   * is lost. The delta is applied to the state the store holds now.
+   */
+  changeQuantity: (variantId: number, delta: number) => void;
   remove: (variantId: number) => void;
   clear: () => void;
 }
@@ -88,6 +95,20 @@ export const useCartStore = create<CartState>()(
                   l.variantId === variantId ? { ...l, quantity: clampQuantity(quantity) } : l,
                 ),
         })),
+
+      changeQuantity: (variantId, delta) =>
+        set((state) => {
+          const line = state.lines.find((l) => l.variantId === variantId);
+          if (!line) return state;
+          const next = line.quantity + delta;
+          return next < 1
+            ? { lines: state.lines.filter((l) => l.variantId !== variantId) }
+            : {
+                lines: state.lines.map((l) =>
+                  l.variantId === variantId ? { ...l, quantity: clampQuantity(next) } : l,
+                ),
+              };
+        }),
 
       remove: (variantId) =>
         set((state) => ({ lines: state.lines.filter((l) => l.variantId !== variantId) })),
