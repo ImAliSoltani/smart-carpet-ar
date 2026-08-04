@@ -107,3 +107,50 @@ def test_facet_keys_are_the_values_the_api_speaks(client, admin_client) -> None:
 def test_facets_is_not_read_as_a_carpet_slug(client) -> None:
     """`/carpets/facets` must not be matched by `/carpets/{slug}`."""
     assert client.get("/api/v1/carpets/facets").status_code == 200
+
+
+def test_one_facet_takes_several_values_as_alternatives(client, admin_client) -> None:
+    """Two ticks in the same group widen; ticks in different groups narrow."""
+    _create(
+        admin_client,
+        "multi-silk",
+        pattern="lachak_toranj",
+        material="silk",
+        rooms=["living_room"],
+        prices=[10_000_000],
+    )
+    _create(
+        admin_client,
+        "multi-wool",
+        pattern="afshan",
+        material="wool",
+        rooms=["bedroom"],
+        prices=[6_000_000],
+    )
+    _create(
+        admin_client,
+        "multi-acrylic",
+        pattern="modern",
+        material="acrylic",
+        rooms=["kids_room"],
+        prices=[2_000_000],
+    )
+
+    only_silk = client.get("/api/v1/carpets", params={"material": ["silk"]}).json()
+    assert only_silk["total"] == 1
+
+    # Alternatives inside one facet.
+    either = client.get("/api/v1/carpets", params={"material": ["silk", "wool"]}).json()
+    assert either["total"] == 2
+
+    # And a second facet still narrows rather than widening.
+    both = client.get(
+        "/api/v1/carpets", params={"material": ["silk", "wool"], "room": ["bedroom"]}
+    ).json()
+    assert both["total"] == 1
+
+    # Rooms are an array column, so several rooms must overlap, not equal.
+    rooms = client.get(
+        "/api/v1/carpets", params={"room": ["bedroom", "kids_room"]}
+    ).json()
+    assert rooms["total"] == 2

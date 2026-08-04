@@ -108,7 +108,7 @@ function useScrolled() {
  */
 function FeaturedPattern({ enabled }: { enabled: boolean }) {
   const { data, isPending } = useQuery({
-    ...carpetListQuery({ pattern: "lachak_toranj", page_size: 1, sort: "price_desc" }),
+    ...carpetListQuery({ pattern: ["lachak_toranj"], page_size: 1, sort: "price_desc" }),
     enabled,
   });
   const carpet = data?.items[0];

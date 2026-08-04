@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import DbSession
 from app.schemas.catalog import (
@@ -17,7 +17,12 @@ router = APIRouter(prefix="/carpets", tags=["catalog"])
 
 @router.get("", response_model=Page[CarpetListItem])
 async def list_carpets(
-    session: DbSession, filters: Annotated[CatalogFilters, Depends()]
+    # `Query()`, not `Depends()`. As a dependency FastAPI reads each field as a
+    # query parameter but drops repeated values for the list ones — filtering
+    # then silently does nothing and answers 200. As a query-parameter model it
+    # collects them.
+    session: DbSession,
+    filters: Annotated[CatalogFilters, Query()],
 ) -> Page[CarpetListItem]:
     items, total = await catalog_service.list_carpets(session, filters)
     return Page(items=items, total=total, page=filters.page, page_size=filters.page_size)

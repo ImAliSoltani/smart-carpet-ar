@@ -1,8 +1,9 @@
 """API schemas for the public catalog."""
 
 from decimal import Decimal
-from typing import Literal
+from typing import Annotated, Literal
 
+from fastapi import Query
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.enums import ArAssetStatus, CarpetMaterial, CarpetPattern, RoomType
@@ -71,9 +72,17 @@ class CatalogFilters(BaseModel):
     """Query params of the listing endpoint — one source of truth for the API contract."""
 
     q: str | None = Field(default=None, max_length=100, description="جست‌وجوی متنی")
-    pattern: CarpetPattern | None = None
-    material: CarpetMaterial | None = None
-    room: RoomType | None = None
+    # Repeatable. A shopper narrowing to "silk" almost always means "silk or
+    # wool, not polyester" — a single value forces them to look twice and
+    # compare from memory. Repeat the parameter: ?material=silk&material=wool.
+    # `Query()` is not decoration. Inside a model used as a dependency, FastAPI
+    # only treats a list field as a repeatable query parameter when it is
+    # annotated; without it the values are silently dropped and every request
+    # comes back unfiltered — which is what happened, and it returns 200.
+    _repeat = "چند مقدار، با تکرار همین پارامتر"
+    pattern: Annotated[list[CarpetPattern] | None, Query(description=_repeat)] = None
+    material: Annotated[list[CarpetMaterial] | None, Query(description=_repeat)] = None
+    room: Annotated[list[RoomType] | None, Query(description=_repeat)] = None
     color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     min_width_cm: int | None = Field(default=None, ge=1)
     max_width_cm: int | None = Field(default=None, ge=1)

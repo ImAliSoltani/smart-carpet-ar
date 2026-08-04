@@ -2140,6 +2140,7 @@
         "operationId": "list_carpets_api_v1_carpets_get",
         "parameters": [
           {
+            "description": "جست‌وجوی متنی",
             "in": "query",
             "name": "q",
             "required": false,
@@ -2153,54 +2154,70 @@
                   "type": "null"
                 }
               ],
+              "description": "جست‌وجوی متنی",
               "title": "Q"
             }
           },
           {
+            "description": "چند مقدار، با تکرار همین پارامتر",
             "in": "query",
             "name": "pattern",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/CarpetPattern"
+                  "items": {
+                    "$ref": "#/components/schemas/CarpetPattern"
+                  },
+                  "type": "array"
                 },
                 {
                   "type": "null"
                 }
               ],
+              "description": "چند مقدار، با تکرار همین پارامتر",
               "title": "Pattern"
             }
           },
           {
+            "description": "چند مقدار، با تکرار همین پارامتر",
             "in": "query",
             "name": "material",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/CarpetMaterial"
+                  "items": {
+                    "$ref": "#/components/schemas/CarpetMaterial"
+                  },
+                  "type": "array"
                 },
                 {
                   "type": "null"
                 }
               ],
+              "description": "چند مقدار، با تکرار همین پارامتر",
               "title": "Material"
             }
           },
           {
+            "description": "چند مقدار، با تکرار همین پارامتر",
             "in": "query",
             "name": "room",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/RoomType"
+                  "items": {
+                    "$ref": "#/components/schemas/RoomType"
+                  },
+                  "type": "array"
                 },
                 {
                   "type": "null"
                 }
               ],
+              "description": "چند مقدار، با تکرار همین پارامتر",
               "title": "Room"
             }
           },

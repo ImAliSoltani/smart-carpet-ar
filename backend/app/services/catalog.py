@@ -55,12 +55,16 @@ def _apply_filters(stmt: Select, filters: CatalogFilters) -> Select:
             | func.coalesce(Carpet.description, "").ilike(pattern)
             | (func.word_similarity(filters.q, Carpet.name) > 0.3)
         )
+    # Within one facet the values are alternatives (silk OR wool); across
+    # facets they narrow (silk AND for a bedroom). That is what a shopper
+    # means by ticking two boxes in the same group.
     if filters.pattern:
-        stmt = stmt.where(Carpet.pattern == filters.pattern)
+        stmt = stmt.where(Carpet.pattern.in_(filters.pattern))
     if filters.material:
-        stmt = stmt.where(Carpet.material == filters.material)
+        stmt = stmt.where(Carpet.material.in_(filters.material))
     if filters.room:
-        stmt = stmt.where(Carpet.suitable_rooms.any(filters.room))
+        # `overlap` is the array `&&`: suits any one of the rooms asked for.
+        stmt = stmt.where(Carpet.suitable_rooms.overlap(filters.room))
     if filters.color:
         stmt = stmt.where(Carpet.colors.any(filters.color.lower()))
 

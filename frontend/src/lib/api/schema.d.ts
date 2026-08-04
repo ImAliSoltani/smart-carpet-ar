@@ -1342,10 +1342,14 @@ export interface operations {
     list_carpets_api_v1_carpets_get: {
         parameters: {
             query?: {
+                /** @description جست‌وجوی متنی */
                 q?: string | null;
-                pattern?: components["schemas"]["CarpetPattern"] | null;
-                material?: components["schemas"]["CarpetMaterial"] | null;
-                room?: components["schemas"]["RoomType"] | null;
+                /** @description چند مقدار، با تکرار همین پارامتر */
+                pattern?: components["schemas"]["CarpetPattern"][] | null;
+                /** @description چند مقدار، با تکرار همین پارامتر */
+                material?: components["schemas"]["CarpetMaterial"][] | null;
+                /** @description چند مقدار، با تکرار همین پارامتر */
+                room?: components["schemas"]["RoomType"][] | null;
                 color?: string | null;
                 min_width_cm?: number | null;
                 max_width_cm?: number | null;

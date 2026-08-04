@@ -74,16 +74,24 @@ function messageFor(status: number, body: unknown): string {
   return FALLBACK_MESSAGE[status] ?? GENERIC_MESSAGE;
 }
 
-export type QueryValue = string | number | boolean | null | undefined;
+export type QueryScalar = string | number | boolean | null | undefined;
+export type QueryValue = QueryScalar | readonly QueryScalar[];
 
 function withQuery(path: string, query?: Record<string, QueryValue>): string {
   if (!query) return path;
   const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(query)) {
+  const put = (key: string, value: QueryScalar) => {
     // An unset filter has to be absent, not empty. `?color=` is a value as far
     // as FastAPI is concerned, and fails validation instead of being ignored.
-    if (value === null || value === undefined || value === "") continue;
+    if (value === null || value === undefined || value === "") return;
     search.append(key, String(value));
+  };
+  for (const [key, value] of Object.entries(query)) {
+    // Several values for one filter repeat the parameter rather than joining
+    // with commas — `?material=silk&material=wool` is what the API reads, and
+    // an empty array means the filter is simply not set.
+    if (Array.isArray(value)) value.forEach((v) => put(key, v));
+    else put(key, value as QueryScalar);
   }
   const qs = search.toString();
   return qs ? `${path}?${qs}` : path;

@@ -22,9 +22,18 @@ function readFilters(params: Record<string, string | string[] | undefined>): Car
     return Array.isArray(v) ? v[0] : v;
   };
 
-  const pattern = one("pattern");
-  const material = one("material");
-  const room = one("room");
+  // Repeatable filters keep every value: ?material=silk&material=wool. Each is
+  // checked against the taxonomy, so one bad entry drops itself rather than the
+  // whole selection.
+  const many = <T extends string>(k: string, allowed: Record<string, unknown>): T[] => {
+    const v = params[k];
+    const list = v === undefined ? [] : Array.isArray(v) ? v : [v];
+    return [...new Set(list.filter((x) => x in allowed))] as T[];
+  };
+
+  const pattern = many<CarpetPattern>("pattern", PATTERN_LABEL);
+  const material = many<CarpetMaterial>("material", MATERIAL_LABEL);
+  const room = many<RoomType>("room", ROOM_LABEL);
   const sort = one("sort");
   const q = one("q")?.trim();
   const page = Number(one("page"));
@@ -40,9 +49,9 @@ function readFilters(params: Record<string, string | string[] | undefined>): Car
 
   return {
     ...(q ? { q: q.slice(0, 100) } : {}),
-    ...(pattern && pattern in PATTERN_LABEL ? { pattern: pattern as CarpetPattern } : {}),
-    ...(material && material in MATERIAL_LABEL ? { material: material as CarpetMaterial } : {}),
-    ...(room && room in ROOM_LABEL ? { room: room as RoomType } : {}),
+    ...(pattern.length ? { pattern } : {}),
+    ...(material.length ? { material } : {}),
+    ...(room.length ? { room } : {}),
     ...(minPrice !== undefined ? { min_price: minPrice } : {}),
     ...(maxPrice !== undefined ? { max_price: maxPrice } : {}),
     ...(sort === "price_asc" || sort === "price_desc" ? { sort } : {}),
@@ -59,21 +68,23 @@ function headingFor(filters: CarpetFilters): { title: string; lede: string } {
       lede: "نتیجه‌ها را می‌توانی با فیلترها باریک‌تر کنی.",
     };
   }
-  if (filters.pattern) {
+  // Only a single choice earns its own heading; two patterns have no shared
+  // name, and «فرش‌های نقش لچک‌ترنج و افشان» reads worse than the plain title.
+  if (filters.pattern?.length === 1) {
     return {
-      title: `فرش‌های نقش ${PATTERN_LABEL[filters.pattern]}`,
+      title: `فرش‌های نقش ${PATTERN_LABEL[filters.pattern[0]]}`,
       lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودت ببین.",
     };
   }
-  if (filters.material) {
+  if (filters.material?.length === 1) {
     return {
-      title: `فرش‌های ${MATERIAL_LABEL[filters.material]}`,
+      title: `فرش‌های ${MATERIAL_LABEL[filters.material[0]]}`,
       lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودت ببین.",
     };
   }
-  if (filters.room) {
+  if (filters.room?.length === 1) {
     return {
-      title: `فرش مناسب ${ROOM_LABEL[filters.room]}`,
+      title: `فرش مناسب ${ROOM_LABEL[filters.room[0]]}`,
       lede: "اندازه و نقش‌هایی که برای این فضا انتخاب شده‌اند.",
     };
   }
