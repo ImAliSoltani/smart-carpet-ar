@@ -102,6 +102,10 @@ export function CarpetCard({
               alt={carpet.name}
               fill
               sizes="(min-width: 1280px) 22vw, (min-width: 768px) 33vw, 50vw"
+              // The first row is above the fold on every breakpoint and is the
+              // largest thing painted; lazy-loading it means measuring our own
+              // LCP against a placeholder. Four covers the widest grid.
+              priority={index < 4}
               // `contain`, not `cover`: these photographs are cut out to the
               // weave, and cropping one would cut the border off the pattern.
               className="object-contain p-4 transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
