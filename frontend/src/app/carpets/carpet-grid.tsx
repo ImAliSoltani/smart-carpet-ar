@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
 import { CarpetCard } from "@/components/toranjan/carpet-card";
@@ -72,12 +73,12 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
         <p className="mt-3 text-sm leading-loose text-muted">
           می‌توانی یکی از فیلترها را بردارید یا همه‌ی فرش‌ها را ببینید.
         </p>
-        <a
+        <Link
           href="/carpets"
           className="mt-6 inline-block rounded-full bg-cta px-6 py-2.5 text-sm text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover"
         >
           همه‌ی فرش‌ها
-        </a>
+        </Link>
       </div>
     );
   }

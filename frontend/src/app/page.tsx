@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { AddToCart } from "@/components/toranjan/add-to-cart";
 import { CatalogProbe } from "./catalog-probe";
 
@@ -126,9 +128,9 @@ export default function DesignCheck() {
       <Section n="04" title="کامپوننت واردشده، پس از تطبیق">
         <p className="max-w-prose text-sm leading-loose text-muted">
           کارت محصول ۲۱st دیگر اینجا نیست: تطبیق داده شد و به{" "}
-          <a href="/carpets" className="text-accent underline underline-offset-4">
+          <Link href="/carpets" className="text-accent underline underline-offset-4">
             صفحه‌ی فرش‌ها
-          </a>{" "}
+          </Link>{" "}
           رفت. نسخه‌ی دست‌نخورده هم نگه داشته نشد — تاریخچه‌ی گیت همان کار را
           می‌کند و فایلی که هیچ‌وقت اجرا نمی‌شود فقط هزینه‌ی نگهداری دارد.
         </p>
