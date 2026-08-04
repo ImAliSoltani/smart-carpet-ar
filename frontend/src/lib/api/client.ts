@@ -8,15 +8,24 @@
  */
 
 /**
- * Origin of the API and of the files it stores.
+ * Where a request is addressed to.
  *
- * Development runs the two on different ports, so this cannot be assumed to be
- * the site's own origin. In production Caddy puts both behind one host and the
- * variable is set to that.
+ * In the browser: nowhere. Requests go to the origin the page was served from
+ * and `next.config.ts` proxies `/api` and `/files` on to the backend. That is
+ * what lets the site be opened from a phone on the same network — a browser
+ * told to call `http://localhost:8000` would be calling the phone itself —
+ * and it is also what production looks like, with Caddy behind one host.
+ *
+ * On the server there is no origin to be relative to, so a real address is
+ * needed. It is the only place the backend's own port is spoken aloud.
  */
-export const API_BASE = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"
+const SERVER_API_BASE = (
+  process.env.API_INTERNAL_URL ??
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "http://localhost:8000"
 ).replace(/\/+$/, "");
+
+export const API_BASE = typeof window === "undefined" ? SERVER_API_BASE : "";
 
 /** A request that reached a verdict — or, with `status === 0`, never arrived. */
 export class ApiError extends Error {
