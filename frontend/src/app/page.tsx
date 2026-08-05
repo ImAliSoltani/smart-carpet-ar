@@ -1,150 +1,83 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { AddToCart } from "@/components/toranjan/add-to-cart";
-import { CatalogProbe } from "./catalog-probe";
+import { Hero04 } from "@/components/ui/hero-04";
+import { HomeFeatured } from "@/components/toranjan/home-featured";
+import { HomePromise } from "@/components/toranjan/home-promise";
+import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
+
+export const metadata: Metadata = {
+  title: "ترنجان — فرش را پیش از خرید در خانه‌ی خودت ببین",
+  description:
+    "فروشگاه فرش دستباف و ماشینی. هر فرش را با ابعاد واقعی روی کف خانه‌ی خودتان ببینید، شبیهش را با یک عکس پیدا کنید، و اندازه‌ی مناسب اتاق را بگیرید.",
+};
 
 /**
- * Design-system check.
+ * The home page.
  *
- * Not a storefront page — it exists to prove the groundwork holds: that the
- * three latin faces and Vazirmatn all load, that the palette reaches a
- * component imported from the catalogue without that component bringing its
- * own colours, that RTL is clean, and that the API client returns real carpets.
- * The real home page replaces it.
+ * Its order is the argument, and the order changed on purpose. `brand-brief`
+ * §5 had the cinematic entrance dissolve straight into the product grid —
+ * «ورودی تحویل نمی‌دهد به فروشگاه؛ خودش تبدیل به فروشگاه می‌شود». That reads
+ * beautifully and leaves the shop's whole claim unsaid: a grid of seventy
+ * cards cannot tell anyone they may stand a carpet on their own floor at its
+ * real size, and a visitor who never learns that has been shown an ordinary
+ * carpet shop.
+ *
+ * So the entrance now lands here instead, and this page says the thing first:
+ * the promise, then the invitation into the shop, then carpets. The entrance
+ * is still built last (ROADMAP), and where it meets this page — the wordmark
+ * settling on the dark carpet before the light page rises over it — is the
+ * seam to build then, not now.
  */
-
-const TOKENS: [string, string, string][] = [
-  ["زمینه", "--bg", "#FAFAFA"],
-  ["کاغذ", "--paper", "#FFFFFF"],
-  ["متن", "--ink", "#18181B"],
-  ["متن دوم", "--ink-2", "#3F3F46"],
-  ["متن ثانویه", "--muted", "#72727A"],
-  ["خط", "--line", "#E9E9EB"],
-  ["تأکید", "--accent", "#A16207"],
-  ["سطح اقدام", "--cta", "#18181B"],
-];
-
-function Section({
-  n,
-  title,
-  children,
-}: {
-  n: string;
-  title: string;
-  children: React.ReactNode;
-}) {
+export default function HomePage() {
   return (
-    <section className="border-t border-line py-10">
-      <p className="mb-6 flex items-baseline gap-3 text-xs text-muted">
-        <span className="ltr-isolate font-figure tracking-widest text-accent">
-          {n}
-        </span>
-        <span className="tracking-widest">{title}</span>
-      </p>
-      {children}
-    </section>
-  );
-}
+    <main>
+      <HomePromise />
 
-export default function DesignCheck() {
-  return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-14 sm:px-8">
-      <p className="ltr-isolate mb-5 font-label text-[10.5px] uppercase tracking-[0.42em] text-muted">
-        Toranjan · Design system check
-      </p>
-      <h1 className="text-4xl font-light tracking-tight sm:text-5xl">ترنجان</h1>
-      <p className="mt-4 max-w-prose leading-loose text-muted">
-        این صفحه بخشی از فروشگاه نیست. فقط بررسی می‌کند که قلم‌ها، توکن‌های رنگ و
-        راست‌به‌چپ درست نشسته‌اند.
-      </p>
+      <Hero04
+        title="فرش ایرانی،"
+        titleLine2="با اندازه‌ی واقعی"
+        description="بین فرش‌های دستباف و ماشینی بگردید، و هرکدام را پیش از خرید با ابعاد دقیق روی کف خانه‌ی خودتان بگذارید."
+        primaryImage="/brand/hero-wide.webp"
+        secondaryImage="/brand/hero-detail.webp"
+        primaryAlt="فرش دستباف ایرانی، پهن‌شده در اتاقی روشن"
+        secondaryAlt="نمای نزدیک از بافت و حاشیه‌ی فرش"
+        primaryCTA={{ ctaEnabled: true, text: "ورود به فروشگاه", link: "/carpets" }}
+        secondaryCTA={{ ctaEnabled: true, text: "پیگیری سفارش", link: "/track" }}
+      />
 
-      <Section n="01" title="قلم‌ها">
-        <div className="space-y-5">
-          <p className="text-2xl">
-            وزیرمتن — فرش دستباف اصفهان نقش لچک‌ترنج، ۲۴٫۸۰۰٫۰۰۰ تومان
-          </p>
-          <p className="ltr-isolate font-display text-3xl">
-            Playfair Display — TORANJAN
-          </p>
-          <p className="ltr-isolate font-label text-sm uppercase tracking-[0.3em]">
-            Inter — collection · hand-knotted
-          </p>
-          <p className="ltr-isolate font-figure text-2xl tracking-wider">
-            Satoshi — 0123456789 · 300 × 400 CM
-          </p>
-        </div>
-      </Section>
+      <HomeFeatured
+        title="تازه‌ترین‌ها"
+        note="آخرین فرش‌هایی که به کاتالوگ اضافه شده‌اند."
+        sort="newest"
+      />
 
-      <Section n="02" title="توکن‌های رنگ">
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {TOKENS.map(([label, name, hex]) => (
-            <li key={name} className="rounded-lg border border-line p-3">
-              <span
-                className="mb-3 block h-12 w-full rounded border border-line-2"
-                style={{ background: `var(${name})` }}
-              />
-              <p className="text-sm">{label}</p>
-              <p className="ltr-isolate font-figure text-[11px] text-muted">
-                {hex}
-              </p>
+      <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
+        <h2 className="mb-8 border-t border-line pt-8 text-xl font-light tracking-tight sm:text-2xl">
+          برای کدام اتاق؟
+        </h2>
+        {/* Rooms rather than patterns: someone arriving at a carpet shop knows
+            which room is empty long before they know what a lachak-toranj is.
+            The pattern names are in the header's menu, for whoever does. */}
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {NAV_ROOMS.map((room) => (
+            <li key={room}>
+              <Link
+                href={`/carpets?room=${room}`}
+                className="flex h-24 items-center justify-center rounded-xl border border-line bg-paper text-[15px] shadow-panel transition-colors duration-[--dur-feedback] hover:border-line-2 hover:text-accent"
+              >
+                {ROOM_LABEL[room]}
+              </Link>
             </li>
           ))}
         </ul>
-      </Section>
+      </section>
 
-      <Section n="03" title="حالت تأیید">
-        <p className="mb-7 max-w-prose text-sm leading-loose text-muted">
-          «ب» انتخاب شد. روی هر کدام بزن تا کل توالی را ببینی: پرده‌ی رنگ از لبه
-          می‌آید، کلمه‌ی قبلی از پشت ماسک می‌رود و بعدی می‌آید، تیک خودش کشیده
-          می‌شود، و یک حلقه‌ی طلایی یک‌بار باز می‌شود و می‌رود. دو گزینه‌ی دیگر برای
-          مقایسه مانده‌اند.
-        </p>
-        <div className="grid gap-7 sm:grid-cols-3">
-          {(
-            [
-              ["ب", "tint", "طلایی کم‌رنگ — انتخاب‌شده"],
-              ["الف", "solid", "طلایی توپر — رد شد"],
-              ["ج", "quiet", "زغالی، فقط تیک — رد شد"],
-            ] as const
-          ).map(([tag, style, note]) => (
-            <div key={style}>
-              <p className="mb-3 flex items-baseline gap-2 text-xs text-muted">
-                <span className="text-accent">{tag}</span>
-                <span>{note}</span>
-              </p>
-              <AddToCart confirmStyle={style} />
-              <div className="mt-3">
-                <AddToCart confirmStyle={style} holdConfirmed />
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-5 text-xs leading-loose text-muted">
-          ردیف بالا زنده است — بزن تا کل توالی را ببینی. ردیف پایین همان حالت تأیید
-          را باز نگه داشته تا بشود سه‌تا را کنار هم مقایسه کرد.
-        </p>
-      </Section>
-
-      <Section n="04" title="کامپوننت واردشده، پس از تطبیق">
-        <p className="max-w-prose text-sm leading-loose text-muted">
-          کارت محصول ۲۱st دیگر اینجا نیست: تطبیق داده شد و به{" "}
-          <Link href="/carpets" className="text-accent underline underline-offset-4">
-            صفحه‌ی فرش‌ها
-          </Link>{" "}
-          رفت. نسخه‌ی دست‌نخورده هم نگه داشته نشد — تاریخچه‌ی گیت همان کار را
-          می‌کند و فایلی که هیچ‌وقت اجرا نمی‌شود فقط هزینه‌ی نگهداری دارد.
-        </p>
-      </Section>
-
-      <Section n="05" title="داده‌ی واقعی از بک‌اند">
-        <p className="mb-6 max-w-prose text-sm leading-loose text-muted">
-          این بخش از دیتابیس محلی می‌خواند، نه از داده‌ی ثابت. اگر بک‌اند بالا
-          نباشد، همین‌جا یکی از دو حالت جایگزین می‌نشیند: خطای فارسی با دکمه‌ی
-          تلاش دوباره، یا — وقتی مرورگر خودش را آفلاین بداند یا تب در پس‌زمینه
-          باشد — پیام انتظار اتصال. هر دو بخشی از چیزی‌اند که باید ثابت شود.
-        </p>
-        <CatalogProbe />
-      </Section>
+      <HomeFeatured
+        title="ارزان‌ترین‌ها"
+        note="اگر بودجه‌ی مشخصی دارید، از اینجا شروع کنید."
+        sort="price_asc"
+      />
     </main>
   );
 }

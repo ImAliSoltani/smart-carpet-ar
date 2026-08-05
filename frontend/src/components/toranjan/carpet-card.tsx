@@ -225,7 +225,9 @@ export function CarpetCard({
           <Button
             asChild
             variant="outline"
-            className="w-full gap-2 rounded-full border-line-2 transition-colors duration-[--dur-feedback] hover:bg-cta hover:text-on-cta"
+            // `h-11`: the outline variant defaults to 40px, four short of the
+            // §3-5 floor, and this is the card's only action.
+            className="h-11 w-full gap-2 rounded-full border-line-2 transition-colors duration-[--dur-feedback] hover:bg-cta hover:text-on-cta"
           >
             <Link href={`${href}#ar`}>
               <Cuboid className="size-[18px] text-accent" />
