@@ -8,7 +8,7 @@ import type { CarpetFilters, CarpetMaterial, CarpetPattern, RoomType } from "@/l
 export const metadata: Metadata = {
   title: "همه‌ی فرش‌ها — ترنجان",
   description:
-    "فرش دستباف و ماشینی، با امکان دیدن هر فرش با ابعاد واقعی روی کف خانه‌ی خودت.",
+    "فرش دستباف و ماشینی، با امکان دیدن هر فرش با ابعاد واقعی روی کف خانه‌ی خودتان.",
 };
 
 /**
@@ -65,7 +65,7 @@ function headingFor(filters: CarpetFilters): { title: string; lede: string } {
   if (filters.q) {
     return {
       title: `جست‌وجوی «${filters.q}»`,
-      lede: "نتیجه‌ها را می‌توانی با فیلترها باریک‌تر کنی.",
+      lede: "نتیجه‌ها را می‌توانید با فیلترها باریک‌تر کنید.",
     };
   }
   // Only a single choice earns its own heading; two patterns have no shared
@@ -73,13 +73,13 @@ function headingFor(filters: CarpetFilters): { title: string; lede: string } {
   if (filters.pattern?.length === 1) {
     return {
       title: `فرش‌های نقش ${PATTERN_LABEL[filters.pattern[0]]}`,
-      lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودت ببین.",
+      lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودتان ببینید.",
     };
   }
   if (filters.material?.length === 1) {
     return {
       title: `فرش‌های ${MATERIAL_LABEL[filters.material[0]]}`,
-      lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودت ببین.",
+      lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودتان ببینید.",
     };
   }
   if (filters.room?.length === 1) {
@@ -90,7 +90,7 @@ function headingFor(filters: CarpetFilters): { title: string; lede: string } {
   }
   return {
     title: "همه‌ی فرش‌ها",
-    lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودت ببین.",
+    lede: "هر فرش را پیش از خرید، با ابعاد واقعی روی کف خانه‌ی خودتان ببینید.",
   };
 }
 

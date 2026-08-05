@@ -31,29 +31,29 @@ import { FeaturesGrid, type Feature } from "@/components/ui/features-grid";
 const PROMISES: Feature[] = [
   {
     icon: Cuboid,
-    title: "در خانه‌ی خودت ببین",
+    title: "در خانه‌ی خودتان ببینید",
     description:
       "هر فرش با ابعاد واقعی روی کف خانه‌ی شما، از دوربین گوشی و بدون نصب هیچ برنامه‌ای.",
     href: "/carpets",
   },
   {
     icon: Camera,
-    title: "با یک عکس پیدا کن",
+    title: "با یک عکس پیدا کنید",
     description:
       "عکسِ فرشی که پسندیده‌اید را بدهید تا نزدیک‌ترین‌ها از میان کاتالوگ پیدا شوند.",
     href: "/carpets",
   },
   {
     icon: Ruler,
-    title: "اندازه را حدس نزن",
+    title: "اندازه را حدس نزنید",
     description: "از روی عکس اتاق، اندازه‌ای که به آن فضا می‌آید پیشنهاد می‌شود.",
     href: "/carpets",
   },
   {
     icon: Sparkles,
-    title: "بپرس چه فرشی می‌آید",
+    title: "بپرسید چه فرشی مناسب است",
     description:
-      "به زبان خودتان بگویید دنبال چه هستید — روشن، برای اتاق کودک، تا فلان قیمت.",
+      "به زبان خودتان بگویید دنبال چه هستید — روشن، برای اتاق کودک، تا سقف قیمتی مشخص.",
     href: "/carpets",
   },
 ];

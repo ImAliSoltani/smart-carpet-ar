@@ -2,12 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Hero10 } from "@/components/ui/hero-10";
+// Imported rather than referenced by path. `next/image` fingerprints a static
+// import by its contents, so replacing a photograph changes its URL and no
+// browser can serve yesterday's copy — which is exactly what happened while
+// the names stayed `/brand/hero-1.webp`. Swapping the file is still the whole
+// procedure; the hash follows it.
+import hero1 from "../../public/brand/hero-1.webp";
+import hero2 from "../../public/brand/hero-2.webp";
+import hero3 from "../../public/brand/hero-3.webp";
 import { HomeFeatured } from "@/components/toranjan/home-featured";
 import { HomePromise } from "@/components/toranjan/home-promise";
 import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
 
 export const metadata: Metadata = {
-  title: "ترنجان — فرش را پیش از خرید در خانه‌ی خودت ببین",
+  title: "ترنجان — فرش را پیش از خرید در خانه‌ی خودتان ببینید",
   description:
     "فروشگاه فرش دستباف و ماشینی. هر فرش را با ابعاد واقعی روی کف خانه‌ی خودتان ببینید، شبیهش را با یک عکس پیدا کنید، و اندازه‌ی مناسب اتاق را بگیرید.",
 };
@@ -39,7 +47,7 @@ export default function HomePage() {
         titleLine2Prefix="با"
         titleHighlight="اندازه‌ی واقعی"
         description="بین فرش‌های دستباف و ماشینی بگردید، و هرکدام را پیش از خرید با ابعاد دقیق روی کف خانه‌ی خودتان بگذارید."
-        images={["/brand/hero-1.webp", "/brand/hero-2.webp", "/brand/hero-3.webp"]}
+        images={[hero1, hero2, hero3]}
         imageAlts={[
           "فرش دستباف ایرانی با نقش لچک‌ترنج",
           "فرش پهن‌شده در اتاقی روشن",

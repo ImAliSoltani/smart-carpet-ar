@@ -110,7 +110,7 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
       <div className="rounded-md border border-line bg-paper p-10 text-center shadow-panel">
         <p className="text-lg">فرشی با این مشخصات پیدا نشد.</p>
         <p className="mt-3 text-sm leading-loose text-muted">
-          می‌توانی یکی از فیلترها را بردارید یا همه‌ی فرش‌ها را ببینید.
+          می‌توانید یکی از فیلترها را بردارید یا همه‌ی فرش‌ها را ببینید.
         </p>
         <Link
           href="/carpets"

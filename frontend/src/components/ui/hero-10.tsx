@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ export interface Hero10Props {
   titleHighlight?: string;
   description: string;
   socialProof?: string;
-  images: string[];
+  images: (string | StaticImageData)[];
   imageAlts?: string[];
   animation?: "none" | "subtle";
   primaryCTA: CtaProps;
@@ -154,7 +154,7 @@ function ImageFan({
   cardAspect,
   animate,
 }: Readonly<{
-  images: string[];
+  images: (string | StaticImageData)[];
   imageAlts?: string[];
   cardAspect: string;
   animate: boolean;
@@ -172,7 +172,7 @@ function ImageFan({
         const slot = fanSlots[i] ?? fanSlots[1];
         return (
           <motion.div
-            key={src}
+            key={typeof src === "string" ? src : src.src}
             custom={slot}
             variants={fanCard}
             className={cn(
