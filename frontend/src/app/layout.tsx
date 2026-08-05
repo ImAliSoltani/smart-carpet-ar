@@ -3,6 +3,7 @@ import { Vazirmatn, Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { SiteHeader } from "@/components/toranjan/site-header";
+import { SiteFooter } from "@/components/toranjan/site-footer";
 
 // Persian carries every word of the interface, so it is the one face that is
 // never allowed to fall back.
@@ -57,6 +58,7 @@ export default function RootLayout({
         <Providers>
           <SiteHeader />
           {children}
+          <SiteFooter />
         </Providers>
       </body>
     </html>
