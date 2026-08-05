@@ -1,9 +1,12 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 import { CarpetCard } from "@/components/toranjan/carpet-card";
+import { CataloguePagination } from "@/components/toranjan/catalogue-pagination";
 import { carpetListQuery } from "@/lib/api/catalog";
 import { ApiError } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
@@ -25,6 +28,14 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
   // The card renders its heart only when something can receive the press, so
   // this is what makes it appear at all.
   const favorites = useFavorites();
+
+  const params = useSearchParams();
+  const firstPageHref = React.useMemo(() => {
+    const next = new URLSearchParams(params.toString());
+    next.delete("page");
+    const qs = next.toString();
+    return qs ? `/carpets?${qs}` : "/carpets";
+  }, [params]);
 
   if (isPaused) {
     return (
@@ -70,9 +81,33 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
     );
   }
 
+  // An empty page with a non-empty result is a different thing from a filter
+  // that matches nothing, and saying «no carpets match» to someone whose
+  // filters match seventy of them sends them off to fix the wrong problem.
+  // Reachable by hand — `?page=99` — and by a bookmark that outlived the stock.
+  if (data.items.length === 0 && data.total > 0) {
+    const lastPage = Math.max(1, Math.ceil(data.total / data.page_size));
+    return (
+      <div className="rounded-md border border-line bg-paper p-10 text-center shadow-panel">
+        <p className="text-lg">این صفحه وجود ندارد.</p>
+        <p className="mt-3 text-sm leading-loose text-muted">
+          {formatNumber(data.total)} فرش در {formatNumber(lastPage)} صفحه هست.
+        </p>
+        {/* Back to the first page of *this* selection, not to the whole shop:
+            the filters are still what the visitor asked for. */}
+        <Link
+          href={firstPageHref}
+          className="mt-6 inline-block rounded-full bg-cta px-6 py-2.5 text-sm text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover"
+        >
+          صفحه‌ی اول
+        </Link>
+      </div>
+    );
+  }
+
   if (data.items.length === 0) {
     return (
-      <div className="rounded-md border border-line bg-paper p-10 text-center">
+      <div className="rounded-md border border-line bg-paper p-10 text-center shadow-panel">
         <p className="text-lg">فرشی با این مشخصات پیدا نشد.</p>
         <p className="mt-3 text-sm leading-loose text-muted">
           می‌توانی یکی از فیلترها را بردارید یا همه‌ی فرش‌ها را ببینید.
@@ -102,6 +137,11 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
           </li>
         ))}
       </ul>
+
+      {/* The numbers come from the response, not from the URL: `?page=99` on a
+          three-page catalogue would otherwise draw a control describing a page
+          that does not exist. */}
+      <CataloguePagination page={data.page} pageSize={data.page_size} total={data.total} />
     </>
   );
 }
