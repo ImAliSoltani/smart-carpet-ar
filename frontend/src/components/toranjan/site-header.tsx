@@ -258,8 +258,16 @@ export function SiteHeader({
                 </Link>
               </SheetClose>
             ))}
+            {/* Tracking has to be reachable by someone who left and came back
+                with only a code. The confirmation screen links to it, but that
+                screen is gone by the next visit. */}
             <SheetClose asChild>
-              <Link href="/about" className="mt-5 py-2.5 text-ink-2">
+              <Link href="/track" className="mt-5 py-2.5 text-ink-2">
+                پیگیری سفارش
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link href="/about" className="py-2.5 text-ink-2">
                 درباره‌ی ما
               </Link>
             </SheetClose>
@@ -364,21 +372,26 @@ export function SiteHeader({
             </NavigationMenuContent>
           </NavigationMenuItem>
 
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link
-                href="/about"
-                className={cn(
-                  navigationMenuTriggerStyle(),
-                  "after:absolute after:inset-x-0 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink",
-                  "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] hover:after:scale-x-100",
-                  pathname === "/about" && "text-ink after:scale-x-100",
-                )}
-              >
-                درباره‌ی ما
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+          {[
+            { href: "/track", label: "پیگیری سفارش" },
+            { href: "/about", label: "درباره‌ی ما" },
+          ].map((item) => (
+            <NavigationMenuItem key={item.href}>
+              <NavigationMenuLink asChild>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "after:absolute after:inset-x-0 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink",
+                    "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] hover:after:scale-x-100",
+                    pathname === item.href && "text-ink after:scale-x-100",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
         </NavigationMenuList>
       </NavigationMenu>
 

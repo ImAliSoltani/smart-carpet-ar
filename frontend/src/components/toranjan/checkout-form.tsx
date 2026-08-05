@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ApiError } from "@/lib/api/client";
 import { createOrder } from "@/lib/api/orders";
 import { formatNumber, formatSize } from "@/lib/format";
+import { IRANIAN_MOBILE, normalizePhone } from "@/lib/phone";
 import { useCartLines, useCartStore } from "@/lib/store/cart";
 import type { OrderOut } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -55,18 +56,6 @@ const STEPS = [
   { id: "review", title: "مرور و ثبت" },
 ] as const;
 
-/** The backend's `normalize_phone`, restated so both ends agree. */
-function normalizePhone(value: string): string {
-  let cleaned = value.replace(/[\s-]/g, "");
-  "۰۱۲۳۴۵۶۷۸۹".split("").forEach((d, i) => {
-    cleaned = cleaned.replaceAll(d, String(i));
-  });
-  "٠١٢٣٤٥٦٧٨٩".split("").forEach((d, i) => {
-    cleaned = cleaned.replaceAll(d, String(i));
-  });
-  return cleaned;
-}
-
 const schema = z.object({
   customer_name: z
     .string()
@@ -76,7 +65,7 @@ const schema = z.object({
   customer_phone: z
     .string()
     .transform(normalizePhone)
-    .refine((v) => /^(\+98|0)9\d{9}$/.test(v), "شماره‌ی موبایل معتبر نیست"),
+    .refine((v) => IRANIAN_MOBILE.test(v), "شماره‌ی موبایل معتبر نیست"),
   address: z
     .string()
     .trim()
@@ -145,9 +134,17 @@ function Confirmation({ order }: { order: OrderOut }) {
         این کد را نگه دارید. پیگیری سفارش با همین کد و شماره‌ی موبایل انجام می‌شود.
       </p>
 
-      <Button asChild variant="outline" className="mt-8 h-12 rounded-full px-7">
-        <Link href="/carpets">بازگشت به فروشگاه</Link>
-      </Button>
+      <div className="mt-8 flex flex-col justify-center gap-2 sm:flex-row">
+        {/* The reference travels in the link so nobody copies a code between
+            two pages. The phone deliberately does not — a link that carried
+            both would be a key to someone else's order. */}
+        <Button asChild className="h-12 rounded-full px-7">
+          <Link href={`/track?ref=${encodeURIComponent(order.reference)}`}>پیگیری سفارش</Link>
+        </Button>
+        <Button asChild variant="outline" className="h-12 rounded-full px-7">
+          <Link href="/carpets">بازگشت به فروشگاه</Link>
+        </Button>
+      </div>
     </div>
   );
 }

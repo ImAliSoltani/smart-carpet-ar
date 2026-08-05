@@ -16,7 +16,7 @@
  * fails the build here rather than rendering an empty chip.
  */
 
-import type { CarpetMaterial, CarpetPattern, RoomType } from "./api/types";
+import type { CarpetMaterial, CarpetPattern, OrderStatus, RoomType } from "./api/types";
 
 export const PATTERN_LABEL: Record<CarpetPattern, string> = {
   lachak_toranj: "لچک‌ترنج",
@@ -47,6 +47,34 @@ export const ROOM_LABEL: Record<RoomType, string> = {
   office: "اتاق کار",
   kids_room: "اتاق کودک",
   hallway: "راهرو",
+};
+
+/**
+ * The three states an order moves through (ROADMAP §6-17).
+ *
+ * Each carries the sentence a buyer needs, not only the word. «در انتظار
+ * بررسی» alone leaves someone wondering whether to wait or to call; the shop
+ * is one person with a phone, so the honest label says what happens next.
+ */
+export const ORDER_STATUS: Record<
+  OrderStatus,
+  { label: string; detail: string; tone: "waiting" | "confirmed" | "cancelled" }
+> = {
+  pending: {
+    label: "در انتظار تأیید",
+    detail: "سفارش ثبت شده و برای هماهنگی تحویل با شما تماس گرفته می‌شود.",
+    tone: "waiting",
+  },
+  confirmed: {
+    label: "تأیید شده",
+    detail: "سفارش تأیید شده و برای ارسال آماده می‌شود.",
+    tone: "confirmed",
+  },
+  cancelled: {
+    label: "لغو شده",
+    detail: "این سفارش لغو شده است. اگر لغو نکرده‌اید، با فروشگاه تماس بگیرید.",
+    tone: "cancelled",
+  },
 };
 
 /**

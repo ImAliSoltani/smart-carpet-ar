@@ -27,6 +27,7 @@ export type ArAssetStatus = Schemas["ArAssetStatus"];
 
 export type OrderCreate = Schemas["OrderCreate"];
 export type OrderOut = Schemas["OrderOut"];
+export type OrderStatus = Schemas["OrderStatus"];
 export type OrderTrackRequest = Schemas["OrderTrackRequest"];
 
 /**
