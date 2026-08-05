@@ -9,6 +9,7 @@
 | `zoomable-image.tsx` | [inference-sh/zoomable-image](https://21st.dev/@inference-sh/components/zoomable-image) — تگ `img` خام به `next/image` تبدیل شد و ظاهر لایت‌باکس در `globals.css` به پالت خودمان آمد |
 | `input.tsx`، `textarea.tsx` | وابستگی‌های رجیستری [arihantcodes/multistep-form](https://21st.dev/@arihantcodes_1f7b8c4d/components/multistep-form) — ارتفاع ۴۸ و اندازه‌ی قلم ۱۶ پیکسل، وگرنه سافاری iOS هنگام فوکوس صفحه را زوم می‌کند و برنمی‌گرداند |
 | `hero-10.tsx`، `hero-10-utils/cta.tsx` | [felipemenezes098/hero-10](https://21st.dev/@felipemenezes098/components/hero-10) — بادبزن سه‌عکسی برای راست‌به‌چپ آینه شد (حاشیه‌های منطقی و چرخش‌های قرینه)، `<img>` به `next/image` رفت، و `cta` که در پاسخ رجیستری نبود نوشته شد |
+| `features-grid.tsx` | [gooseui/features-grid](https://21st.dev/@gooseui/components/features-grid) — ورود پلکانی با اسکرول اضافه شد، چیپ آیکون طلایی شد (`primary` در نقشه‌ی ما زغالی است)، و `hover:bg-muted/50` برداشته شد چون `muted` اینجا رنگ متن است |
 | `pagination.tsx` | [shadcn/pagination](https://21st.dev/@shadcn/components/pagination) — `buttonVariants` کنار گذاشته شد (چون `hover:bg-accent` در پالت ما طلایی است)، جهت شورون‌ها آینه شد، و `<a>` به `next/link` تبدیل شد |
 
 ## روش کار (تصمیم ۱۴۰۵/۰۵/۱۳)
@@ -41,4 +42,5 @@
 - **رنگ‌ها انتخاب‌شدنی نیستند:** رنگ‌های ما از عکس استخراج شده‌اند، پس نمایشی‌اند نه کنترل.
 - **کنش شاخص «در خانه‌ی من ببین» است**، نه «افزودن به سبد» — کسی از شبکه‌ی محصولات فرش نمی‌خرد.
 - **پالت:** `hover:bg-accent` رجیستری در پالت ما طلایی می‌شود و طلایی فقط مال نشانه‌های ریز است؛ به‌جایش سطح کاغذی.
+- **مرز سرور/کلاینت:** اگر کامپوننتی «use client» است و پراپی از جنس *کامپوننت* می‌گیرد (مثل آیکون)، فایلی که آن پراپ را می‌سازد هم باید کلاینت باشد. تابع از مرز سرور به کلاینت رد نمی‌شود و کل صفحه با «Functions cannot be passed directly to Client Components» می‌افتد.
 - **حرکت:** انیمیشن‌های کامپوننت نگه داشته می‌شوند، ولی زمان و easing از مقیاس خودمان. `framer-motion` از بلوک `prefers-reduced-motion` در CSS پیروی نمی‌کند چون با JS استایل اینلاین می‌گذارد؛ آنجا باید `useReducedMotion()` گذاشت.
