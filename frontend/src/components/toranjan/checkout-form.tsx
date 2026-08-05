@@ -124,7 +124,7 @@ function Field({
 
 function Confirmation({ order }: { order: OrderOut }) {
   return (
-    <div className="rounded-xl border border-line bg-paper px-6 py-14 text-center">
+    <div className="rounded-xl border border-line bg-paper px-6 py-14 text-center shadow-raised">
       <span className="mx-auto grid size-14 place-items-center rounded-full bg-confirm-tint text-confirm-tint-ink">
         <Check className="size-7" aria-hidden />
       </span>
@@ -215,7 +215,7 @@ export function CheckoutForm() {
   // only after hydration — before it, every cart looks empty.
   if (lines.length === 0) {
     return (
-      <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center">
+      <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center shadow-panel">
         <p className="text-lg font-light">سبد خرید خالی است</p>
         <p className="mt-2 text-sm leading-loose text-muted">
           برای ثبت سفارش، اول فرشی را به سبد اضافه کنید.
@@ -269,7 +269,7 @@ export function CheckoutForm() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-line bg-paper p-5 sm:p-7">
+      <div className="rounded-xl border border-line bg-paper p-5 shadow-raised sm:p-7">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}

@@ -118,7 +118,7 @@ function NavigationMenuViewport({
           // it off was a reading of the design system applied over the top of a
           // component that had already answered the question.
           "w-full origin-top overflow-hidden rounded-md border border-line bg-paper",
-          "shadow-[0_1px_2px_rgba(24,24,27,0.05),0_24px_48px_-32px_rgba(24,24,27,0.35)]",
+          "shadow-raised",
           "md:w-[var(--radix-navigation-menu-viewport-width)]",
           className,
         )}

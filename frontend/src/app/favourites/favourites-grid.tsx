@@ -38,7 +38,7 @@ export function FavouritesGrid() {
 
   if (favorites.ids.length === 0) {
     return (
-      <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center">
+      <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center shadow-panel">
         <Heart className="mx-auto size-8 text-muted" aria-hidden />
         <p className="mt-5 text-lg font-light">هنوز فرشی را نشان نکرده‌اید</p>
         <p className="mt-2 text-sm leading-loose text-muted">

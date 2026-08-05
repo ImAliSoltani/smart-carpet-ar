@@ -96,7 +96,7 @@ function CartRow({ line }: { line: CartLine }) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ opacity: { duration: 0.2 }, layout: { duration: 0.24 } }}
-      className="flex gap-4 rounded-xl border border-line bg-paper p-3 sm:p-4"
+      className="flex gap-4 rounded-xl border border-line bg-paper p-3 shadow-panel sm:p-4"
     >
       <Link
         href={`/carpets/${line.carpetSlug}`}
@@ -179,7 +179,7 @@ function CartRow({ line }: { line: CartLine }) {
 
 function EmptyCart() {
   return (
-    <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center">
+    <div className="rounded-xl border border-line bg-paper px-6 py-16 text-center shadow-panel">
       <ShoppingBag className="mx-auto size-8 text-muted" aria-hidden />
       <p className="mt-5 text-lg font-light">سبد خرید خالی است</p>
       <p className="mt-2 text-sm leading-loose text-muted">
@@ -225,7 +225,7 @@ export function CartView() {
         initial={reduced ? false : { opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduced ? 0 : 0.42, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full rounded-xl border border-line bg-paper p-5 lg:sticky lg:top-24 lg:w-80"
+        className="w-full rounded-xl border border-line bg-paper p-5 shadow-raised lg:sticky lg:top-24 lg:w-80"
       >
         <h2 className="text-[12px] tracking-[0.1em] text-muted">خلاصه‌ی سفارش</h2>
 

@@ -120,6 +120,22 @@
   --color-input: var(--line-2);
   --color-ring: var(--accent);
 
+  /* ---- elevation -------------------------------------------------------
+     A hairline border on a near-white ground does not lift anything; it
+     draws an outline and the panel reads as pasted onto the page rather
+     than resting on it. Both of these are the shape this codebase had
+     already settled into by hand — a 1px contact shadow for the edge that
+     touches, and a wide one with a deep negative spread for the light that
+     falls away. Named here so the answer is the same everywhere, and so
+     the gallery direction's restraint is a decision rather than an
+     accident of whoever typed the last box.
+
+     `panel` is a surface at rest: rows, empty states, anything repeated.
+     `raised` is the one thing the page is about — the checkout card, the
+     order summary. Using it twice on one screen spends it. */
+  --shadow-panel: 0 1px 2px rgba(24, 24, 27, 0.05), 0 4px 10px -8px rgba(24, 24, 27, 0.4);
+  --shadow-raised: 0 1px 2px rgba(24, 24, 27, 0.05), 0 24px 48px -32px rgba(24, 24, 27, 0.35);
+
   --font-sans: var(--font-fa), system-ui, sans-serif;
   --font-display: var(--font-lat-display), serif;
   --font-label: var(--font-lat-body), sans-serif;

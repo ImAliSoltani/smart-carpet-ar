@@ -284,7 +284,7 @@ export function Accordion({
 
   return (
     <div
-      className={`divide-y divide-line overflow-hidden rounded-md border border-line bg-paper shadow-[0_1px_2px_rgba(24,24,27,0.05),0_4px_10px_-8px_rgba(24,24,27,0.4)] ${className}`}
+      className={`divide-y divide-line overflow-hidden rounded-md border border-line bg-paper shadow-panel ${className}`}
     >
       {items.map((item) => (
         <AccordionRow
