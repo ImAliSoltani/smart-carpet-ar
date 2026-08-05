@@ -132,9 +132,31 @@
 
      `panel` is a surface at rest: rows, empty states, anything repeated.
      `raised` is the one thing the page is about — the checkout card, the
-     order summary. Using it twice on one screen spends it. */
-  --shadow-panel: 0 1px 2px rgba(24, 24, 27, 0.05), 0 4px 10px -8px rgba(24, 24, 27, 0.4);
-  --shadow-raised: 0 1px 2px rgba(24, 24, 27, 0.05), 0 24px 48px -32px rgba(24, 24, 27, 0.35);
+     order summary. Using it twice on one screen spends it.
+
+     **Deepened ۱۴۰۵/۰۵/۱۴.** The first pass was too shy to do its job — every
+     card still read as printed onto the page rather than lying on it. Both
+     keep the same two-part shape and simply carry further: a contact shadow
+     that is actually visible, and an ambient one wide enough to separate a
+     card from the ground behind it. */
+  --shadow-panel:
+    0 1px 2px rgba(24, 24, 27, 0.06), 0 6px 16px -8px rgba(24, 24, 27, 0.22),
+    0 16px 32px -24px rgba(24, 24, 27, 0.3);
+  --shadow-raised:
+    0 1px 3px rgba(24, 24, 27, 0.07), 0 12px 28px -12px rgba(24, 24, 27, 0.22),
+    0 32px 56px -32px rgba(24, 24, 27, 0.35);
+
+  /* ---- corner radius ---------------------------------------------------
+     One scale, set here, so «rounder» is a decision in one place instead of
+     a number retyped on every box. Tailwind's own `rounded-md`/`lg`/`xl`
+     read these, so raising them rounds every card, panel and field on the
+     site at once. Softened ۱۴۰۵/۰۵/۱۴: the defaults were sharp enough that
+     a card looked cut rather than set down. */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 
   --font-sans: var(--font-fa), system-ui, sans-serif;
   --font-display: var(--font-lat-display), serif;

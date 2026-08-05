@@ -50,7 +50,7 @@ function CardBody({ icon: Icon, title, description }: Feature) {
       <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-accent/10">
         <Icon className="size-6 text-accent" />
       </div>
-      <h3 className="mb-2 text-[15px] tracking-tight">{title}</h3>
+      <h3 className="mb-2 text-[15px] font-bold tracking-tight">{title}</h3>
       <p className="text-[13.5px] leading-loose text-muted">{description}</p>
     </>
   );
@@ -67,7 +67,9 @@ export function FeaturesGrid({ title, subtitle, features, className }: FeaturesG
         {(title || subtitle) && (
           <div className="mb-12 text-center">
             {title && (
-              <h2 className="text-2xl font-light leading-[1.7] tracking-tight sm:text-3xl">
+              // The page's argument, not a section label: it carries the most
+              // weight on the screen and the size to match.
+              <h2 className="text-3xl font-bold leading-[1.55] tracking-tight sm:text-4xl md:text-[2.75rem]">
                 {title}
               </h2>
             )}
@@ -77,7 +79,9 @@ export function FeaturesGrid({ title, subtitle, features, className }: FeaturesG
           </div>
         )}
 
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Four across, not three: there are exactly four promises and a
+              row of three leaves one orphaned underneath. */}
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => (
             <motion.li
               key={feature.title}

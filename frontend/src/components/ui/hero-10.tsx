@@ -52,7 +52,7 @@ export interface Hero10Props {
 const variantStyles = {
   standard: {
     section: "py-20 sm:py-28",
-    title: "text-3xl sm:text-4xl md:text-5xl",
+    title: "text-4xl sm:text-5xl md:text-6xl",
     description: "max-w-lg text-sm sm:text-base",
     header: "gap-5",
     content: "gap-8 sm:gap-10",
@@ -233,7 +233,8 @@ export function Hero10({
           active={animate}
           className={cn("flex w-full max-w-2xl flex-col items-center", vs.header)}
         >
-          <h1 className={cn("font-light tracking-tight text-balance text-ink", vs.title)}>
+          {/* The shop's one sentence. Bold and large enough to be that. */}
+          <h1 className={cn("font-bold leading-[1.3] tracking-tight text-balance text-ink", vs.title)}>
             {title}
             {(titleLine2Prefix || titleHighlight) && (
               <>

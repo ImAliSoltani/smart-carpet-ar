@@ -7,7 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import { CarpetCard } from "@/components/toranjan/carpet-card";
 import { carpetListQuery } from "@/lib/api/catalog";
 import { useFavorites } from "@/lib/store/favorites";
-import type { CarpetSort } from "@/lib/api/types";
+import type { CarpetFilters } from "@/lib/api/types";
 
 /**
  * A short row of carpets on the home page.
@@ -23,22 +23,25 @@ import type { CarpetSort } from "@/lib/api/types";
 export function HomeFeatured({
   title,
   note,
-  sort,
+  filters,
   href = "/carpets",
 }: {
   title: string;
   note?: string;
-  sort: CarpetSort;
+  /** Any slice of the catalogue — a sort, a material, a room. */
+  filters: CarpetFilters;
   href?: string;
 }) {
   const favorites = useFavorites();
-  const { data, isPending, error } = useQuery(carpetListQuery({ sort, page_size: 4 }));
+  const { data, isPending, error } = useQuery(
+    carpetListQuery({ ...filters, page_size: 4 }),
+  );
 
   return (
     <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
       <div className="mb-8 flex items-end justify-between gap-4 border-t border-line pt-8">
         <div>
-          <h2 className="text-xl font-light tracking-tight sm:text-2xl">{title}</h2>
+          <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
           {note && <p className="mt-2 text-[13px] text-muted">{note}</p>}
         </div>
         <Link

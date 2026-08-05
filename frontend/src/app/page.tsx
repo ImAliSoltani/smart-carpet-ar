@@ -52,11 +52,11 @@ export default function HomePage() {
       <HomeFeatured
         title="تازه‌ترین‌ها"
         note="آخرین فرش‌هایی که به کاتالوگ اضافه شده‌اند."
-        sort="newest"
+        filters={{ sort: "newest" }}
       />
 
       <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
-        <h2 className="mb-8 border-t border-line pt-8 text-xl font-light tracking-tight sm:text-2xl">
+        <h2 className="mb-8 border-t border-line pt-8 text-xl font-bold tracking-tight sm:text-2xl">
           برای کدام اتاق؟
         </h2>
         {/* Rooms rather than patterns: someone arriving at a carpet shop knows
@@ -76,10 +76,15 @@ export default function HomePage() {
         </ul>
       </section>
 
+      {/* Not «the cheapest». A shop that opens its front page with a bargain
+          bin has told the visitor what it thinks of its own carpets — and this
+          one's argument is craft, not price. Silk is the other end of the same
+          catalogue and needs no apology. */}
       <HomeFeatured
-        title="ارزان‌ترین‌ها"
-        note="اگر بودجه‌ی مشخصی دارید، از اینجا شروع کنید."
-        sort="price_asc"
+        title="ابریشم دستباف"
+        note="ظریف‌ترین بافت‌های کاتالوگ."
+        filters={{ material: ["silk"], sort: "price_desc" }}
+        href="/carpets?material=silk"
       />
     </main>
   );
