@@ -201,7 +201,13 @@ export function SiteHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 flex items-center gap-4 bg-bg/85 px-5 backdrop-blur-md sm:px-8",
+        // The phone gap is tighter than the desktop one because at 320px this
+        // bar is nearly full before the brand is placed at all: the drawer
+        // button and the three tools spend 184px of it, and the padding another
+        // 40. The 8px bought back here is what keeps a real margin under the
+        // stacked wordmark instead of a rounding error. It falls between a
+        // 44px button and the wordmark, so nothing looks crowded for it.
+        "sticky top-0 z-50 flex items-center gap-2 bg-bg/85 px-5 backdrop-blur-md sm:gap-4 sm:px-8",
         "border-b border-line transition-[height,box-shadow] duration-500 ease-[cubic-bezier(.16,1,.3,1)]",
         scrolled ? "h-[62px] shadow-[0_10px_30px_-24px_rgba(24,24,27,0.5)]" : "h-[78px]",
       )}
@@ -275,7 +281,21 @@ export function SiteHeader({
         </SheetContent>
       </Sheet>
 
-      <Link href="/" className="flex shrink-0 items-baseline gap-2.5">
+      {/* The lockup turns a corner on a phone rather than losing half of itself.
+          Side by side the two words want 167px of a 375px bar, which is what
+          pushed the whole site into sideways scroll; stacked they want 70px and
+          both survive. Two lines is the older form of this lockup anyway — a
+          name with its transliteration set beneath it — so the phone gets the
+          more formal arrangement, not a poorer one.
+
+          The padding is sm-only on purpose. Stacked, the block is already 54px
+          tall and clears the 44px the roadmap asks of anything you touch; in one
+          row it is a 37px line box and needs the padding to get there. Adding it
+          to both would make the stack 70px inside a header that shrinks to 62. */}
+      <Link
+        href="/"
+        className="flex shrink-0 flex-col items-start gap-0.5 sm:flex-row sm:items-baseline sm:gap-2.5 sm:py-2"
+      >
         <span
           className={cn(
             "font-semibold tracking-tight transition-[font-size] duration-500 ease-[cubic-bezier(.16,1,.3,1)]",
@@ -284,11 +304,41 @@ export function SiteHeader({
         >
           ترنجان
         </span>
+        {/* aria-hidden because a reader that has just said «ترنجان» should not
+            then spell the same name in Latin — not because the line is
+            decoration. It carries most of what makes the header read as a shop
+            rather than a page, so it is set two sizes down on a phone instead
+            of dropped: 10px and slightly tighter spacing, which lands it at
+            70px against the wordmark's 64px. Two lines of near-equal width is
+            what makes a stack read as one mark.
+
+            The fade on scroll stays a desktop manner. There the wordmark is one
+            of several things competing for the bar and can afford to shed its
+            second half; on a phone it is the only brand on screen, and a
+            lockup that empties out as you scroll is just a gap. */}
         <span
           className={cn(
-            "ltr-isolate font-display text-[12px] tracking-[0.34em] text-muted",
+            // Playfair is a high-contrast face: the thin strokes are hairlines,
+            // and at 10px on a phone they thin out until the line reads as a
+            // grey smudge. Muted made it worse — #72727a clears the 4.5:1 the
+            // roadmap asks by 0.07, and that ratio is measured on solid area,
+            // which a hairline serif does not have. So the weight goes to 800,
+            // heavy enough that the thin strokes still carry at 10px, and the
+            // colour to ink-2, which is 10:1 and still two stops lighter than
+            // the wordmark it sits under. It is the same mark at both sizes, so
+            // both get it. 900 was legible too but left 320px viewports 0.4px
+            // short, and glyph advances move about a percent between platforms
+            // — a margin thinner than that rounding is not a margin.
+            //
+            // The negative end margin is the trailing letter-space coming back.
+            // Tracking is added after every letter including the last, so the
+            // stacked line hangs 2.6px clear of the wordmark above it and the
+            // two stop looking like one mark. Only the stack needs it; in a row
+            // that same space is what separates the two words.
+            "ltr-isolate font-display font-extrabold text-[10px] tracking-[0.26em] text-ink-2 -me-[0.26em]",
+            "sm:me-0 sm:text-[12px] sm:tracking-[0.34em]",
             "transition-[opacity,transform] duration-500 ease-[cubic-bezier(.16,1,.3,1)]",
-            scrolled && "-translate-x-1.5 opacity-0",
+            scrolled && "sm:-translate-x-1.5 sm:opacity-0",
           )}
           aria-hidden="true"
         >
