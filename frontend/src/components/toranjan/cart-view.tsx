@@ -70,7 +70,10 @@ function Toman({ value, className }: { value: number; className?: string }) {
             animate={{ y: 0, opacity: 1 }}
             exit={reduced ? { opacity: 0 } : { y: "-115%", opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.42, ease: [0.16, 1, 0.3, 1] }}
-            className={`col-start-1 row-start-1 font-figure tabular-nums ${className ?? ""}`}
+            // No `font-figure` here: these are Persian figures and that face
+            // is subset to Latin digits. `tabular-nums` stays — Vazirmatn has
+            // them, and they stop the total shifting width as it rolls.
+            className={`col-start-1 row-start-1 tabular-nums ${className ?? ""}`}
           >
             {formatNumber(value)}
           </motion.span>
@@ -150,7 +153,7 @@ function CartRow({ line }: { line: CartLine }) {
             <span
               aria-live="polite"
               aria-label={`تعداد: ${formatNumber(line.quantity)}`}
-              className="min-w-6 text-center font-figure text-sm"
+              className="min-w-6 text-center text-sm tabular-nums"
             >
               {formatNumber(line.quantity)}
             </span>

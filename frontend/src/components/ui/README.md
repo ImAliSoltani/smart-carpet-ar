@@ -7,6 +7,7 @@
 | `button.tsx`، `badge.tsx`، `card.tsx` | وابستگی‌های رجیستری کارت محصول |
 | `navigation-menu.tsx`، `sheet.tsx` | وابستگی‌های رجیستری [bundui/navigation-menu4](https://21st.dev/@bundui/components/navigation-menu4) |
 | `zoomable-image.tsx` | [inference-sh/zoomable-image](https://21st.dev/@inference-sh/components/zoomable-image) — تگ `img` خام به `next/image` تبدیل شد و ظاهر لایت‌باکس در `globals.css` به پالت خودمان آمد |
+| `input.tsx`، `textarea.tsx` | وابستگی‌های رجیستری [arihantcodes/multistep-form](https://21st.dev/@arihantcodes_1f7b8c4d/components/multistep-form) — ارتفاع ۴۸ و اندازه‌ی قلم ۱۶ پیکسل، وگرنه سافاری iOS هنگام فوکوس صفحه را زوم می‌کند و برنمی‌گرداند |
 
 ## روش کار (تصمیم ۱۴۰۵/۰۵/۱۳)
 
@@ -20,6 +21,11 @@
 | `toranjan/site-header.tsx` | [bundui/navigation-menu4](https://21st.dev/@bundui/components/navigation-menu4) |
 | `toranjan/product-detail.tsx` | [kavikatiyar/product-detail-page](https://21st.dev/@kavikatiyar/components/product-detail-page) |
 | `toranjan/cart-view.tsx` | [kokonutd/interactive-checkout](https://21st.dev/@kokonutd/components/interactive-checkout) — ستون چپش از کاتالوگ به خود سبد تبدیل شد؛ `NumberFlow` حذف شد چون با ارقام فارسی `NaN` می‌دهد |
+| `toranjan/checkout-form.tsx` | [arihantcodes/multistep-form](https://21st.dev/@arihantcodes_1f7b8c4d/components/multistep-form) — شش گام به سه گام رسید و `useState` هر فیلد جای خود را به react-hook-form + zod داد |
+
+## دام قلم که یک‌بار خوردیم
+
+`font-figure` **فقط برای ارقام لاتین است.** Satoshi به گلیف عددهای لاتین subset شده و Inter پشت آن هم رقم فارسی ندارد، پس عددی که با `formatNumber` نوشته شده و کلاس `font-figure` گرفته باشد، از هر دو رد می‌شود و روی قلم پیش‌فرض سیستم می‌افتد — که آشکارا قلم بقیه‌ی صفحه نیست. یک‌بار قیمت‌های صفحه‌ی سبد را برد. هر چیزی که `formatNumber`/`formatToman` چاپ می‌کند فارسی است و وزیرمتن می‌خواهد، یعنی هیچ کلاس قلمی نمی‌گیرد.
 
 ## چرا فایل‌ها در مخزن‌اند و با `shadcn add` نصب نمی‌شوند
 

@@ -123,6 +123,13 @@
   --font-sans: var(--font-fa), system-ui, sans-serif;
   --font-display: var(--font-lat-display), serif;
   --font-label: var(--font-lat-body), sans-serif;
+  /* LATIN FIGURES ONLY. Satoshi is subset to its digit glyphs (۰-۹ are not
+     among them) and Inter behind it has no Persian figures either, so a
+     Persian number wearing `font-figure` falls through both to whatever
+     generic sans the machine happens to have — which is visibly not the face
+     the rest of the page is set in. It cost the cart page its prices once.
+     Anything printed by `formatNumber`/`formatToman` is Persian and belongs
+     in Vazirmatn, i.e. no font class at all. */
   --font-figure: "Satoshi", var(--font-lat-body), sans-serif;
 }
 
