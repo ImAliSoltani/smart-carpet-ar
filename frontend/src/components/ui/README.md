@@ -8,6 +8,7 @@
 | `navigation-menu.tsx`، `sheet.tsx` | وابستگی‌های رجیستری [bundui/navigation-menu4](https://21st.dev/@bundui/components/navigation-menu4) |
 | `zoomable-image.tsx` | [inference-sh/zoomable-image](https://21st.dev/@inference-sh/components/zoomable-image) — تگ `img` خام به `next/image` تبدیل شد و ظاهر لایت‌باکس در `globals.css` به پالت خودمان آمد |
 | `input.tsx`، `textarea.tsx` | وابستگی‌های رجیستری [arihantcodes/multistep-form](https://21st.dev/@arihantcodes_1f7b8c4d/components/multistep-form) — ارتفاع ۴۸ و اندازه‌ی قلم ۱۶ پیکسل، وگرنه سافاری iOS هنگام فوکوس صفحه را زوم می‌کند و برنمی‌گرداند |
+| `hero-10.tsx`، `hero-10-utils/cta.tsx` | [felipemenezes098/hero-10](https://21st.dev/@felipemenezes098/components/hero-10) — بادبزن سه‌عکسی برای راست‌به‌چپ آینه شد (حاشیه‌های منطقی و چرخش‌های قرینه)، `<img>` به `next/image` رفت، و `cta` که در پاسخ رجیستری نبود نوشته شد |
 | `pagination.tsx` | [shadcn/pagination](https://21st.dev/@shadcn/components/pagination) — `buttonVariants` کنار گذاشته شد (چون `hover:bg-accent` در پالت ما طلایی است)، جهت شورون‌ها آینه شد، و `<a>` به `next/link` تبدیل شد |
 
 ## روش کار (تصمیم ۱۴۰۵/۰۵/۱۳)

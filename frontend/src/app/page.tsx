@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Hero04 } from "@/components/ui/hero-04";
+import { Hero10 } from "@/components/ui/hero-10";
 import { HomeFeatured } from "@/components/toranjan/home-featured";
 import { HomePromise } from "@/components/toranjan/home-promise";
 import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
@@ -34,14 +34,17 @@ export default function HomePage() {
     <main>
       <HomePromise />
 
-      <Hero04
+      <Hero10
         title="فرش ایرانی،"
-        titleLine2="با اندازه‌ی واقعی"
+        titleLine2Prefix="با"
+        titleHighlight="اندازه‌ی واقعی"
         description="بین فرش‌های دستباف و ماشینی بگردید، و هرکدام را پیش از خرید با ابعاد دقیق روی کف خانه‌ی خودتان بگذارید."
-        primaryImage="/brand/hero-wide.webp"
-        secondaryImage="/brand/hero-detail.webp"
-        primaryAlt="فرش دستباف ایرانی، پهن‌شده در اتاقی روشن"
-        secondaryAlt="نمای نزدیک از بافت و حاشیه‌ی فرش"
+        images={["/brand/hero-1.webp", "/brand/hero-2.webp", "/brand/hero-3.webp"]}
+        imageAlts={[
+          "فرش دستباف ایرانی با نقش لچک‌ترنج",
+          "فرش پهن‌شده در اتاقی روشن",
+          "نمای نزدیک از بافت و حاشیه‌ی فرش",
+        ]}
         primaryCTA={{ ctaEnabled: true, text: "ورود به فروشگاه", link: "/carpets" }}
         secondaryCTA={{ ctaEnabled: true, text: "پیگیری سفارش", link: "/track" }}
       />

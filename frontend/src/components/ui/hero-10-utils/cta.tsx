@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * The call to action of [hero-04](../hero-04.tsx), to the shape its parent
- * passes: `{ ctaEnabled, text, link, variant, size }`. Written here for the
- * same reason as [art-collage](./art-collage.tsx) — the registry answered with
- * the parent alone.
+ * The call to action of [hero-10](../hero-10.tsx), to the shape its parent
+ * passes: `{ ctaEnabled, text, link, variant, size }`. Written here because
+ * `hero-10-utils/cta` is the one file the registry's answer left out — the
+ * rest of that hero, including its image fan, arrived whole.
  *
  * `link` is rendered as a `next/link`, since every destination this hero has
  * is inside the shop.
