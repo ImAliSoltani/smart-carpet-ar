@@ -164,7 +164,7 @@ const ROWS: Row[] = [
     render: (entry) => {
       if (entry.item.colors.length === 0) return <span className="text-muted">—</span>;
       return (
-        <span className="flex flex-wrap gap-1.5">
+        <span className="flex flex-wrap justify-center gap-1.5 sm:justify-start">
           {entry.item.colors.slice(0, 6).map((hex, i) => (
             <span
               key={hex + i}
@@ -193,9 +193,23 @@ const ROWS: Row[] = [
   },
 ];
 
+/**
+ * How many columns a phone gets.
+ *
+ * Two, and the rest of the shortlist waits behind a picker. Four columns on a
+ * 375px screen is 84px of carpet each — the table technically fits by scrolling
+ * sideways, and sideways scrolling is exactly what makes it unreadable: you
+ * cannot compare two things you cannot see at once, so a four-column table on a
+ * phone is a list wearing a table's clothes.
+ */
+const MOBILE_COLUMNS = 2;
+
 export function CompareTable() {
   const compare = useCompare();
   const [onlyDifferences, setOnlyDifferences] = React.useState(false);
+  // Which two carpets the phone shows. Ids rather than positions, so removing a
+  // column does not silently swap a different carpet into the reader's slot.
+  const [slots, setSlots] = React.useState<[number | null, number | null]>([null, null]);
 
   const list = useQuery({
     ...carpetListQuery({ id: compare.ids, page_size: COMPARE_LIMIT }),
@@ -230,6 +244,19 @@ export function CompareTable() {
   }));
 
   const detailsSettled = details.every((query) => !query.isPending);
+
+  /* ---- which two the phone shows ---------------------------------------
+     Derived rather than kept in sync with an effect. A slot holds an id only
+     while that id is still in the shortlist; the moment a column is removed the
+     expression below falls back to the first carpet that is left, so there is
+     no window where the picker points at a carpet the table no longer has. */
+  const liveIds = entries.map((entry) => entry.id);
+  const slotA = slots[0] !== null && liveIds.includes(slots[0]) ? slots[0] : liveIds[0];
+  const slotB =
+    slots[1] !== null && liveIds.includes(slots[1]) && slots[1] !== slotA
+      ? slots[1]
+      : liveIds.find((id) => id !== slotA);
+  const shownOnPhone = new Set([slotA, slotB].filter((id): id is number => id !== undefined));
 
   if (!compare.hydrated) {
     return <div className="h-72 animate-pulse rounded-xl border border-line bg-paper" aria-hidden />;
@@ -269,6 +296,13 @@ export function CompareTable() {
   // Only once every detail has answered. Filtering on a half-loaded table would
   // hide rows that are «the same» purely because both cells are still empty,
   // and then show them again a moment later.
+  //
+  // Compared across the whole shortlist, not across the two columns a phone
+  // happens to be showing. Which columns those are is decided by CSS at each
+  // width, and this list is decided once in JavaScript; narrowing it to the
+  // visible pair would mean the *rows* changed when the window was resized. The
+  // cost is a row that survives the filter because carpets three and four
+  // differ, and reads identical on a phone showing one and two.
   const rows =
     onlyDifferences && detailsSettled && entries.length > 1
       ? ROWS.filter((row) => new Set(entries.map(row.text)).size > 1)
@@ -277,9 +311,8 @@ export function CompareTable() {
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          {formatNumber(entries.length)} فرش، کنار هم
-        </p>
+        {/* «در مقایسه», not «کنار هم» — on a phone only two of them are. */}
+        <p className="text-sm text-muted">{formatNumber(entries.length)} فرش در مقایسه</p>
 
         <div className="flex items-center gap-1.5">
           {entries.length > 1 && (
@@ -313,10 +346,43 @@ export function CompareTable() {
         </p>
       )}
 
-      {/* The table is wider than a phone by design: four carpets side by side is
-          the feature. It scrolls inside this box and never takes the page with
-          it, and the property column stays put so a cell three columns along
-          still says what it is.
+      <PhoneColumnPicker
+        entries={entries}
+        slotA={slotA}
+        slotB={slotB}
+        onPick={(index, id) => {
+          const current = [slotA, slotB];
+          const other = current[index === 0 ? 1 : 0];
+          // Choosing the carpet that already sits in the other slot swaps the
+          // two rather than drawing one carpet twice.
+          const partner = other === id ? current[index] : other;
+          const pair = [id, partner].filter((value): value is number => value !== undefined);
+          // Normalised to shortlist order, because the table draws its columns
+          // in that order and CSS cannot reorder them per breakpoint. Without
+          // this the picker would say «فرش نخست: تبریز» while تبریز stood in
+          // the second column — the label would be describing a slot the table
+          // does not have.
+          const inOrder = liveIds.filter((value) => pair.includes(value));
+          setSlots([inOrder[0] ?? null, inOrder[1] ?? null]);
+        }}
+      />
+
+      {/* **Two shapes, one table.** From `sm` up this is the ordinary thing: a
+          pinned property column on the reading edge and a column per carpet,
+          scrolling inside its own box if the shortlist is long. Below `sm` the
+          property name climbs out of that column and becomes a full-width line
+          above its own values, and only two carpets are drawn.
+
+          Four columns on a 375px screen is 84px of carpet each. The table fits
+          by scrolling sideways, and sideways scrolling is what breaks it: two
+          carpets you cannot see at once are two carpets you cannot compare. So
+          the phone spends its width on two columns and its *height* on the
+          values, which is the axis a phone actually has.
+
+          It is one `<table>` at both widths, not two blocks with a `hidden`
+          each. The columns line up across rows because they are real table
+          columns; hiding the same column index in every row keeps them lined up,
+          which two independent layouts would not.
 
           **No `-mx-5 px-5` bleed here, and it was tried.** Widening the box past
           the page gutter on a phone costs nothing anywhere else in this shop,
@@ -328,14 +394,15 @@ export function CompareTable() {
       <div className="overflow-x-auto">
         <table className="w-full border-separate border-spacing-0 text-sm">
           <caption className="sr-only">
-            مقایسه‌ی مشخصات فرش‌های انتخاب‌شده. ستون نخست نام ویژگی است.
+            مقایسه‌ی مشخصات فرش‌های انتخاب‌شده. روی صفحه‌ی بزرگ ستون نخست نام ویژگی است؛
+            روی گوشی نام ویژگی بالای مقدارهایش می‌آید و دو فرش نشان داده می‌شود.
           </caption>
 
           <thead>
             <tr>
               <th
                 scope="col"
-                className="sticky start-0 z-20 w-[104px] min-w-[104px] bg-bg pb-5 pe-3 align-bottom sm:w-[150px] sm:min-w-[150px]"
+                className="sticky start-0 z-20 hidden bg-bg pb-5 pe-3 align-bottom sm:table-cell sm:w-[150px] sm:min-w-[150px]"
               >
                 <span className="sr-only">ویژگی</span>
               </th>
@@ -343,7 +410,16 @@ export function CompareTable() {
                 <th
                   key={entry.id}
                   scope="col"
-                  className="min-w-[172px] px-2 pb-5 align-bottom text-start font-normal sm:min-w-[200px] sm:px-3"
+                  className={cn(
+                    "w-1/2 px-1.5 pb-5 align-bottom text-center font-normal",
+                    // 190, not 200. Four columns at 200 plus the 150 label is
+                    // 950 against the 945 a 1024 window leaves, so the widest
+                    // laptop breakpoint the roadmap tests scrolled by five
+                    // pixels to show nothing. At 190 the four fit and then grow
+                    // to fill, which is 199 each — the same picture, unscrolled.
+                    "sm:w-auto sm:min-w-[190px] sm:px-3 sm:text-start",
+                    !shownOnPhone.has(entry.id) && "hidden sm:table-cell",
+                  )}
                 >
                   <CarpetHeading entry={entry} onRemove={() => compare.remove(entry.id)} />
                 </th>
@@ -353,37 +429,67 @@ export function CompareTable() {
 
           <tbody>
             {rows.map((row) => (
-              <tr key={row.key} className="group/row">
-                <th
-                  scope="row"
-                  className="sticky start-0 z-10 border-t border-line bg-bg py-4 pe-3 text-start align-top text-[13px] font-normal leading-relaxed text-muted"
-                >
-                  {row.label}
-                </th>
-                {entries.map((entry) => (
-                  <td
-                    key={entry.id}
-                    className="border-t border-line px-2 py-4 align-top leading-relaxed sm:px-3"
+              <React.Fragment key={row.key}>
+                {/* The phone's property line. `colgroup` rather than `row`:
+                    below `sm` it heads the two cells beneath it, not the cells
+                    beside it. The `sm` version of the same label is a proper
+                    `scope="row"` and this one is gone, so a screen reader never
+                    meets both. */}
+                <tr className="sm:hidden">
+                  <th
+                    scope="colgroup"
+                    colSpan={Math.min(entries.length, MOBILE_COLUMNS)}
+                    className="border-t border-line pb-1 pt-4 text-start text-[11px] font-normal tracking-[0.14em] text-muted"
                   >
-                    {/* A cell whose detail has not arrived shows a bar of the
-                        right height rather than «—», which would read as «this
-                        carpet has none». */}
-                    {row.needsDetail && entry.detail === undefined ? (
-                      <span className="block h-4 w-16 animate-pulse rounded bg-line" aria-hidden />
-                    ) : (
-                      (row.render?.(entry, { lowestPrice }) ?? row.text(entry))
-                    )}
-                  </td>
-                ))}
-              </tr>
+                    {row.label}
+                  </th>
+                </tr>
+
+                <tr className="group/row">
+                  <th
+                    scope="row"
+                    className="sticky start-0 z-10 hidden border-t border-line bg-bg py-4 pe-3 text-start align-top text-[13px] font-normal leading-relaxed text-muted sm:table-cell"
+                  >
+                    {row.label}
+                  </th>
+                  {entries.map((entry) => (
+                    <td
+                      key={entry.id}
+                      className={cn(
+                        "px-1.5 pb-4 align-top text-center leading-loose",
+                        "sm:border-t sm:border-line sm:px-3 sm:py-4 sm:text-start sm:leading-relaxed",
+                        !shownOnPhone.has(entry.id) && "hidden sm:table-cell",
+                      )}
+                    >
+                      {/* A cell whose detail has not arrived shows a bar of the
+                          right height rather than «—», which would read as «this
+                          carpet has none». */}
+                      {row.needsDetail && entry.detail === undefined ? (
+                        <span className="mx-auto block h-4 w-16 animate-pulse rounded bg-line sm:mx-0" aria-hidden />
+                      ) : (
+                        (row.render?.(entry, { lowestPrice }) ?? row.text(entry))
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              </React.Fragment>
             ))}
 
             <tr>
-              <th scope="row" className="sticky start-0 z-10 border-t border-line bg-bg py-5 pe-3">
+              <th
+                scope="row"
+                className="sticky start-0 z-10 hidden border-t border-line bg-bg py-5 pe-3 sm:table-cell"
+              >
                 <span className="sr-only">کنش‌ها</span>
               </th>
               {entries.map((entry) => (
-                <td key={entry.id} className="border-t border-line px-2 py-5 align-top sm:px-3">
+                <td
+                  key={entry.id}
+                  className={cn(
+                    "border-t border-line px-1.5 py-5 align-top sm:px-3",
+                    !shownOnPhone.has(entry.id) && "hidden sm:table-cell",
+                  )}
+                >
                   <div className="flex flex-col gap-2">
                     <Button asChild className="h-11 rounded-full text-[13px]">
                       <Link href={`/carpets/${entry.item.slug}`}>دیدن فرش</Link>
@@ -422,6 +528,64 @@ export function CompareTable() {
   );
 }
 
+/**
+ * Which two carpets the phone draws.
+ *
+ * The alternative was the one the reference shops settle for: show the first two
+ * and let the rest of the shortlist be invisible. That is fine until somebody
+ * shortlists four carpets *on a phone*, which the tray lets them do — and then
+ * half of what they chose is gone with nothing on screen admitting it.
+ *
+ * Two native `<select>`s, not a custom control: they are reachable, they read
+ * correctly right-to-left, and they open the platform's own picker, which is
+ * the right thing on the device this exists for. 16px because anything smaller
+ * makes Safari zoom the page on focus and not zoom back — the same trap
+ * `ui/input.tsx` records.
+ */
+function PhoneColumnPicker({
+  entries,
+  slotA,
+  slotB,
+  onPick,
+}: {
+  entries: Entry[];
+  slotA: number | undefined;
+  slotB: number | undefined;
+  onPick: (index: 0 | 1, carpetId: number) => void;
+}) {
+  if (entries.length <= MOBILE_COLUMNS) return null;
+
+  const slot = (index: 0 | 1, value: number | undefined, label: string) => (
+    <label className="block">
+      <span className="mb-1.5 block text-[11px] tracking-[0.14em] text-muted">{label}</span>
+      <select
+        value={value ?? ""}
+        onChange={(event) => onPick(index, Number(event.target.value))}
+        className="h-11 w-full truncate rounded-md border border-line-2 bg-paper px-3 text-base"
+      >
+        {entries.map((entry) => (
+          <option key={entry.id} value={entry.id}>
+            {entry.item.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+
+  return (
+    <div className="mb-6 sm:hidden">
+      <p className="mb-3 text-[13px] leading-loose text-muted">
+        روی گوشی {formatNumber(MOBILE_COLUMNS)} فرش کنار هم جا می‌شوند. انتخاب کنید کدام دو
+        تا:
+      </p>
+      <div className="grid grid-cols-2 gap-3">
+        {slot(0, slotA, "فرش نخست")}
+        {slot(1, slotB, "فرش دوم")}
+      </div>
+    </div>
+  );
+}
+
 /** The photograph, the name, and the way out of the comparison. */
 function CarpetHeading({ entry, onRemove }: { entry: Entry; onRemove: () => void }) {
   const image = mediaUrl(entry.item.primary_image);
@@ -438,7 +602,7 @@ function CarpetHeading({ entry, onRemove }: { entry: Entry; onRemove: () => void
               src={image}
               alt={entry.item.name}
               fill
-              sizes="(min-width: 640px) 240px, 172px"
+              sizes="(min-width: 640px) 240px, 45vw"
               className="object-contain p-3 transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover/h:scale-[1.04]"
             />
           )}
@@ -449,7 +613,12 @@ function CarpetHeading({ entry, onRemove }: { entry: Entry; onRemove: () => void
         type="button"
         onClick={onRemove}
         aria-label={`برداشتن ${entry.item.name} از مقایسه`}
-        className="absolute -top-2.5 -end-2.5 grid size-11 place-items-center"
+        // Hanging off the corner is the nicer picture and it is `sm`-only: an
+        // absolutely positioned child still counts toward the scroll container's
+        // width, so ten pixels past the outermost column gave the table four
+        // pixels of scroll it had no business having. Inside the frame on a
+        // phone, where the photograph's own padding leaves the corner empty.
+        className="absolute top-0 end-0 grid size-11 place-items-center sm:-top-2.5 sm:-end-2.5"
       >
         <span className="grid size-7 place-items-center rounded-full border border-line bg-paper text-ink-2 shadow-sm transition-colors duration-[--dur-feedback] hover:border-cta hover:bg-cta hover:text-on-cta">
           <X className="size-3.5" />
