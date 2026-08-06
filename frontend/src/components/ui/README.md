@@ -25,6 +25,7 @@
 | `toranjan/product-detail.tsx` | [kavikatiyar/product-detail-page](https://21st.dev/@kavikatiyar/components/product-detail-page) |
 | `toranjan/cart-view.tsx` | [kokonutd/interactive-checkout](https://21st.dev/@kokonutd/components/interactive-checkout) — ستون چپش از کاتالوگ به خود سبد تبدیل شد؛ `NumberFlow` حذف شد چون با ارقام فارسی `NaN` می‌دهد |
 | `toranjan/checkout-form.tsx` | [arihantcodes/multistep-form](https://21st.dev/@arihantcodes_1f7b8c4d/components/multistep-form) — شش گام به سه گام رسید و `useState` هر فیلد جای خود را به react-hook-form + zod داد |
+| `toranjan/faq-accordion.tsx` | ظاهر از [jatin-yadav05/interactive-accordion](https://21st.dev/@jatin-yadav05/components/interactive-accordion)، ولی **ماشینش از `ui/accordion.tsx` خودمان** — هوک‌های `useAccordion`/`useAutoHeight` که فوکوس چرخشی و `aria`ها و `inert` را دارند. نسخه‌ی وارداتی `<h3>` را داخل دکمه گذاشته بود و فنرهایش زمان نداشتند؛ هر دو اصلاح شدند |
 
 ## دام قلم که یک‌بار خوردیم
 

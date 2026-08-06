@@ -76,6 +76,33 @@ const HELP_LINKS = [
   },
 ];
 
+/**
+ * The entries that are a link and nothing more.
+ *
+ * Two on the bar, four in the drawer, and the difference is a measurement
+ * rather than an oversight. A third flat link was tried and taken out again:
+ * at 1024 the bar's four children want 1047px of 1009, and the site scrolls
+ * sideways — the same failure the wordmark was stacked to fix. The drawer has a
+ * vertical axis and no such budget, so it carries the questions page and the
+ * contact page too.
+ *
+ * Both lists are declared here rather than inline, because the bar and the
+ * drawer have drifted apart once already — the drawer offered all three help
+ * links while the bar offered one — and that is the shape of mistake that only
+ * shows up on the device you are not testing on.
+ */
+const FLAT_LINKS = [
+  { href: "/track", label: "پیگیری سفارش" },
+  { href: "/about", label: "درباره‌ی ما" },
+];
+
+const DRAWER_LINKS = [
+  { href: "/track", label: "پیگیری سفارش" },
+  { href: "/faq", label: "سؤال‌های پرتکرار" },
+  { href: "/about", label: "درباره‌ی ما" },
+  { href: "/contact", label: "تماس" },
+];
+
 function useScrolled() {
   const [scrolled, setScrolled] = React.useState(false);
   React.useEffect(() => {
@@ -266,17 +293,18 @@ export function SiteHeader({
             ))}
             {/* Tracking has to be reachable by someone who left and came back
                 with only a code. The confirmation screen links to it, but that
-                screen is gone by the next visit. */}
-            <SheetClose asChild>
-              <Link href="/track" className="mt-5 py-2.5 text-ink-2">
-                پیگیری سفارش
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
-              <Link href="/about" className="py-2.5 text-ink-2">
-                درباره‌ی ما
-              </Link>
-            </SheetClose>
+                screen is gone by the next visit.
+
+                The drawer carries `/contact` as well, which the bar does not:
+                the constraint up there is horizontal and there is none here. */}
+            <span className="mt-5" />
+            {DRAWER_LINKS.map((link) => (
+              <SheetClose asChild key={link.href}>
+                <Link href={link.href} className="py-2.5 text-ink-2">
+                  {link.label}
+                </Link>
+              </SheetClose>
+            ))}
           </nav>
         </SheetContent>
       </Sheet>
@@ -422,10 +450,7 @@ export function SiteHeader({
             </NavigationMenuContent>
           </NavigationMenuItem>
 
-          {[
-            { href: "/track", label: "پیگیری سفارش" },
-            { href: "/about", label: "درباره‌ی ما" },
-          ].map((item) => (
+          {FLAT_LINKS.map((item) => (
             <NavigationMenuItem key={item.href}>
               <NavigationMenuLink asChild>
                 <Link

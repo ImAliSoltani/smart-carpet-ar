@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { contactChannels } from "@/lib/content/contact";
+
 /**
  * The footer.
  *
@@ -7,20 +9,17 @@ import Link from "next/link";
  * a footer is a list of links in a box: there is no interaction here worth
  * importing.
  *
- * **It links only to pages that exist.** `/about`, `/contact` and `/faq` are
- * §6-12 and are not built; a footer full of dead links is worse than a short
- * one, and it is the kind of thing nobody notices until a visitor does.
+ * **It links only to pages that exist.** That rule wrote the first version of
+ * this file, when `/about`, `/contact` and `/faq` were §6-12 and unbuilt. They
+ * are built now, so they are here, in a column of their own: they answer a
+ * different question from «where are the carpets», and a single list of seven
+ * links makes the visitor read all seven to find out which.
  *
- * The WhatsApp and Instagram links §6-12 asks for are real accounts the shop
- * does not have yet, so they are one empty constant here rather than a
- * plausible-looking URL. Filling them in is a one-line change; inventing them
- * would put a broken promise on every page of the site.
+ * The WhatsApp and Instagram links §6-12 asks for are still accounts the shop
+ * does not have. They now come from `lib/content/contact.ts` — the same empty
+ * constants the contact page reads — so the day they exist, this footer and
+ * that page fill in together instead of one of them being forgotten.
  */
-
-const SOCIAL = {
-  whatsapp: "",
-  instagram: "",
-} as const;
 
 const SHOP_LINKS = [
   { href: "/carpets", label: "همه‌ی فرش‌ها" },
@@ -29,8 +28,14 @@ const SHOP_LINKS = [
   { href: "/track", label: "پیگیری سفارش" },
 ];
 
+const ABOUT_LINKS = [
+  { href: "/about", label: "درباره‌ی ترنجان" },
+  { href: "/faq", label: "سؤال‌های پرتکرار" },
+  { href: "/contact", label: "تماس" },
+];
+
 export function SiteFooter() {
-  const socials = Object.entries(SOCIAL).filter(([, href]) => href);
+  const socials = contactChannels();
 
   return (
     <footer className="mt-auto border-t border-line bg-paper">
@@ -44,33 +49,52 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <nav aria-label="پیوندهای فروشگاه">
-            <ul className="grid grid-cols-2 gap-x-10 gap-y-1 sm:grid-cols-1">
-              {SHOP_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="flex h-11 items-center text-[13.5px] text-ink-2 transition-colors duration-[--dur-feedback] hover:text-accent"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="flex gap-10 sm:gap-16">
+            <nav aria-label="پیوندهای فروشگاه">
+              <p className="mb-1 text-[11px] tracking-[0.18em] text-muted">فروشگاه</p>
+              <ul>
+                {SHOP_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="flex h-11 items-center text-[13.5px] text-ink-2 transition-colors duration-[--dur-feedback] hover:text-accent"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-label="درباره و راهنما">
+              <p className="mb-1 text-[11px] tracking-[0.18em] text-muted">راهنما</p>
+              <ul>
+                {ABOUT_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="flex h-11 items-center text-[13.5px] text-ink-2 transition-colors duration-[--dur-feedback] hover:text-accent"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
 
         {socials.length > 0 && (
           <ul className="mt-8 flex gap-5">
-            {socials.map(([name, href]) => (
-              <li key={name}>
+            {socials.map((channel) => (
+              <li key={channel.id}>
                 <a
-                  href={href}
+                  href={channel.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ltr-isolate flex h-11 items-center text-[13px] uppercase tracking-widest text-muted transition-colors duration-[--dur-feedback] hover:text-ink"
+                  className="flex h-11 items-center text-[13px] text-muted transition-colors duration-[--dur-feedback] hover:text-ink"
                 >
-                  {name}
+                  {channel.label}
                 </a>
               </li>
             ))}
