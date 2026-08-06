@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 
 import { CarpetCard } from "@/components/toranjan/carpet-card";
 import { carpetListQuery } from "@/lib/api/catalog";
+import { useCompare } from "@/lib/store/compare";
 import { useFavorites } from "@/lib/store/favorites";
 import type { CarpetFilters } from "@/lib/api/types";
 
@@ -33,6 +34,9 @@ export function HomeFeatured({
   href?: string;
 }) {
   const favorites = useFavorites();
+  // Both corner controls, for the reason in the note above: a card that behaves
+  // differently here is a second card to keep in step with the first.
+  const compare = useCompare();
   const { data, isPending, error } = useQuery(
     carpetListQuery({ ...filters, page_size: 4 }),
   );
@@ -77,6 +81,9 @@ export function HomeFeatured({
                 index={i}
                 isWishlisted={favorites.has(carpet.id)}
                 onWishlistToggle={favorites.toggle}
+                isComparing={compare.has(carpet.id)}
+                onCompareToggle={compare.toggle}
+                compareFull={compare.isFull}
               />
             </li>
           ))}

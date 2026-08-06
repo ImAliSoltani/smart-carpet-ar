@@ -10,6 +10,7 @@ import { CataloguePagination } from "@/components/toranjan/catalogue-pagination"
 import { carpetListQuery } from "@/lib/api/catalog";
 import { ApiError } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
+import { useCompare } from "@/lib/store/compare";
 import { useFavorites } from "@/lib/store/favorites";
 import type { CarpetFilters } from "@/lib/api/types";
 
@@ -25,9 +26,10 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
   const { data, error, isPending, isPaused, isFetching, refetch } = useQuery(
     carpetListQuery(filters),
   );
-  // The card renders its heart only when something can receive the press, so
-  // this is what makes it appear at all.
+  // The card renders each corner control only when something can receive the
+  // press, so these are what make them appear at all.
   const favorites = useFavorites();
+  const compare = useCompare();
 
   const params = useSearchParams();
   const firstPageHref = React.useMemo(() => {
@@ -133,6 +135,9 @@ export function CarpetGrid({ filters }: { filters: CarpetFilters }) {
               index={i}
               isWishlisted={favorites.has(carpet.id)}
               onWishlistToggle={favorites.toggle}
+              isComparing={compare.has(carpet.id)}
+              onCompareToggle={compare.toggle}
+              compareFull={compare.isFull}
             />
           </li>
         ))}

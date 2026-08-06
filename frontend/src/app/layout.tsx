@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { SiteHeader } from "@/components/toranjan/site-header";
 import { SiteFooter } from "@/components/toranjan/site-footer";
+import { CompareTray } from "@/components/toranjan/compare-tray";
 
 // Persian carries every word of the interface, so it is the one face that is
 // never allowed to fall back.
@@ -59,6 +60,10 @@ export default function RootLayout({
           <SiteHeader />
           {children}
           <SiteFooter />
+          {/* Outside the page, because a shortlist survives navigation — it is
+              filled on one page and read on another. It draws nothing until
+              something is in it. */}
+          <CompareTray />
         </Providers>
       </body>
     </html>

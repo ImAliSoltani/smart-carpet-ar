@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { carpetListQuery } from "@/lib/api/catalog";
 import { ApiError } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
+import { useCompare } from "@/lib/store/compare";
 import { useFavorites } from "@/lib/store/favorites";
 
 /**
@@ -24,6 +25,9 @@ import { useFavorites } from "@/lib/store/favorites";
  */
 export function FavouritesGrid() {
   const favorites = useFavorites();
+  // Shortlisting from here is the shape the two features were built for: heart
+  // whatever catches the eye while browsing, then put four of them side by side.
+  const compare = useCompare();
 
   const { data, error, isPending, isPaused } = useQuery({
     ...carpetListQuery({ id: favorites.ids, page_size: 60 }),
@@ -100,6 +104,9 @@ export function FavouritesGrid() {
               index={i}
               isWishlisted={favorites.has(carpet.id)}
               onWishlistToggle={favorites.toggle}
+              isComparing={compare.has(carpet.id)}
+              onCompareToggle={compare.toggle}
+              compareFull={compare.isFull}
             />
           </li>
         ))}

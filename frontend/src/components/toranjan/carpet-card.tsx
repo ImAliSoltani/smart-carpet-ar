@@ -4,13 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Cuboid, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Cuboid, Heart, Scale } from "lucide-react";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CornerToggle } from "@/components/toranjan/corner-toggle";
 import { mediaUrl } from "@/lib/api/client";
 import type { CarpetListItem } from "@/lib/api/types";
 import { formatNumber, formatToman } from "@/lib/format";
+import { COMPARE_LIMIT } from "@/lib/store/compare";
 import { MATERIAL_LABEL, PATTERN_LABEL } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +34,12 @@ import { cn } from "@/lib/utils";
  * The footer action is «در خانه‌ی من ببین», not «افزودن به سبد». Nobody buys a
  * carpet from a grid — the thing worth pressing here is the one that answers
  * the question the shop exists to answer.
+ *
+ * Added since: the comparison toggle, under the heart. A grid is where a
+ * comparison starts — four rugs of the same pattern is exactly the moment
+ * somebody wants them side by side — so the shortlist is filled from here and
+ * read at `/compare`. Both corner controls moved into `CornerToggle`, which is
+ * also where the touch-target floor finally got applied to the heart.
  */
 
 export interface CarpetCardProps {
@@ -42,6 +50,11 @@ export interface CarpetCardProps {
   images?: string[];
   isWishlisted?: boolean;
   onWishlistToggle?: (carpetId: number) => void;
+  isComparing?: boolean;
+  /** Absent on grids where a shortlist would mean nothing, like the shortlist. */
+  onCompareToggle?: (carpetId: number) => void;
+  /** The shortlist is at its limit — offer the toggle, but say why it is shut. */
+  compareFull?: boolean;
 }
 
 // Per the motion guidance for long lists: 20–40ms between items, and never
@@ -56,6 +69,9 @@ export function CarpetCard({
   images,
   isWishlisted = false,
   onWishlistToggle,
+  isComparing = false,
+  onCompareToggle,
+  compareFull = false,
 }: CarpetCardProps) {
   const gallery = (images?.length ? images : [carpet.primary_image])
     .map((u) => mediaUrl(u))
@@ -158,25 +174,45 @@ export function CarpetCard({
             </>
           )}
 
-          {/* Shown only once something can receive the press. The favourites
-              store is not built yet, and a heart that silently does nothing is
-              worse than no heart at all. */}
-          {onWishlistToggle && (
-            <Button
-              type="button"
-              variant="secondary"
-              size="icon"
-              aria-label={isWishlisted ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
-              aria-pressed={isWishlisted}
-              className="absolute top-3 end-3 size-9 rounded-full bg-paper/85 shadow-sm backdrop-blur-sm"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onWishlistToggle(carpet.id);
-              }}
-            >
-              <Heart className={cn("size-4", isWishlisted && "fill-accent text-accent")} />
-            </Button>
+          {/* Shown only once something can receive the press. A control that
+              silently does nothing is worse than no control at all — which is
+              why each of these appears with its handler and not before.
+
+              The column is 1.5 rather than 3 from the corner because the pills
+              inside it are inset 4px of their own: the 44px hit areas touch
+              each other, the 36px discs keep an 8px gap, and the picture is
+              where it was. */}
+          {(onWishlistToggle || onCompareToggle) && (
+            <div className="absolute top-1.5 end-1.5 flex flex-col">
+              {onWishlistToggle && (
+                <CornerToggle
+                  label={isWishlisted ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+                  pressed={isWishlisted}
+                  onPress={() => onWishlistToggle(carpet.id)}
+                >
+                  <Heart className={cn("size-4", isWishlisted && "fill-accent text-accent")} />
+                </CornerToggle>
+              )}
+
+              {onCompareToggle && (
+                <CornerToggle
+                  label={
+                    isComparing
+                      ? "برداشتن از مقایسه"
+                      : compareFull
+                        ? `فهرست مقایسه پر است — حداکثر ${formatNumber(COMPARE_LIMIT)} فرش`
+                        : "افزودن به مقایسه"
+                  }
+                  pressed={isComparing}
+                  // Full and not already chosen is the only dead case, and it
+                  // is dead with a sentence attached rather than silently.
+                  disabled={compareFull && !isComparing}
+                  onPress={() => onCompareToggle(carpet.id)}
+                >
+                  <Scale className={cn("size-4", isComparing && "text-accent")} />
+                </CornerToggle>
+              )}
+            </div>
           )}
         </Link>
 

@@ -3,7 +3,18 @@
 import * as React from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, ChevronRight, Cuboid, Heart, Info, Ruler, Share2, Tag, Users } from "lucide-react";
+import {
+  Camera,
+  ChevronRight,
+  Cuboid,
+  Heart,
+  Info,
+  Ruler,
+  Scale,
+  Share2,
+  Tag,
+  Users,
+} from "lucide-react";
 
 import { AddToCart } from "@/components/toranjan/add-to-cart";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +24,7 @@ import { mediaUrl } from "@/lib/api/client";
 import type { CarpetDetail, VariantOut } from "@/lib/api/types";
 import { formatNumber, formatSize, formatToman } from "@/lib/format";
 import { useCartStore } from "@/lib/store/cart";
+import { COMPARE_LIMIT, useCompare } from "@/lib/store/compare";
 import { useFavorites } from "@/lib/store/favorites";
 import { MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
@@ -64,6 +76,7 @@ export function ProductDetail({
 }) {
   const reduced = useReducedMotion();
   const favorites = useFavorites();
+  const compare = useCompare();
   const addToCart = useCartStore((state) => state.add);
 
   // Each photograph twice over: the 800px derivative for the page, and the
@@ -161,6 +174,33 @@ export function ProductDetail({
           <Heart
             className={cn("size-5", favorites.has(carpet.id) && "fill-accent text-accent")}
           />
+        </Button>
+        {/* The shortlist, from the page as well as from the grid. Somebody who
+            has read this far and is not convinced is exactly the person who
+            wants it beside two others. Disabled only when the shortlist is full
+            and this carpet is not on it — with the reason in the label, because
+            a control that is dead and silent is the thing the tray avoids. */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 rounded-full disabled:opacity-40"
+          aria-label={
+            compare.has(carpet.id)
+              ? "برداشتن از مقایسه"
+              : compare.isFull
+                ? `فهرست مقایسه پر است — حداکثر ${formatNumber(COMPARE_LIMIT)} فرش`
+                : "افزودن به مقایسه"
+          }
+          aria-pressed={compare.has(carpet.id)}
+          title={
+            compare.isFull && !compare.has(carpet.id)
+              ? `فهرست مقایسه پر است — حداکثر ${formatNumber(COMPARE_LIMIT)} فرش`
+              : "مقایسه"
+          }
+          disabled={compare.isFull && !compare.has(carpet.id)}
+          onClick={() => compare.toggle(carpet.id)}
+        >
+          <Scale className={cn("size-5", compare.has(carpet.id) && "text-accent")} />
         </Button>
         <Button variant="ghost" size="icon" className="size-11 rounded-full" aria-label="اشتراک‌گذاری">
           <Share2 className="size-5" />

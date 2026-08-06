@@ -24,6 +24,12 @@ import { contactChannels } from "@/lib/content/contact";
 const SHOP_LINKS = [
   { href: "/carpets", label: "همه‌ی فرش‌ها" },
   { href: "/favourites", label: "علاقه‌مندی‌ها" },
+  // The comparison's only fixed door. Its tray appears when there is something
+  // in it, and the header has no room for a fifth tool — measured, not felt; the
+  // note above `FLAT_LINKS` in the header records the 1024 overflow. So this is
+  // the one way to reach the page with an empty shortlist, which is what makes
+  // the empty state worth having written.
+  { href: "/compare", label: "مقایسه‌ی فرش‌ها" },
   { href: "/cart", label: "سبد خرید" },
   { href: "/track", label: "پیگیری سفارش" },
 ];
