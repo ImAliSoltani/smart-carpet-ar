@@ -17,8 +17,11 @@ from app.ar import pipeline as ar_pipeline
 from app.ar.rectify import detect_corners
 from app.core.config import get_settings
 from app.models import Carpet, CarpetImage, CarpetVariant, Order
-from app.models.enums import OrderStatus
+from app.models.enums import ArAssetStatus, OrderStatus
 from app.schemas.admin import (
+    AdminCarpetRow,
+    AdminOrderOut,
+    AdminStats,
     ArCornerSuggestion,
     ArGenerateRequest,
     ArVariantStatus,
@@ -31,8 +34,7 @@ from app.schemas.admin import (
     VariantCreate,
     VariantUpdate,
 )
-from app.schemas.catalog import CarpetDetail, ImageOut, VariantOut
-from app.schemas.orders import OrderOut
+from app.schemas.catalog import CarpetDetail, ImageOut, Page, VariantOut
 from app.services.auth import (
     SESSION_COOKIE,
     check_rate_limit,
@@ -82,7 +84,113 @@ async def me() -> dict[str, str]:
     return {"username": get_settings().admin_username}
 
 
+# --- dashboard --------------------------------------------------------------
+
+
+@router.get("/stats", response_model=AdminStats, dependencies=[Depends(require_admin)])
+async def stats(session: DbSession) -> AdminStats:
+    """Counters for the dashboard, counted in the database."""
+
+    async def count(stmt) -> int:  # noqa: ANN001 - a select of one aggregate
+        return (await session.execute(stmt)).scalar_one() or 0
+
+    carpets = select(func.count(Carpet.id))
+    orders = select(func.count(Order.id))
+    ar = select(func.count(CarpetVariant.id))
+
+    return AdminStats(
+        carpets_active=await count(carpets.where(Carpet.is_active.is_(True))),
+        carpets_inactive=await count(carpets.where(Carpet.is_active.is_(False))),
+        variants_total=await count(select(func.count(CarpetVariant.id))),
+        orders_pending=await count(orders.where(Order.status == OrderStatus.PENDING)),
+        orders_confirmed=await count(orders.where(Order.status == OrderStatus.CONFIRMED)),
+        orders_cancelled=await count(orders.where(Order.status == OrderStatus.CANCELLED)),
+        confirmed_total=(
+            await session.execute(
+                select(func.coalesce(func.sum(Order.total), 0)).where(
+                    Order.status == OrderStatus.CONFIRMED
+                )
+            )
+        ).scalar_one(),
+        ar_ready=await count(ar.where(CarpetVariant.ar_status == ArAssetStatus.READY)),
+        ar_missing=await count(ar.where(CarpetVariant.ar_status == ArAssetStatus.MISSING)),
+        ar_processing=await count(
+            ar.where(CarpetVariant.ar_status == ArAssetStatus.PROCESSING)
+        ),
+        ar_failed=await count(ar.where(CarpetVariant.ar_status == ArAssetStatus.FAILED)),
+    )
+
+
 # --- carpets ----------------------------------------------------------------
+
+
+@router.get(
+    "/carpets", response_model=Page[AdminCarpetRow], dependencies=[Depends(require_admin)]
+)
+async def list_admin_carpets(
+    session: DbSession,
+    q: str | None = None,
+    is_active: bool | None = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> Page[AdminCarpetRow]:
+    """The management table's own listing — inactive carpets included.
+
+    `is_active` defaults to None meaning «both», which is the whole point: the
+    shop's listing hides deactivated carpets, so without this the only way back
+    to one would be to remember its id.
+    """
+    page = max(page, 1)
+    page_size = min(max(page_size, 1), 100)
+
+    where = []
+    if q:
+        where.append(Carpet.name.ilike(f"%{q}%"))
+    if is_active is not None:
+        where.append(Carpet.is_active.is_(is_active))
+
+    total = (
+        await session.execute(select(func.count(Carpet.id)).where(*where))
+    ).scalar_one()
+
+    rows = (
+        await session.execute(
+            select(Carpet)
+            .where(*where)
+            # Newest first: the carpet just added is the one being worked on.
+            .order_by(Carpet.id.desc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
+    ).scalars().all()
+
+    items = []
+    for carpet in rows:
+        prices = [variant.price for variant in carpet.variants]
+        primary = next(
+            iter(sorted(carpet.images, key=lambda i: (not i.is_primary, i.position))), None
+        )
+        items.append(
+            AdminCarpetRow(
+                id=carpet.id,
+                slug=carpet.slug,
+                name=carpet.name,
+                pattern=carpet.pattern,
+                material=carpet.material,
+                origin=carpet.origin,
+                is_active=carpet.is_active,
+                variants_count=len(carpet.variants),
+                images_count=len(carpet.images),
+                min_price=min(prices) if prices else None,
+                max_price=max(prices) if prices else None,
+                primary_image=primary.url if primary else None,
+                ar_ready=sum(
+                    1 for v in carpet.variants if v.ar_status == ArAssetStatus.READY
+                ),
+            )
+        )
+
+    return Page[AdminCarpetRow](items=items, total=total, page=page, page_size=page_size)
 
 
 @router.post(
@@ -355,27 +463,29 @@ async def ar_status(session: DbSession, carpet_id: int) -> list[ArVariantStatus]
 # --- orders -----------------------------------------------------------------
 
 
-@router.get("/orders", response_model=list[OrderOut], dependencies=[Depends(require_admin)])
+@router.get(
+    "/orders", response_model=list[AdminOrderOut], dependencies=[Depends(require_admin)]
+)
 async def list_orders(
     session: DbSession, status: OrderStatus | None = None, limit: int = 50
-) -> list[OrderOut]:
+) -> list[AdminOrderOut]:
     stmt = select(Order).order_by(Order.id.desc()).limit(min(limit, 200))
     if status is not None:
         stmt = stmt.where(Order.status == status)
     orders = (await session.execute(stmt)).scalars().all()
-    return [OrderOut.model_validate(order) for order in orders]
+    return [AdminOrderOut.model_validate(order) for order in orders]
 
 
 @router.patch(
-    "/orders/{order_id}", response_model=OrderOut, dependencies=[Depends(require_admin)]
+    "/orders/{order_id}", response_model=AdminOrderOut, dependencies=[Depends(require_admin)]
 )
 async def update_order_status(
     session: DbSession, order_id: int, payload: OrderStatusUpdate
-) -> OrderOut:
+) -> AdminOrderOut:
     order = await session.get(Order, order_id)
     if order is None:
         raise HTTPException(404, detail="سفارش پیدا نشد")
     order.status = payload.status
     await session.commit()
     await session.refresh(order)
-    return OrderOut.model_validate(order)
+    return AdminOrderOut.model_validate(order)

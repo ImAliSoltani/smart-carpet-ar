@@ -1,6 +1,243 @@
 {
   "components": {
     "schemas": {
+      "AdminCarpetRow": {
+        "description": "One row of the carpet management table (ROADMAP §6-15).\n\nDeliberately not `CarpetListItem`. That one is the shop's view and hides\neverything a shopper must not see — above all it only ever returns active\ncarpets, so an admin who deactivated a carpet could never find it again to\nturn it back on.",
+        "properties": {
+          "ar_ready": {
+            "title": "Ar Ready",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "images_count": {
+            "title": "Images Count",
+            "type": "integer"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "material": {
+            "$ref": "#/components/schemas/CarpetMaterial"
+          },
+          "max_price": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Price"
+          },
+          "min_price": {
+            "anyOf": [
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Price"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "pattern": {
+            "$ref": "#/components/schemas/CarpetPattern"
+          },
+          "primary_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Image"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "variants_count": {
+            "title": "Variants Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "pattern",
+          "material",
+          "origin",
+          "is_active",
+          "variants_count",
+          "images_count",
+          "min_price",
+          "max_price",
+          "primary_image",
+          "ar_ready"
+        ],
+        "title": "AdminCarpetRow",
+        "type": "object"
+      },
+      "AdminOrderOut": {
+        "description": "An order as the shopkeeper needs to see it (ROADMAP §6-17).\n\nSeparate from the public `OrderOut` in both directions.\n\nIt carries **more**: the phone number and address, without which an order\ncannot be fulfilled, and `created_at`, without which a list of orders has\nno order. And `id` — the status endpoint is keyed by id, so a management\ntable built on the public shape could list orders and never change one.\n\nIt also leaves the public shape **alone**, which is the point. Someone\ntracking a parcel proves who they are with a reference and a phone number;\nechoing the delivery address back into that response would put it one\nguessed reference away from a stranger.",
+        "properties": {
+          "address": {
+            "title": "Address",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "customer_name": {
+            "title": "Customer Name",
+            "type": "string"
+          },
+          "customer_phone": {
+            "title": "Customer Phone",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/OrderItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "status",
+          "total",
+          "created_at",
+          "customer_name",
+          "customer_phone",
+          "address",
+          "note",
+          "items"
+        ],
+        "title": "AdminOrderOut",
+        "type": "object"
+      },
+      "AdminStats": {
+        "description": "The dashboard's counters (ROADMAP §6-14).\n\nCounted in the database rather than by measuring the length of a list the\nAPI returned. `/admin/orders` caps at 200 rows, so counting its response\nwould quietly stop being true on the two-hundred-and-first order — and a\ndashboard that is wrong only once the shop gets busy is worse than none.",
+        "properties": {
+          "ar_failed": {
+            "title": "Ar Failed",
+            "type": "integer"
+          },
+          "ar_missing": {
+            "title": "Ar Missing",
+            "type": "integer"
+          },
+          "ar_processing": {
+            "title": "Ar Processing",
+            "type": "integer"
+          },
+          "ar_ready": {
+            "title": "Ar Ready",
+            "type": "integer"
+          },
+          "carpets_active": {
+            "title": "Carpets Active",
+            "type": "integer"
+          },
+          "carpets_inactive": {
+            "title": "Carpets Inactive",
+            "type": "integer"
+          },
+          "confirmed_total": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Confirmed Total",
+            "type": "string"
+          },
+          "orders_cancelled": {
+            "title": "Orders Cancelled",
+            "type": "integer"
+          },
+          "orders_confirmed": {
+            "title": "Orders Confirmed",
+            "type": "integer"
+          },
+          "orders_pending": {
+            "title": "Orders Pending",
+            "type": "integer"
+          },
+          "variants_total": {
+            "title": "Variants Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "carpets_active",
+          "carpets_inactive",
+          "variants_total",
+          "orders_pending",
+          "orders_confirmed",
+          "orders_cancelled",
+          "confirmed_total",
+          "ar_ready",
+          "ar_missing",
+          "ar_processing",
+          "ar_failed"
+        ],
+        "title": "AdminStats",
+        "type": "object"
+      },
       "ArAssetStatus": {
         "description": "Lifecycle of the automatically generated AR files for a variant.",
         "enum": [
@@ -897,6 +1134,37 @@
         "title": "OrderTrackRequest",
         "type": "object"
       },
+      "Page_AdminCarpetRow_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminCarpetRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "Page[AdminCarpetRow]",
+        "type": "object"
+      },
       "Page_CarpetListItem_": {
         "properties": {
           "items": {
@@ -1161,6 +1429,106 @@
   "openapi": "3.1.0",
   "paths": {
     "/api/v1/admin/carpets": {
+      "get": {
+        "description": "The management table's own listing — inactive carpets included.\n\n`is_active` defaults to None meaning «both», which is the whole point: the\nshop's listing hides deactivated carpets, so without this the only way back\nto one would be to remember its id.",
+        "operationId": "list_admin_carpets_api_v1_admin_carpets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "is_active",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Is Active"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "farsh_admin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Farsh Admin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AdminCarpetRow_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Admin Carpets",
+        "tags": [
+          "admin"
+        ]
+      },
       "post": {
         "operationId": "create_carpet_api_v1_admin_carpets_post",
         "parameters": [
@@ -1946,7 +2314,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/OrderOut"
+                    "$ref": "#/components/schemas/AdminOrderOut"
                   },
                   "title": "Response List Orders Api V1 Admin Orders Get",
                   "type": "array"
@@ -2017,7 +2385,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrderOut"
+                  "$ref": "#/components/schemas/AdminOrderOut"
                 }
               }
             },
@@ -2035,6 +2403,56 @@
           }
         },
         "summary": "Update Order Status",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/v1/admin/stats": {
+      "get": {
+        "description": "Counters for the dashboard, counted in the database.",
+        "operationId": "stats_api_v1_admin_stats_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "farsh_admin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Farsh Admin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stats",
         "tags": [
           "admin"
         ]

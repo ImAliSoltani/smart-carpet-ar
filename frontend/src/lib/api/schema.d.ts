@@ -11,7 +11,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List Admin Carpets
+         * @description The management table's own listing — inactive carpets included.
+         *
+         *     `is_active` defaults to None meaning «both», which is the whole point: the
+         *     shop's listing hides deactivated carpets, so without this the only way back
+         *     to one would be to remember its id.
+         */
+        get: operations["list_admin_carpets_api_v1_admin_carpets_get"];
         put?: never;
         /** Create Carpet */
         post: operations["create_carpet_api_v1_admin_carpets_post"];
@@ -235,6 +243,26 @@ export interface paths {
         patch: operations["update_order_status_api_v1_admin_orders__order_id__patch"];
         trace?: never;
     };
+    "/api/v1/admin/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stats
+         * @description Counters for the dashboard, counted in the database.
+         */
+        get: operations["stats_api_v1_admin_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/variants/{variant_id}": {
         parameters: {
             query?: never;
@@ -411,6 +439,114 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AdminCarpetRow
+         * @description One row of the carpet management table (ROADMAP §6-15).
+         *
+         *     Deliberately not `CarpetListItem`. That one is the shop's view and hides
+         *     everything a shopper must not see — above all it only ever returns active
+         *     carpets, so an admin who deactivated a carpet could never find it again to
+         *     turn it back on.
+         */
+        AdminCarpetRow: {
+            /** Ar Ready */
+            ar_ready: number;
+            /** Id */
+            id: number;
+            /** Images Count */
+            images_count: number;
+            /** Is Active */
+            is_active: boolean;
+            material: components["schemas"]["CarpetMaterial"];
+            /** Max Price */
+            max_price: string | null;
+            /** Min Price */
+            min_price: string | null;
+            /** Name */
+            name: string;
+            /** Origin */
+            origin: string | null;
+            pattern: components["schemas"]["CarpetPattern"];
+            /** Primary Image */
+            primary_image: string | null;
+            /** Slug */
+            slug: string;
+            /** Variants Count */
+            variants_count: number;
+        };
+        /**
+         * AdminOrderOut
+         * @description An order as the shopkeeper needs to see it (ROADMAP §6-17).
+         *
+         *     Separate from the public `OrderOut` in both directions.
+         *
+         *     It carries **more**: the phone number and address, without which an order
+         *     cannot be fulfilled, and `created_at`, without which a list of orders has
+         *     no order. And `id` — the status endpoint is keyed by id, so a management
+         *     table built on the public shape could list orders and never change one.
+         *
+         *     It also leaves the public shape **alone**, which is the point. Someone
+         *     tracking a parcel proves who they are with a reference and a phone number;
+         *     echoing the delivery address back into that response would put it one
+         *     guessed reference away from a stranger.
+         */
+        AdminOrderOut: {
+            /** Address */
+            address: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Customer Name */
+            customer_name: string;
+            /** Customer Phone */
+            customer_phone: string;
+            /** Id */
+            id: number;
+            /** Items */
+            items: components["schemas"]["OrderItemOut"][];
+            /** Note */
+            note: string | null;
+            /** Reference */
+            reference: string;
+            status: components["schemas"]["OrderStatus"];
+            /** Total */
+            total: string;
+        };
+        /**
+         * AdminStats
+         * @description The dashboard's counters (ROADMAP §6-14).
+         *
+         *     Counted in the database rather than by measuring the length of a list the
+         *     API returned. `/admin/orders` caps at 200 rows, so counting its response
+         *     would quietly stop being true on the two-hundred-and-first order — and a
+         *     dashboard that is wrong only once the shop gets busy is worse than none.
+         */
+        AdminStats: {
+            /** Ar Failed */
+            ar_failed: number;
+            /** Ar Missing */
+            ar_missing: number;
+            /** Ar Processing */
+            ar_processing: number;
+            /** Ar Ready */
+            ar_ready: number;
+            /** Carpets Active */
+            carpets_active: number;
+            /** Carpets Inactive */
+            carpets_inactive: number;
+            /** Confirmed Total */
+            confirmed_total: string;
+            /** Orders Cancelled */
+            orders_cancelled: number;
+            /** Orders Confirmed */
+            orders_confirmed: number;
+            /** Orders Pending */
+            orders_pending: number;
+            /** Variants Total */
+            variants_total: number;
+        };
         /**
          * ArAssetStatus
          * @description Lifecycle of the automatically generated AR files for a variant.
@@ -693,6 +829,17 @@ export interface components {
             /** Reference */
             reference: string;
         };
+        /** Page[AdminCarpetRow] */
+        Page_AdminCarpetRow_: {
+            /** Items */
+            items: components["schemas"]["AdminCarpetRow"][];
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+        };
         /** Page[CarpetListItem] */
         Page_CarpetListItem_: {
             /** Items */
@@ -784,6 +931,42 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_admin_carpets_api_v1_admin_carpets_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                is_active?: boolean | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                farsh_admin_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AdminCarpetRow_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_carpet_api_v1_admin_carpets_post: {
         parameters: {
             query?: never;
@@ -1224,7 +1407,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderOut"][];
+                    "application/json": components["schemas"]["AdminOrderOut"][];
                 };
             };
             /** @description Validation Error */
@@ -1261,7 +1444,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderOut"];
+                    "application/json": components["schemas"]["AdminOrderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stats_api_v1_admin_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                farsh_admin_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminStats"];
                 };
             };
             /** @description Validation Error */

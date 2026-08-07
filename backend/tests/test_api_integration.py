@@ -159,7 +159,12 @@ def test_full_shop_cycle(admin_client):
     # --- admin order management ---
     orders = admin_client.get("/api/v1/admin/orders").json()
     assert len(orders) == 1
-    response = admin_client.patch("/api/v1/admin/orders/1", json={"status": "confirmed"})
+    # Followed from the listing rather than assumed to be 1. The hardcoded id
+    # passed while the listing carried no id at all, which is exactly the gap
+    # it should have caught: the panel could show orders and change none.
+    response = admin_client.patch(
+        f"/api/v1/admin/orders/{orders[0]['id']}", json={"status": "confirmed"}
+    )
     assert response.json()["status"] == "confirmed"
 
 
