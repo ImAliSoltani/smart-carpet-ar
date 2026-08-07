@@ -25,6 +25,24 @@ export type CarpetMaterial = Schemas["CarpetMaterial"];
 export type RoomType = Schemas["RoomType"];
 export type ArAssetStatus = Schemas["ArAssetStatus"];
 
+/**
+ * The panel's own shapes.
+ *
+ * Named without the `Out` the generator carries over from Pydantic — inside the
+ * interface there is no other direction for them to go.
+ */
+export type AdminStats = Schemas["AdminStats"];
+export type AdminCarpetRow = Schemas["AdminCarpetRow"];
+export type AdminCarpetPage = Schemas["Page_AdminCarpetRow_"];
+export type AdminOrder = Schemas["AdminOrderOut"];
+export type ArVariantStatus = Schemas["ArVariantStatus"];
+export type ArCornerSuggestion = Schemas["ArCornerSuggestion"];
+export type CornerPoint = Schemas["CornerPoint"];
+export type CarpetCreate = Schemas["CarpetCreate"];
+export type CarpetUpdate = Schemas["CarpetUpdate"];
+export type VariantCreate = Schemas["VariantCreate"];
+export type VariantUpdate = Schemas["VariantUpdate"];
+
 export type OrderCreate = Schemas["OrderCreate"];
 export type OrderOut = Schemas["OrderOut"];
 export type OrderStatus = Schemas["OrderStatus"];

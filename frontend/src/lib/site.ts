@@ -32,4 +32,14 @@ export const SITE_NAME = "ترنجان";
  * crawlers not to *fetch* them at all, which is the only one of the two that a
  * crawler reads before spending the request.
  */
-export const PRIVATE_PATHS = ["/cart", "/checkout", "/compare", "/favourites", "/track"];
+export const PRIVATE_PATHS = [
+  "/cart",
+  "/checkout",
+  "/compare",
+  "/favourites",
+  "/track",
+  // The panel. Every route under it refuses an unauthenticated request, so this
+  // is not what keeps it shut — it is what keeps a login form out of search
+  // results, and stops a crawler wandering the shop's back door at all.
+  "/admin",
+];

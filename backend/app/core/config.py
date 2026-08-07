@@ -33,10 +33,27 @@ class Settings(BaseSettings):
     admin_password_hash: str = ""
     session_secret: str = "dev-only-change-me"
     session_max_age_hours: int = 12
+    # Whether the session cookie carries `Secure`. Unset means «follow debug»,
+    # which is the right default and stays the production behaviour.
+    #
+    # It is its own setting because the two things were one, and that made
+    # testing the panel over a LAN address cost more than it should: a browser
+    # will not store a `Secure` cookie sent over plain http, so logging in from
+    # a phone at `http://<laptop-ip>:3000` silently does nothing — and the only
+    # lever for it was `debug`, which also turns on SQL echo for every
+    # statement the app runs. Cookie security should not be a side effect of
+    # logging verbosity.
+    session_cookie_secure: bool | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def cookie_secure(self) -> bool:
+        if self.session_cookie_secure is not None:
+            return self.session_cookie_secure
+        return not self.debug
 
 
 @lru_cache

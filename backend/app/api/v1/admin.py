@@ -67,7 +67,7 @@ async def login(request: Request, response: Response, payload: LoginRequest) -> 
         max_age=settings.session_max_age_hours * 3600,
         httponly=True,
         samesite="lax",
-        secure=not settings.debug,
+        secure=settings.cookie_secure,
         path="/",
     )
     return {"status": "ok"}

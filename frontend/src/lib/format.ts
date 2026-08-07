@@ -33,3 +33,46 @@ export function formatToman(value: string | number | null | undefined): string {
 export function formatSize(widthCm: number, lengthCm: number): string {
   return `${faDigits.format(widthCm)} × ${faDigits.format(lengthCm)} سانتی‌متر`;
 }
+
+/**
+ * ۱۶ مرداد ۱۴۰۵ — a Jalali date, which is the only calendar these dates are
+ * ever read in.
+ *
+ * `fa-IR` alone is not enough and the difference is a whole calendar: the
+ * locale gives Persian digits and Persian month names but keeps the Gregorian
+ * reckoning, so today would print as «۷ اوت ۲۰۲۶» — right numerals, wrong year,
+ * wrong month, and wrong in a way that looks convincing. The extension asks for
+ * the calendar itself.
+ *
+ * Timestamps arrive from the API in UTC; the shop is one shop in one place, so
+ * they are shown in the reader's own zone rather than converted to a fixed one.
+ */
+const faDate = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+const faDateTime = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function toDate(value: string | Date | null | undefined): Date | null {
+  if (!value) return null;
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function formatDate(value: string | Date | null | undefined): string {
+  const parsed = toDate(value);
+  return parsed === null ? "—" : faDate.format(parsed);
+}
+
+export function formatDateTime(value: string | Date | null | undefined): string {
+  const parsed = toDate(value);
+  return parsed === null ? "—" : faDateTime.format(parsed);
+}

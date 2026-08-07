@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Vazirmatn, Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { SiteHeader } from "@/components/toranjan/site-header";
-import { SiteFooter } from "@/components/toranjan/site-footer";
-import { CompareTray } from "@/components/toranjan/compare-tray";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Persian carries every word of the interface, so it is the one face that is
@@ -75,16 +72,13 @@ export default function RootLayout({
           href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
         />
       </head>
+      {/* The document, the fonts and the query client — everything both the shop
+          and the panel need. The shop's own chrome moved down into `(shop)`,
+          because it was reaching places it had no business being: the admin
+          login page rendered under a storefront header, a footer of shop links
+          and a compare tray still carrying somebody's shortlist. */}
       <body className="min-h-full flex flex-col">
-        <Providers>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-          {/* Outside the page, because a shortlist survives navigation — it is
-              filled on one page and read on another. It draws nothing until
-              something is in it. */}
-          <CompareTray />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -7,9 +7,9 @@ import { Hero10 } from "@/components/ui/hero-10";
 // browser can serve yesterday's copy — which is exactly what happened while
 // the names stayed `/brand/hero-1.webp`. Swapping the file is still the whole
 // procedure; the hash follows it.
-import hero1 from "../../public/brand/hero-1.webp";
-import hero2 from "../../public/brand/hero-2.webp";
-import hero3 from "../../public/brand/hero-3.webp";
+import hero1 from "../../../public/brand/hero-1.webp";
+import hero2 from "../../../public/brand/hero-2.webp";
+import hero3 from "../../../public/brand/hero-3.webp";
 import { HomeFeatured } from "@/components/toranjan/home-featured";
 import { HomePromise } from "@/components/toranjan/home-promise";
 import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
