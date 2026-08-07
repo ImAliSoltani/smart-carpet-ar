@@ -4,9 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, PanelRightClose, PanelRightOpen } from "lucide-react";
 
 import { AdminNav, useAdminTitle } from "@/components/toranjan/admin-nav";
+import { EASE_OUT } from "@/components/toranjan/admin-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { adminKeys, isUnauthorized, logout, meQuery } from "@/lib/api/admin";
 
@@ -28,6 +30,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const queryClient = useQueryClient();
   const title = useAdminTitle();
+  const reduced = useReducedMotion();
 
   const [railOpen, setRailOpen] = React.useState(true);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -78,11 +81,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-dvh bg-bg">
       {/* The rail, from `md` up. It collapses to nothing rather than to a strip
           of icons: four destinations named in Persian do not survive being cut
-          to their first letter. */}
-      <aside
-        className={`hidden shrink-0 overflow-hidden border-s border-line bg-bg transition-[width] duration-[--dur-enter] ease-[cubic-bezier(.16,1,.3,1)] md:block ${
-          railOpen ? "w-[248px]" : "w-0 border-s-0"
-        }`}
+          to their first letter.
+
+          **This was the stiff one, and the cause was a typo.** It asked for
+          `duration-[--dur-enter]`; the token is `--dur-entrance`, so the
+          declaration was invalid, the duration fell back to zero and the rail
+          snapped shut with no animation at all. It is a motion value now rather
+          than a class, which also lets the width and the fade share one curve —
+          the panel slides out from under its own edge instead of the contents
+          reflowing as the box narrows. */}
+      <motion.aside
+        className="hidden shrink-0 overflow-hidden border-s border-line bg-bg md:block"
+        initial={false}
+        // Width and opacity only. The border needs no separate treatment — it
+        // fades with everything else — and the logical `border-s` has no
+        // animatable counterpart that is not the physical left or right, which
+        // would be the wrong edge in half the world.
+        animate={{ width: railOpen ? 248 : 0, opacity: railOpen ? 1 : 0 }}
+        transition={reduced ? { duration: 0 } : { duration: 0.46, ease: EASE_OUT }}
       >
         <div className="sticky top-0 flex h-dvh w-[248px] flex-col">
           <div className="flex h-14 items-center px-5">
@@ -98,7 +114,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
           <AdminNav onSignOut={signOut.mutate} signingOut={signOut.isPending} />
         </div>
-      </aside>
+      </motion.aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line bg-bg/85 px-4 backdrop-blur-sm sm:px-6">
@@ -132,6 +148,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   onNavigate={() => setDrawerOpen(false)}
                   onSignOut={signOut.mutate}
                   signingOut={signOut.isPending}
+                  layoutGroup="drawer"
                 />
               </SheetContent>
             </Sheet>
@@ -144,7 +161,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </span>
         </header>
 
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        {/* One page gives way to the next rather than being replaced. Keyed on
+            the path, so React tears the old subtree down and the new one enters
+            — a rise of ten pixels, which at this duration reads as a settle
+            rather than a slide. `mode="wait"` is deliberately not used: making
+            the arriving page queue behind the leaving one doubles the wait on
+            every navigation, and the panel is somewhere people move quickly. */}
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 sm:py-8">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={pathname}
+              initial={reduced ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.42, ease: EASE_OUT }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
     </div>
   );

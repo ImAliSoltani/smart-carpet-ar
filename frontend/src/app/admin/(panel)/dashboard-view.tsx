@@ -1,7 +1,9 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { motion, useReducedMotion } from "framer-motion";
 import { AlertTriangle, ArrowLeft, Cuboid } from "lucide-react";
 
 import {
@@ -13,6 +15,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ordersQuery, statsQuery } from "@/lib/api/admin";
+import {
+  CountUp,
+  ENTER,
+  EASE_OUT,
+  GoldRule,
+  staggerDelay,
+} from "@/components/toranjan/admin-motion";
 import { OrderStatusBadge } from "@/components/toranjan/order-status-badge";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -30,38 +39,65 @@ function Counter({
   value,
   hint,
   href,
+  index,
   tone = "plain",
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   hint?: string;
   href?: string;
+  index: number;
   tone?: "plain" | "attention";
 }) {
+  const reduced = useReducedMotion();
+
   const body = (
     <>
+      <GoldRule delay={staggerDelay(index) + 0.15} />
       <p className="text-[11px] tracking-[0.14em] text-muted">{label}</p>
-      <p className="mt-3 text-[26px] font-semibold tracking-tight">{value}</p>
+      {/* `h-9` so the four cards agree on a baseline whatever their figure is
+          — one wrapping value used to make its card taller than the row. */}
+      <p className="mt-3 flex h-9 items-center text-[26px] font-semibold tracking-tight">
+        {value}
+      </p>
       {hint && <p className="mt-1.5 text-[12.5px] leading-loose text-muted">{hint}</p>}
     </>
   );
 
   const className = cn(
-    "rounded-xl border bg-paper p-5 shadow-panel",
+    "relative block overflow-hidden rounded-xl border bg-paper p-5 shadow-panel",
     tone === "attention" ? "border-confirm-tint-ink/30" : "border-line",
-    href && "transition-colors duration-[--dur-feedback] hover:border-line-2",
   );
 
-  return href ? (
-    <Link href={href} className={cn(className, "block")}>
-      {body}
-    </Link>
-  ) : (
-    <div className={className}>{body}</div>
+  return (
+    <motion.div
+      initial={reduced ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ ...ENTER, delay: reduced ? 0 : staggerDelay(index) }}
+      // Only the ones that lead somewhere lift. A card that rises under the
+      // pointer and then does nothing when pressed is a promise the panel does
+      // not keep.
+      whileHover={href && !reduced ? { y: -3 } : undefined}
+    >
+      {href ? (
+        <Link
+          href={href}
+          className={cn(
+            className,
+            "transition-shadow duration-[--dur-feedback] hover:shadow-[0_18px_40px_-28px_rgba(24,24,27,0.5)]",
+          )}
+        >
+          {body}
+        </Link>
+      ) : (
+        <div className={className}>{body}</div>
+      )}
+    </motion.div>
   );
 }
 
 export function DashboardView() {
+  const reduced = useReducedMotion();
   const stats = useQuery(statsQuery());
   const orders = useQuery(ordersQuery());
 
@@ -91,20 +127,25 @@ export function DashboardView() {
     <div className="flex flex-col gap-8">
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Counter
+          index={0}
           label="در انتظار تأیید"
-          value={formatNumber(s.orders_pending)}
+          value={<CountUp value={s.orders_pending} />}
           hint={s.orders_pending > 0 ? "منتظر شماست" : "چیزی معطل نمانده"}
           href="/admin/orders?status=pending"
           tone={s.orders_pending > 0 ? "attention" : "plain"}
         />
         <Counter
+          index={1}
           label="فروش تأییدشده"
-          value={formatToman(s.confirmed_total)}
+          // Not counted up. Watching ۶۷٬۴۰۰٬۰۰۰ spin is a slot machine, and the
+          // component skips anything above its ceiling for that reason.
+          value={<CountUp value={s.confirmed_total} money />}
           hint={`از ${formatNumber(s.orders_confirmed)} سفارش تأییدشده`}
         />
         <Counter
+          index={2}
           label="فرش‌های فعال"
-          value={formatNumber(s.carpets_active)}
+          value={<CountUp value={s.carpets_active} />}
           hint={
             s.carpets_inactive > 0
               ? `${formatNumber(s.carpets_inactive)} فرش غیرفعال`
@@ -113,8 +154,13 @@ export function DashboardView() {
           href="/admin/carpets"
         />
         <Counter
+          index={3}
           label="واقعیت افزوده"
-          value={`${formatNumber(s.ar_ready)} از ${formatNumber(s.variants_total)}`}
+          value={
+            <>
+              <CountUp value={s.ar_ready} /> از {formatNumber(s.variants_total)}
+            </>
+          }
           hint="سایزهایی که فایل AR دارند"
           href="/admin/ar"
           tone={arTrouble > 0 ? "attention" : "plain"}
@@ -178,8 +224,22 @@ export function DashboardView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recent.map((order) => (
-                  <TableRow key={order.id}>
+                {recent.map((order, i) => (
+                  // A `<tr>` cannot be wrapped without breaking the table, so
+                  // the row itself is the motion element. Opacity and a small
+                  // rise only — transforming a table row's width or height
+                  // would fight the layout algorithm every frame.
+                  <motion.tr
+                    key={order.id}
+                    initial={reduced ? false : { opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      ease: EASE_OUT,
+                      delay: reduced ? 0 : 0.1 + staggerDelay(i),
+                    }}
+                    className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-bg"
+                  >
                     <TableCell>
                       <Link
                         href={`/admin/orders/${order.id}`}
@@ -218,7 +278,7 @@ export function DashboardView() {
                     <TableCell className="text-end text-[13px]">
                       {formatToman(order.total)}
                     </TableCell>
-                  </TableRow>
+                  </motion.tr>
                 ))}
               </TableBody>
             </Table>

@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Boxes,
   Cuboid,
@@ -13,6 +14,7 @@ import {
   Store,
 } from "lucide-react";
 
+import { EASE_OUT } from "@/components/toranjan/admin-motion";
 import { statsQuery } from "@/lib/api/admin";
 import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -61,12 +63,17 @@ function NavLink({
   entry,
   badge,
   onNavigate,
+  layoutGroup,
 }: {
   entry: NavEntry;
   badge?: number;
   onNavigate?: () => void;
+  /** Distinct per instance: the rail and the drawer are both mounted at once
+   *  on a tablet, and one shared id would make the card fly between them. */
+  layoutGroup: string;
 }) {
   const pathname = usePathname();
+  const reduced = useReducedMotion();
   const current = isCurrent(pathname, entry);
 
   return (
@@ -77,14 +84,38 @@ function NavLink({
       // weight and a wash of paper, and neither reaches a screen reader.
       aria-current={current ? "page" : undefined}
       className={cn(
-        "group flex h-11 items-center justify-between gap-2.5 rounded-md px-3",
+        "group relative flex h-11 items-center justify-between gap-2.5 rounded-md px-3",
         "transition-colors duration-[--dur-feedback]",
-        current ? "bg-paper font-medium text-ink shadow-panel" : "text-muted hover:text-ink",
+        current ? "font-medium text-ink" : "text-muted hover:text-ink",
       )}
     >
+      {/* The active card is one element that *moves* between items rather than
+          four that switch on and off — `layoutId` is what lets framer measure
+          the old position and the new one and tween between them. It is the
+          single detail that makes a rail feel built rather than styled, and it
+          costs one shared id.
+
+          Behind the label (`-z-10`), so the text never inherits the transform
+          and blurs mid-flight. */}
+      {current && (
+        <motion.span
+          layoutId={layoutGroup}
+          aria-hidden
+          className="absolute inset-0 -z-10 rounded-md bg-paper shadow-panel"
+          transition={reduced ? { duration: 0 } : { duration: 0.42, ease: EASE_OUT }}
+        >
+          {/* A gold hairline on the reading edge — the accent as a mark, which
+              is the only size §4 lets it be. */}
+          <span className="absolute inset-y-1.5 end-0 w-px rounded-full bg-accent" />
+        </motion.span>
+      )}
+
       <span className="flex items-center gap-2.5">
         <entry.icon
-          className={cn("size-[17px] shrink-0", current ? "text-accent" : "text-muted")}
+          className={cn(
+            "size-[17px] shrink-0 transition-colors duration-[--dur-feedback]",
+            current ? "text-accent" : "text-muted group-hover:text-ink-2",
+          )}
           strokeWidth={1.5}
         />
         <span className="truncate text-[13.5px]">{entry.title}</span>
@@ -93,9 +124,18 @@ function NavLink({
       {/* Only when there is something waiting. A badge reading «۰» is a badge
           asking to be ignored, and then the one that matters is ignored too. */}
       {badge !== undefined && badge > 0 && (
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-confirm-tint px-1.5 text-[11px] text-confirm-tint-ink">
+        <motion.span
+          // It arrives rather than appearing. The count is fetched after the
+          // rail is already drawn, so without this a badge pops into a row that
+          // was settled — the one moment in the panel where something changes
+          // without the eye being told.
+          initial={reduced ? false : { scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={reduced ? { duration: 0 } : { duration: 0.4, ease: EASE_OUT }}
+          className="flex h-5 min-w-5 items-center justify-center rounded-full bg-confirm-tint px-1.5 text-[11px] text-confirm-tint-ink"
+        >
           {formatNumber(badge)}
-        </span>
+        </motion.span>
       )}
     </Link>
   );
@@ -105,11 +145,13 @@ export function AdminNav({
   onNavigate,
   onSignOut,
   signingOut = false,
+  layoutGroup = "rail",
 }: {
   /** Closes the drawer on a phone; nothing on a desktop. */
   onNavigate?: () => void;
   onSignOut: () => void;
   signingOut?: boolean;
+  layoutGroup?: string;
 }) {
   // The badge is the only reason navigation asks for anything. It shares a key
   // with the dashboard's own copy, so moving between pages does not re-ask.
@@ -124,6 +166,7 @@ export function AdminNav({
             entry={entry}
             badge={entry.href === "/admin/orders" ? stats?.orders_pending : undefined}
             onNavigate={onNavigate}
+            layoutGroup={`admin-nav-${layoutGroup}`}
           />
         ))}
       </div>
