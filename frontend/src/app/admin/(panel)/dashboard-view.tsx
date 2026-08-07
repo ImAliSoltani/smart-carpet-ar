@@ -195,14 +195,14 @@ export function DashboardView() {
 
       <section>
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-[15px] font-medium">سفارش‌های اخیر</h2>
+          <h2 className="text-[16px] font-medium">سفارش‌های اخیر</h2>
           <Link
             href="/admin/orders"
             // `h-11` and a negative inline margin: the §3-5 floor applies to
             // anything touched, and a 20px line of text is not a target. The
             // padding is pulled back out so the words still line up with the
             // heading beside them.
-            className="-me-3 flex h-11 items-center gap-1.5 px-3 text-[13px] text-muted transition-colors duration-[--dur-feedback] hover:text-ink"
+            className="-me-3 flex h-11 items-center gap-1.5 px-3 text-[13.5px] text-ink-2 transition-colors duration-[--dur-feedback] hover:text-ink"
           >
             همه‌ی سفارش‌ها
             <ArrowLeft className="size-4" strokeWidth={1.5} />
@@ -259,7 +259,7 @@ export function DashboardView() {
                         // `min-h-11` because the cell's own padding leaves the
                         // link 37px tall, and a row you tap to open an order is
                         // exactly what the §3-5 floor is about.
-                        className="inline-flex min-h-11 items-center font-figure text-[13px] underline-offset-4 hover:underline"
+                        className="inline-flex min-h-11 items-center font-figure text-[14px] underline-offset-4 hover:underline"
                         dir="ltr"
                       >
                         {order.reference}
@@ -271,20 +271,20 @@ export function DashboardView() {
                           have made this a list of codes. Height is the axis a
                           phone has; it is the same answer the compare table
                           arrived at. */}
-                      <span className="block truncate text-[12px] text-muted sm:hidden">
+                      <span className="block truncate text-[13px] text-ink-2 sm:hidden">
                         {order.customer_name}
                       </span>
                     </TableCell>
-                    <TableCell className="hidden text-[13px] sm:table-cell">
+                    <TableCell className="hidden text-[14px] sm:table-cell">
                       {order.customer_name}
                     </TableCell>
-                    <TableCell className="hidden text-[13px] text-muted sm:table-cell">
+                    <TableCell className="hidden text-[13.5px] text-ink-2 sm:table-cell">
                       {formatDate(order.created_at)}
                     </TableCell>
                     <TableCell>
                       <OrderStatusBadge status={order.status} />
                     </TableCell>
-                    <TableCell className="text-end text-[13px]">
+                    <TableCell className="text-end text-[14px]">
                       {formatToman(order.total)}
                     </TableCell>
                   </motion.tr>

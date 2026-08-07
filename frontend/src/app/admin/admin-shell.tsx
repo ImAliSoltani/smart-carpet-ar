@@ -107,9 +107,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="inline-flex h-11 items-center text-[17px] font-semibold tracking-tight"
             >
               ترنجان
-              <span className="ms-2 text-[11px] font-normal tracking-[0.14em] text-muted">
-                مدیریت
-              </span>
+              {/* No tracking. It is Persian, and letter-spacing pushes apart
+                  letters that are meant to be joined — the wordmark's own
+                  TORANJAN keeps its tracking because that one is Latin. */}
+              <span className="ms-2 text-[12.5px] font-normal text-muted">مدیریت</span>
             </Link>
           </div>
           <AdminNav onSignOut={signOut.mutate} signingOut={signOut.isPending} />
@@ -143,7 +144,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <Menu className="size-[18px]" strokeWidth={1.5} />
                 </button>
               </SheetTrigger>
-              <SheetContent title="منوی مدیریت" className="glass w-[276px] border-y-0 p-0">
+              {/* `data-surface` has to be repeated *here*, on the panel
+                  itself. Radix portals its content to `document.body`, which
+                  is outside the element carrying the admin tokens — so every
+                  dark value fell back to the shop's light one and the drawer
+                  came out white with `bg-paper` resolving to #ffffff. The
+                  glass rules match the same element as well as a descendant
+                  for exactly this case. */}
+              <SheetContent
+                title="منوی مدیریت"
+                data-surface="admin"
+                className="glass w-[276px] border-y-0 p-0 text-ink"
+              >
                 <AdminNav
                   onNavigate={() => setDrawerOpen(false)}
                   onSignOut={signOut.mutate}
@@ -153,10 +165,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </SheetContent>
             </Sheet>
 
-            <h1 className="truncate text-[15px] font-medium">{title}</h1>
+            <h1 className="truncate text-[16px] font-medium">{title}</h1>
           </div>
 
-          <span className="hidden truncate text-[13px] text-muted sm:block">
+          <span className="hidden truncate text-[13.5px] text-ink-2 sm:block">
             {session.data?.username}
           </span>
         </header>

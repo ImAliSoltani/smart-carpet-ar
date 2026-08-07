@@ -5,17 +5,25 @@ import { cn } from "@/lib/utils";
 /**
  * One of the three states an order is in (ROADMAP §6-17).
  *
- * The 21st table this came from paints its statuses green, amber and a solid
- * red — a palette this shop does not have and, in the red's case, a weight it
- * does not want: a cancelled order is a fact to record, not an alarm to sound.
+ * **Traffic-light colours, which is a reversal, and a deliberate one.** The
+ * first version used the shop's own palette — gold for confirmed, a hairline
+ * for waiting — because §4 rejects green for the storefront's confirmation
+ * gesture: it would be the only green on the site and would read as a system
+ * message rather than as this shop confirming something.
  *
- * So the tones come from our own tokens. Confirmed takes the `confirm` pair
- * that was chosen for exactly this job. Waiting is paper and a hairline, which
- * is what «nothing has happened yet» should look like. Cancelled is the
- * destructive colour as *text* on a plain ground rather than a filled pill.
+ * That reasoning is about a shopper being congratulated once. It does not
+ * carry into a back office, where the same three words are scanned across a
+ * hundred rows and the reader already knows what green, amber and red mean
+ * before reading a single label. Making them relearn a gold-means-done rule
+ * costs them time on every screen. The storefront's `/track` page keeps its
+ * own tones and is untouched by this.
+ *
+ * The colours are tokens, not literals, so they hold on either ground. Each
+ * was measured against the worst place a badge lands — glass over the
+ * scrimmed skylight — and clears AA there: 8.49, 8.86 and 5.35 to one.
  *
  * **The dot is not decoration.** Three states told apart only by colour fail
- * anyone who cannot separate those colours, so each carries its own shape of
+ * anyone who cannot separate those colours, so each keeps its own shape of
  * mark — filled, hollow, and a struck line — and the word is always present.
  */
 export function OrderStatusBadge({
@@ -30,10 +38,10 @@ export function OrderStatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[12px]",
-        tone === "confirmed" && "border-transparent bg-confirm-tint text-confirm-tint-ink",
-        tone === "waiting" && "border-line-2 text-ink-2",
-        tone === "cancelled" && "border-line-2 text-destructive",
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[12.5px] font-medium",
+        tone === "confirmed" && "border-status-confirmed/35 bg-status-confirmed/12 text-status-confirmed",
+        tone === "waiting" && "border-status-waiting/35 bg-status-waiting/12 text-status-waiting",
+        tone === "cancelled" && "border-status-cancelled/35 bg-status-cancelled/12 text-status-cancelled",
         className,
       )}
     >
@@ -41,9 +49,9 @@ export function OrderStatusBadge({
         aria-hidden
         className={cn(
           "size-1.5 shrink-0 rounded-full",
-          tone === "confirmed" && "bg-confirm-tint-ink",
-          tone === "waiting" && "border border-ink-2 bg-transparent",
-          tone === "cancelled" && "h-px w-2 rounded-none bg-destructive",
+          tone === "confirmed" && "bg-status-confirmed",
+          tone === "waiting" && "border border-status-waiting bg-transparent",
+          tone === "cancelled" && "h-px w-2 rounded-none bg-status-cancelled",
         )}
       />
       {label}

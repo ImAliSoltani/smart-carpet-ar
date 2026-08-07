@@ -70,6 +70,22 @@
   --confirm-tint: #f6eedf;
   --confirm-tint-ink: #8a5406;
 
+  /* -- order status --
+     Conventional traffic-light semantics, and deliberately *not* the
+     shop's palette. The note above explains why the storefront's own
+     confirmation gesture refuses green: it would be the only green on
+     the site and would read as a system message rather than as this shop
+     confirming something. That reasoning is about a shopper being
+     congratulated. It does not carry to a back office, where a hundred
+     rows are scanned at a glance and «green means done, amber means
+     waiting, red means cancelled» is knowledge the reader already has.
+     The storefront's `/track` page keeps its own tones and is untouched.
+
+     These are the light-ground values; the panel overrides them. */
+  --status-confirmed: #15803d;
+  --status-waiting: #b45309;
+  --status-cancelled: #b91c1c;
+
   /* -- motion --
      Two bands, per ROADMAP section 3: state feedback stays short enough
      to feel immediate, entrances and transitions are allowed to breathe. */
@@ -141,6 +157,12 @@
   --on-confirm: #14131a;
   --confirm-tint: rgba(217, 168, 66, 0.16);
   --confirm-tint-ink: #e8c98a; /* 10.4:1 */
+
+  /* Opened up for the dark ground, and measured against the worst place
+     a badge ever lands: glass over the scrimmed skylight, #28272e. */
+  --status-confirmed: #4ade80; /* 8.49:1 */
+  --status-waiting: #fbbf24; /* 8.86:1 */
+  --status-cancelled: #f87171; /* 5.35:1 */
 
   /* A shadow the colour of the page's own shadow does nothing on a dark
      ground — what separates a panel here is the light caught on its top
@@ -222,8 +244,8 @@
 
 /* Smoked glass. Dark-tinted rather than white-tinted, which is the whole
    reason it clears contrast over a photograph containing white. */
-[data-surface="admin"] .glass,
-[data-surface="admin"] .glass-strong {
+:is([data-surface="admin"] .glass, [data-surface="admin"].glass),
+:is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
   position: relative;
   background: rgba(26, 25, 34, 0.66);
   backdrop-filter: blur(22px) saturate(1.25);
@@ -233,14 +255,14 @@
 
 /* The login card carries text over a deliberately lighter scrim, so it
    is denser: 0.80 puts the weakest text at 4.66:1 there. */
-[data-surface="admin"] .glass-strong {
+:is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
   background: rgba(26, 25, 34, 0.8);
 }
 
 /* The lit top edge — what actually reads as «glass» rather than «dark
    box», and the cheapest part of the effect. */
-[data-surface="admin"] .glass::before,
-[data-surface="admin"] .glass-strong::before {
+:is([data-surface="admin"] .glass, [data-surface="admin"].glass)::before,
+:is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong)::before {
   content: "";
   position: absolute;
   inset-inline: 0;
@@ -263,15 +285,15 @@
    interface unreadable. Backdrop blur is precisely what it is asking
    about, so honouring it is not optional. */
 @supports not (backdrop-filter: blur(1px)) {
-  [data-surface="admin"] .glass,
-  [data-surface="admin"] .glass-strong {
+  :is([data-surface="admin"] .glass, [data-surface="admin"].glass),
+  :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
     background: var(--paper);
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  [data-surface="admin"] .glass,
-  [data-surface="admin"] .glass-strong {
+  :is([data-surface="admin"] .glass, [data-surface="admin"].glass),
+  :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
     background: var(--paper);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -362,6 +384,13 @@
   --color-on-confirm: var(--on-confirm);
   --color-confirm-tint: var(--confirm-tint);
   --color-confirm-tint-ink: var(--confirm-tint-ink);
+
+  /* Registered so `text-status-waiting` and `bg-status-waiting/12` are real
+     utilities. Named by what they mean rather than by their hue: the same
+     class has to survive the panel opening the colours up for a dark ground. */
+  --color-status-confirmed: var(--status-confirmed);
+  --color-status-waiting: var(--status-waiting);
+  --color-status-cancelled: var(--status-cancelled);
   --color-border: var(--line);
   --color-input: var(--line-2);
   --color-ring: var(--accent);
