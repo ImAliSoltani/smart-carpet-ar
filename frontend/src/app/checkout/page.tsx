@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CheckoutForm } from "@/components/toranjan/checkout-form";
 
 export const metadata: Metadata = {
-  title: "ثبت سفارش — ترنجان",
+  title: "ثبت سفارش",
   robots: { index: false, follow: false },
 };
 

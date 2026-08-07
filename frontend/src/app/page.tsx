@@ -15,7 +15,7 @@ import { HomePromise } from "@/components/toranjan/home-promise";
 import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
 
 export const metadata: Metadata = {
-  title: "ترنجان — فرش را پیش از خرید در خانه‌ی خودتان ببینید",
+  title: { absolute: "ترنجان — فرش را پیش از خرید در خانه‌ی خودتان ببینید" },
   description:
     "فروشگاه فرش دستباف و ماشینی. هر فرش را با ابعاد واقعی روی کف خانه‌ی خودتان ببینید، شبیهش را با یک عکس پیدا کنید، و اندازه‌ی مناسب اتاق را بگیرید.",
 };

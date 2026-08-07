@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ProductDetail } from "@/components/toranjan/product-detail";
 import { SimilarCarpets } from "./similar-carpets";
+import { ProductSchema } from "./product-schema";
 import { getCarpet } from "@/lib/api/catalog";
 import { ApiError, absoluteMediaUrl } from "@/lib/api/client";
 import type { CarpetDetail } from "@/lib/api/types";
@@ -37,7 +38,7 @@ export async function generateMetadata({
   try {
     carpet = await getCarpet(slug);
   } catch {
-    return { title: "فرش پیدا نشد — ترنجان" };
+    return { title: "فرش پیدا نشد" };
   }
 
   const cheapest = carpet.variants.reduce<number | null>(
@@ -49,12 +50,14 @@ export async function generateMetadata({
     `${PATTERN_LABEL[carpet.pattern]} · ${MATERIAL_LABEL[carpet.material]}${
       cheapest ? ` · از ${formatToman(cheapest)}` : ""
     }`;
-  const image = absoluteMediaUrl(
-    carpet.images.find((i) => i.is_primary)?.url ?? carpet.images[0]?.url,
-  );
+  // `full_url`, not `url`. The latter is the 800px card derivative, and the
+  // card a link draws in a chat is rendered near 1200 wide — it was being
+  // upscaled. Both come from migration 0002; only one of them is the big one.
+  const primary = carpet.images.find((i) => i.is_primary) ?? carpet.images[0];
+  const image = absoluteMediaUrl(primary?.full_url ?? primary?.url);
 
   return {
-    title: `${carpet.name} — ترنجان`,
+    title: carpet.name,
     description,
     openGraph: {
       title: carpet.name,
@@ -71,6 +74,7 @@ export default async function CarpetPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main>
+      <ProductSchema carpet={carpet} />
       <ProductDetail carpet={carpet} similar={<SimilarCarpets carpetId={carpet.id} />} />
     </main>
   );

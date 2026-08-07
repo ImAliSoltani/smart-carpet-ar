@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
  */
 
 export const metadata: Metadata = {
-  title: "تماس با ترنجان",
+  title: "تماس با ما",
   description: "راه‌های تماس با ترنجان، پیگیری سفارش و پاسخ سؤال‌های پرتکرار.",
 };
 

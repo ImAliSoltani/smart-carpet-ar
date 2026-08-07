@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { FavouritesGrid } from "./favourites-grid";
 
 export const metadata: Metadata = {
-  title: "علاقه‌مندی‌ها — ترنجان",
+  title: "علاقه‌مندی‌ها",
   // Like the cart, this list exists only on the reader's device.
   robots: { index: false, follow: true },
 };

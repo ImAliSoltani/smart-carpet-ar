@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { SiteHeader } from "@/components/toranjan/site-header";
 import { SiteFooter } from "@/components/toranjan/site-footer";
 import { CompareTray } from "@/components/toranjan/compare-tray";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 // Persian carries every word of the interface, so it is the one face that is
 // never allowed to fall back.
@@ -29,9 +30,28 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ترنجان — فرش دستباف با ابعاد واقعی",
+  // Without this every OpenGraph image ships as a relative path, and no crawler
+  // resolves one — the product pages have carried real `og:image` tags for two
+  // phases and none of them would have drawn a card. Next warns about it in the
+  // build log, which is where it stayed unread.
+  metadataBase: SITE_URL,
+  title: {
+    default: "ترنجان — فرش دستباف با ابعاد واقعی",
+    // Every page used to append «— ترنجان» by hand, so introducing this meant
+    // stripping it from all eleven of them or watching the shop's name arrive
+    // twice per tab. The home page opts out with `absolute` — its title already
+    // leads with the name — and «درباره‌ی ترنجان» became «درباره‌ی ما», which
+    // is what it should have said once the suffix was doing that job.
+    template: "%s — ترنجان",
+  },
   description:
     "فرش را پیش از خرید با مقیاس واقعی روی کف خانه‌ی خودتان ببینید. جست‌وجوی بصری، مشاور چیدمان و راهنمای اندازه.",
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "fa_IR",
+  },
 };
 
 export default function RootLayout({

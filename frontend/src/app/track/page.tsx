@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { TrackOrder } from "./track-order";
 
 export const metadata: Metadata = {
-  title: "پیگیری سفارش — ترنجان",
+  title: "پیگیری سفارش",
   description: "وضعیت سفارش را با کد رهگیری و شماره‌ی موبایل ببینید.",
 };
 

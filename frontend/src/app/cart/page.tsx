@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CartView } from "@/components/toranjan/cart-view";
 
 export const metadata: Metadata = {
-  title: "سبد خرید — ترنجان",
+  title: "سبد خرید",
   // A cart is this device's alone, so there is nothing here for a crawler to
   // hold on to and nothing anyone gains by finding it in a search result.
   robots: { index: false, follow: true },

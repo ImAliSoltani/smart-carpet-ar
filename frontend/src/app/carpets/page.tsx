@@ -6,7 +6,7 @@ import { MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
 import type { CarpetFilters, CarpetMaterial, CarpetPattern, RoomType } from "@/lib/api/types";
 
 export const metadata: Metadata = {
-  title: "همه‌ی فرش‌ها — ترنجان",
+  title: "همه‌ی فرش‌ها",
   description:
     "فرش دستباف و ماشینی، با امکان دیدن هر فرش با ابعاد واقعی روی کف خانه‌ی خودتان.",
 };

@@ -7,6 +7,8 @@
  * for, never *how*.
  */
 
+import { SITE_URL } from "@/lib/site";
+
 /**
  * Where a request is addressed to.
  *
@@ -159,7 +161,12 @@ export function absoluteMediaUrl(path: string | null | undefined): string | unde
   const relative = mediaUrl(path);
   if (!relative) return undefined;
   if (/^https?:\/\//i.test(relative)) return relative;
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
-  return origin ? `${origin}${relative}` : `${API_BASE}${relative}`;
+  // The shop's own origin, never the backend's. `/files` is proxied through
+  // this server (next.config.ts), so a media URL on the site origin resolves
+  // everywhere the site does — while the backend's origin is a private address
+  // behind Caddy in production and `localhost:8000` in development. Falling
+  // back to it, which this used to do, put `http://localhost:8000/files/…` into
+  // the `og:image` of every product page: a host no crawler can reach.
+  const origin = typeof window !== "undefined" ? window.location.origin : SITE_URL.origin;
+  return `${origin}${relative}`;
 }

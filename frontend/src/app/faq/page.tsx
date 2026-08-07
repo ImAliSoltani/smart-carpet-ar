@@ -16,7 +16,7 @@ import { FAQ_ITEMS } from "@/lib/content/faq";
  */
 
 export const metadata: Metadata = {
-  title: "سؤال‌های پرتکرار — ترنجان",
+  title: "سؤال‌های پرتکرار",
   description:
     "دیدن فرش با ابعاد واقعی در خانه، ثبت سفارش بدون حساب کاربری، پیگیری با کد رهگیری — و آنچه این نسخه هنوز انجام نمی‌دهد.",
 };

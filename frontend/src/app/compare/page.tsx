@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { CompareTable } from "./compare-table";
 
 export const metadata: Metadata = {
-  title: "مقایسه‌ی فرش‌ها — ترنجان",
+  title: "مقایسه‌ی فرش‌ها",
   // Like the cart and the favourites, this table is assembled from a list that
   // exists only on the reader's device. There is nothing here for an index.
   robots: { index: false, follow: true },
