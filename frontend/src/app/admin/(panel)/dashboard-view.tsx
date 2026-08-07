@@ -55,13 +55,13 @@ function Counter({
   const body = (
     <>
       <GoldRule delay={staggerDelay(index) + 0.15} />
-      <p className="text-[11px] tracking-[0.14em] text-muted">{label}</p>
+      <p className="panel-label">{label}</p>
       {/* `h-9` so the four cards agree on a baseline whatever their figure is
           — one wrapping value used to make its card taller than the row. */}
       <p className="mt-3 flex h-9 items-center text-[26px] font-semibold tracking-tight">
         {value}
       </p>
-      {hint && <p className="mt-1.5 text-[12.5px] leading-loose text-muted">{hint}</p>}
+      {hint && <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{hint}</p>}
     </>
   );
 

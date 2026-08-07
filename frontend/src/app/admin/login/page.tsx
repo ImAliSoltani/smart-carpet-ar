@@ -70,7 +70,7 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
       <div>
-        <label htmlFor="username" className="mb-2 block text-[13px] text-muted">
+        <label htmlFor="username" className="mb-2 block text-[13px] text-ink-2">
           نام کاربری
         </label>
         <Input
@@ -90,7 +90,7 @@ function LoginForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-2 block text-[13px] text-muted">
+        <label htmlFor="password" className="mb-2 block text-[13px] text-ink-2">
           رمز عبور
         </label>
         <Input
@@ -148,7 +148,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-2xl font-semibold tracking-tight">ترنجان</p>
-          <p className="mt-2 text-[13px] tracking-[0.14em] text-muted">پنل مدیریت</p>
+          <p className="mt-2 text-[13px] text-ink-2">پنل مدیریت</p>
         </div>
 
         <div className="glass-strong rounded-xl p-6 shadow-raised sm:p-8">

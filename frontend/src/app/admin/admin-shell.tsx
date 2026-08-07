@@ -168,7 +168,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             the arriving page queue behind the leaving one doubles the wait on
             every navigation, and the panel is somewhere people move quickly. */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 sm:py-8">
-          <AnimatePresence initial={false}>
+          {/* **No `initial={false}` here, and that was the bug.** It reads like
+              it only suppresses this wrapper's own first entrance, but framer
+              publishes it on the presence context and every descendant
+              `motion` element reads it — so on the first load of the panel the
+              counters and every table row skipped their entrance and were
+              simply *there*. The staggered arrival only ever played on a
+              second navigation, which is the one time nobody is watching for
+              it. */}
+          <AnimatePresence>
             <motion.div
               key={pathname}
               initial={reduced ? false : { opacity: 0, y: 10 }}

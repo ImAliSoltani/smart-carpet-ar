@@ -111,7 +111,13 @@
   --paper: #1a1922;
   --ink: #f5f4f7; /* 14.2:1 */
   --ink-2: #cfcdd6; /* 9.9:1 */
-  --muted: #9d9aa8; /* 5.65:1 — the tightest of them, and still clear */
+  /* Lifted from #9d9aa8 (5.65:1). Passing AA is a floor for body text a
+     reader chose to read; it is not a target for the captions, hints and
+     column headers somebody scans a hundred times an hour, and on this
+     ground at 12–13px the old value read as thin grey haze. Raising the
+     token lifts every muted string in the panel at once, which is the
+     only fix that stays fixed. */
+  --muted: #a8a5b2; /* 7.64:1 on the ground, 6.9:1 through glass */
   --line: rgba(255, 255, 255, 0.09);
   --line-2: rgba(255, 255, 255, 0.18);
 
@@ -185,6 +191,34 @@
     var(--bg);
 }
 
+
+/* ---- the panel's small type ------------------------------------------
+   Every column header, every counter caption, every «label above a
+   value» in the panel. It replaces `text-[11px] tracking-[0.14em]
+   text-muted`, which was wrong three times over and worst in the way
+   that is hardest to see.
+
+   **Letter-spacing does not belong on Persian.** Arabic script is
+   cursive: the letters of a word are joined, and `letter-spacing` pushes
+   those joins apart, so «مشتری» stops being a word and becomes four
+   pieces sitting near each other. It is a Latin small-caps device —
+   right on TORANJAN in the wordmark, wrong on every Persian label it was
+   copied onto. At 11px the damage is severe.
+
+   Then the two obvious ones: 11px is below where this face stays
+   comfortable, and `--muted` is the dimmest ink in the set. It passes AA
+   at 5.65:1, but passing is a floor for body text a reader chooses to
+   read, not a target for a caption somebody has to scan a hundred times
+   an hour. `--ink-2` is 9.9:1 and costs nothing.
+
+   The result is 12.5px, unspaced, in the brighter grey, a shade heavier
+   to hold its own on a dark ground. */
+.panel-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: normal;
+  color: var(--ink-2);
+}
 
 /* Smoked glass. Dark-tinted rather than white-tinted, which is the whole
    reason it clears contrast over a photograph containing white. */
