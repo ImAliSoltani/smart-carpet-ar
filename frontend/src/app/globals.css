@@ -79,6 +79,218 @@
   --dur-entrance: 700ms;
 }
 
+/* ============================================================
+   THE PANEL'S OWN GROUND
+   ============================================================
+   The shop is light by a decision that is closed. The panel is not the
+   shop: it is one person's workroom, behind a login, entered on purpose,
+   and often for a long sitting. It gets its own ground.
+
+   This is a *token swap*, not a second stylesheet — the mechanism the
+   roadmap put in place when it said dark should later be «تغییر توکن
+   است نه بازنویسی». Every component already reads these names, so the
+   table, the badges and the buttons follow without being touched.
+
+   Glassmorphism is allowed here for the same reason it was refused in
+   the shop. It was rejected there because a shop that stays dark has to
+   drain the colour out of the carpets, and because glass over a flat
+   ground has nothing to refract. Behind this panel there is a
+   photograph. The roadmap kept the technique for exactly this case.
+
+   **Every value below was measured, not chosen.** The photograph
+   contains pure white (a skylight), so a light-tinted glass over it
+   fails badly: at a 0.55 scrim the muted text measured 1.31:1. Smoked
+   glass over a scrimmed photograph is what holds — the numbers on each
+   token are its worst case, over that white, through both layers.
+   ============================================================ */
+
+[data-surface="admin"] {
+  --bg: #14131a;
+  /* The solid under the glass, and the fallback wherever the glass is
+     switched off (no `backdrop-filter`, or reduced transparency). */
+  --paper: #1a1922;
+  --ink: #f5f4f7; /* 14.2:1 */
+  --ink-2: #cfcdd6; /* 9.9:1 */
+  --muted: #9d9aa8; /* 5.65:1 — the tightest of them, and still clear */
+  --line: rgba(255, 255, 255, 0.09);
+  --line-2: rgba(255, 255, 255, 0.18);
+
+  /* Gold has to climb on a dark ground: #a16207 measures 1.6:1 here and
+     would be a brown smudge. This is the same hue opened up until it
+     reads, and it stays a detail — a hairline, an icon, a focus ring. */
+  --accent: #d9a842; /* 7.1:1 */
+  --accent-strong: #e0b968;
+
+  /* Inverted, not recoloured. On a dark ground the large action surface
+     is the pale one; charcoal would vanish into the page, and making it
+     gold would break the rule that gold stays small. */
+  --cta: #f5f4f7;
+  --cta-hover: #ffffff;
+  --on-cta: #14131a;
+
+  --destructive: #ef8078; /* 6.4:1 */
+  --on-destructive: #14131a;
+
+  --confirm: var(--accent);
+  --on-confirm: #14131a;
+  --confirm-tint: rgba(217, 168, 66, 0.16);
+  --confirm-tint-ink: #e8c98a; /* 10.4:1 */
+
+  /* A shadow the colour of the page's own shadow does nothing on a dark
+     ground — what separates a panel here is the light caught on its top
+     edge, which the glass utilities draw, plus a deeper contact well. */
+  --shadow-panel:
+    0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6),
+    0 24px 48px -32px rgba(0, 0, 0, 0.7);
+  --shadow-raised:
+    0 2px 4px rgba(0, 0, 0, 0.45), 0 16px 40px -16px rgba(0, 0, 0, 0.65),
+    0 40px 72px -40px rgba(0, 0, 0, 0.8);
+}
+
+/* The photograph and its scrim, as layers of one background rather than
+   two positioned pseudo-elements.
+
+   The pseudo-element version was written first and did not work: they
+   sat at a negative z-index, and a negative-z child paints *behind its
+   own parent's background*, which here was an opaque `--bg`. The photo
+   was rendering the whole time, underneath the very element that was
+   supposed to be showing it. Layers on a single element have no
+   stacking to get wrong.
+
+   `fixed` attachment so the panel slides across a still room rather
+   than dragging the room with it. The scrim is the first layer, i.e.
+   the topmost, and `--bg` closes the stack as the colour that shows
+   before the image has loaded. */
+[data-surface="admin"].admin-ground {
+  background:
+    linear-gradient(to left, rgba(13, 12, 17, 0.86), rgba(13, 12, 17, 0.74) 55%),
+    image-set(url("/brand/admin-bg-1280.webp") 1x, url("/brand/admin-bg-1920.webp") 2x)
+      center / cover fixed no-repeat,
+    var(--bg);
+}
+
+/* The login page's ground is the same photograph held much lighter,
+   because there it *is* the page rather than the surface under one.
+   0.45, which is where the weakest text on the card above it still
+   measured 4.66:1.
+
+   It is a separate class rather than an extra scrim laid over the panel
+   ground, and that was the first attempt: two scrims multiply rather
+   than add — 0.86 under 0.62 is 0.95 — and the photograph went black. */
+[data-surface="admin"].admin-ground-hero {
+  background:
+    linear-gradient(to left, rgba(13, 12, 17, 0.56), rgba(13, 12, 17, 0.34) 60%),
+    image-set(url("/brand/admin-bg-1280.webp") 1x, url("/brand/admin-bg-1920.webp") 2x)
+      center / cover fixed no-repeat,
+    var(--bg);
+}
+
+
+/* Smoked glass. Dark-tinted rather than white-tinted, which is the whole
+   reason it clears contrast over a photograph containing white. */
+[data-surface="admin"] .glass,
+[data-surface="admin"] .glass-strong {
+  position: relative;
+  background: rgba(26, 25, 34, 0.66);
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* The login card carries text over a deliberately lighter scrim, so it
+   is denser: 0.80 puts the weakest text at 4.66:1 there. */
+[data-surface="admin"] .glass-strong {
+  background: rgba(26, 25, 34, 0.8);
+}
+
+/* The lit top edge — what actually reads as «glass» rather than «dark
+   box», and the cheapest part of the effect. */
+[data-surface="admin"] .glass::before,
+[data-surface="admin"] .glass-strong::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    to left,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Two ways out, and both land on the solid `--paper` that every token
+   above was measured against anyway.
+
+   `prefers-reduced-transparency` is a real preference, often set by
+   people for whom a blurred, shifting ground is the thing that makes an
+   interface unreadable. Backdrop blur is precisely what it is asking
+   about, so honouring it is not optional. */
+@supports not (backdrop-filter: blur(1px)) {
+  [data-surface="admin"] .glass,
+  [data-surface="admin"] .glass-strong {
+    background: var(--paper);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-surface="admin"] .glass,
+  [data-surface="admin"] .glass-strong {
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* The photograph stays. The preference is about translucency and blur —
+     a moving, half-seen ground behind text is what it exists to stop —
+     and an opaque panel sitting on a still image is neither. Dropping the
+     image as well was over-reading it, and left the panel a flat black
+     rectangle for anyone who has Windows' transparency effects switched
+     off, which is a great many people and costs them the whole design for
+     a preference they did not express.
+
+     The scrim goes heavier to make up for the blur that is no longer
+     softening what shows between the panels. */
+  [data-surface="admin"].admin-ground {
+    background:
+      linear-gradient(to left, rgba(13, 12, 17, 0.93), rgba(13, 12, 17, 0.87) 55%),
+      image-set(url("/brand/admin-bg-1280.webp") 1x, url("/brand/admin-bg-1920.webp") 2x)
+        center / cover fixed no-repeat,
+      var(--bg);
+  }
+
+  /* The hero keeps more of its photograph even here: the only text over
+     it sits inside a card that is now fully opaque, so nothing is being
+     read through anything. */
+  [data-surface="admin"].admin-ground-hero {
+    background:
+      linear-gradient(to left, rgba(13, 12, 17, 0.62), rgba(13, 12, 17, 0.42) 60%),
+      image-set(url("/brand/admin-bg-1280.webp") 1x, url("/brand/admin-bg-1920.webp") 2x)
+        center / cover fixed no-repeat,
+      var(--bg);
+  }
+}
+
+/* Last, and that is the point. A phone gets the colour alone: a
+   cover-fitted 1280px photograph on a 375px screen is a crop of a wall,
+   it costs a download on the connection least able to spare one, and
+   `fixed` attachment is the one thing iOS Safari reliably renders wrong.
+
+   It has to come after the reduced-transparency block rather than before
+   it. Both carry the same specificity, so source order decides — and
+   with this rule written first, a phone whose owner has transparency
+   effects switched off was served the photograph anyway by the rule
+   below it. Measured, not assumed: the phone reported the image still
+   attached. */
+@media (max-width: 639px) {
+  [data-surface="admin"].admin-ground,
+  [data-surface="admin"].admin-ground-hero {
+    background: var(--bg);
+  }
+}
+
 @theme inline {
   /* Toranjan's own names */
   --color-bg: var(--bg);

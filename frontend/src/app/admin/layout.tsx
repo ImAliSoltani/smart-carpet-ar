@@ -19,6 +19,24 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/**
+ * `data-surface="admin"` is the whole theme switch.
+ *
+ * Every colour token is redefined under that attribute in `globals.css`, so
+ * the table, the badges, the buttons and the inputs — all of which already
+ * read those names — turn dark without one of them being edited. It is the
+ * escape hatch the roadmap built when it decided the shop would be light «اما
+ * توکن‌ها از ابتدا متغیر تعریف می‌شوند تا افزودن تیره بعداً بازنویسی نباشد».
+ */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    // The tokens live here; the ground does not. The panel and the login page
+    // want the same photograph at very different strengths — one is a surface
+    // to work on, the other is the picture itself — so each applies its own
+    // ground class. Scrims multiply rather than add, so layering a second one
+    // over a shared base turns the photograph black.
+    <div data-surface="admin" className="min-h-dvh text-ink">
+      {children}
+    </div>
+  );
 }

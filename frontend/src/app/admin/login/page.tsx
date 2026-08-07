@@ -112,7 +112,10 @@ function LoginForm() {
       {/* `role="alert"` so a reader that has already moved past the fields is
           told the attempt failed, rather than finding out by tabbing back. */}
       {failure && (
-        <p role="alert" className="rounded-md border border-line bg-paper p-4 text-[13px] leading-loose">
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-[13px] leading-loose"
+        >
           {failure}
         </p>
       )}
@@ -133,17 +136,27 @@ function LoginForm() {
 
 export default function AdminLoginPage() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-bg px-5 py-12">
+    // The one place the photograph is the point rather than the ground, so its
+    // scrim is lighter than the panel's — and the card is correspondingly
+    // denser to pay for it. Measured over the skylight, which is pure white and
+    // therefore the worst case in the frame: the weakest text on this card
+    // clears 4.66:1. At the panel's own 0.66 it would have been 4.20.
+    <main
+      data-surface="admin"
+      className="admin-ground-hero grid min-h-dvh place-items-center px-5 py-12"
+    >
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="text-2xl font-semibold tracking-tight">ترنجان</p>
           <p className="mt-2 text-[13px] tracking-[0.14em] text-muted">پنل مدیریت</p>
         </div>
 
-        <div className="rounded-xl border border-line bg-paper p-6 shadow-panel sm:p-8">
+        <div className="glass-strong rounded-xl p-6 shadow-raised sm:p-8">
           {/* `useSearchParams` opts the tree into client rendering, and Next
               wants the boundary named rather than inferred. */}
-          <React.Suspense fallback={<div className="h-64 animate-pulse rounded-md bg-line" />}>
+          <React.Suspense
+            fallback={<div className="h-64 animate-pulse rounded-md bg-white/5" />}
+          >
             <LoginForm />
           </React.Suspense>
         </div>

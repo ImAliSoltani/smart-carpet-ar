@@ -78,7 +78,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-dvh bg-bg">
+    <div data-surface="admin" className="admin-ground flex min-h-dvh">
       {/* The rail, from `md` up. It collapses to nothing rather than to a strip
           of icons: four destinations named in Persian do not survive being cut
           to their first letter.
@@ -91,7 +91,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           the panel slides out from under its own edge instead of the contents
           reflowing as the box narrows. */}
       <motion.aside
-        className="hidden shrink-0 overflow-hidden border-s border-line bg-bg md:block"
+        className="glass hidden shrink-0 overflow-hidden border-y-0 border-e-0 md:block"
         initial={false}
         // Width and opacity only. The border needs no separate treatment — it
         // fades with everything else — and the logical `border-s` has no
@@ -117,7 +117,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </motion.aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line bg-bg/85 px-4 backdrop-blur-sm sm:px-6">
+        <header className="glass sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-x-0 border-t-0 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-2">
             <button
               type="button"
@@ -143,7 +143,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <Menu className="size-[18px]" strokeWidth={1.5} />
                 </button>
               </SheetTrigger>
-              <SheetContent title="منوی مدیریت" className="w-[276px] p-0">
+              <SheetContent title="منوی مدیریت" className="glass w-[276px] border-y-0 p-0">
                 <AdminNav
                   onNavigate={() => setDrawerOpen(false)}
                   onSignOut={signOut.mutate}

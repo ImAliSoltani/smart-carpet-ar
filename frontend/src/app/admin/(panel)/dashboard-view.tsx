@@ -20,6 +20,7 @@ import {
   ENTER,
   EASE_OUT,
   GoldRule,
+  listStagger,
   staggerDelay,
 } from "@/components/toranjan/admin-motion";
 import { OrderStatusBadge } from "@/components/toranjan/order-status-badge";
@@ -65,8 +66,8 @@ function Counter({
   );
 
   const className = cn(
-    "relative block overflow-hidden rounded-xl border bg-paper p-5 shadow-panel",
-    tone === "attention" ? "border-confirm-tint-ink/30" : "border-line",
+    "glass relative block overflow-hidden rounded-xl p-5 shadow-panel",
+    tone === "attention" && "border-accent/35",
   );
 
   return (
@@ -84,7 +85,10 @@ function Counter({
           href={href}
           className={cn(
             className,
-            "transition-shadow duration-[--dur-feedback] hover:shadow-[0_18px_40px_-28px_rgba(24,24,27,0.5)]",
+            // Black, not the light theme's charcoal: a shadow tinted like the
+            // page it came from is invisible on this ground.
+            "transition-[box-shadow,border-color] duration-[--dur-feedback]",
+            "hover:border-white/20 hover:shadow-raised",
           )}
         >
           {body}
@@ -105,7 +109,7 @@ export function DashboardView() {
     return (
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-32 animate-pulse rounded-xl border border-line bg-paper" />
+          <div key={i} className="glass h-32 animate-pulse rounded-xl" />
         ))}
       </div>
     );
@@ -113,7 +117,7 @@ export function DashboardView() {
 
   if (stats.error) {
     return (
-      <p className="rounded-md border border-line bg-paper p-6 text-sm leading-loose">
+      <p className="glass rounded-md p-6 text-sm leading-loose">
         {stats.error.message}
       </p>
     );
@@ -170,7 +174,7 @@ export function DashboardView() {
       {/* Only when something is actually wrong. A permanent «all good» panel is
           furniture; a panel that appears is a message. */}
       {(s.ar_failed > 0 || s.ar_processing > 0) && (
-        <section className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-line bg-paper px-5 py-4 shadow-panel">
+        <section className="glass flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl px-5 py-4 shadow-panel">
           {s.ar_failed > 0 && (
             <p className="flex items-center gap-2 text-[13px]">
               <AlertTriangle className="size-4 text-destructive" strokeWidth={1.5} />
@@ -205,9 +209,9 @@ export function DashboardView() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-line bg-paper shadow-panel">
+        <div className="glass overflow-hidden rounded-xl shadow-panel">
           {orders.isPending ? (
-            <div className="h-56 animate-pulse rounded-xl bg-paper" aria-hidden />
+            <div className="h-56 animate-pulse rounded-xl" aria-hidden />
           ) : recent.length === 0 ? (
             <p className="px-5 py-14 text-center text-sm leading-loose text-muted">
               هنوز سفارشی ثبت نشده است.
@@ -231,14 +235,19 @@ export function DashboardView() {
                   // would fight the layout algorithm every frame.
                   <motion.tr
                     key={order.id}
-                    initial={reduced ? false : { opacity: 0, y: 6 }}
+                    initial={reduced ? false : { opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
-                      duration: 0.38,
+                      duration: 0.46,
                       ease: EASE_OUT,
-                      delay: reduced ? 0 : 0.1 + staggerDelay(i),
+                      // `listStagger`, not the fixed step: at 45ms with a 0.36s
+                      // cap the last rows landed together, which reads as a
+                      // block arriving late rather than a list filling in one
+                      // row at a time. The lead-in waits for the counters above
+                      // to finish, so the eye is handed down the page.
+                      delay: reduced ? 0 : 0.34 + listStagger(i, recent.length),
                     }}
-                    className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-bg"
+                    className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]"
                   >
                     <TableCell>
                       <Link

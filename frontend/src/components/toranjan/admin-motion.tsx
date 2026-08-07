@@ -44,6 +44,25 @@ export function staggerDelay(index: number): number {
 }
 
 /**
+ * The same idea, but told how long the list is.
+ *
+ * A fixed step cannot serve both a row of four counters and a table of two
+ * hundred orders. Short lists want a step you can *see* — the rows arriving one
+ * after another is the point, and at 45ms with a 0.36s cap the last few landed
+ * together, which reads as a block appearing late rather than a list filling
+ * in. Long lists want the opposite: the guidance caps per-item delay at 40ms
+ * for anything past ten items, because total reveal time is what turns into
+ * waiting.
+ *
+ * So the step comes from the count, and the cap is what stops a long list from
+ * taking longer to arrive than it took to fetch.
+ */
+export function listStagger(index: number, total: number): number {
+  const step = total <= 12 ? 0.065 : 0.028;
+  return Math.min(index * step, 0.62);
+}
+
+/**
  * A block that rises into place.
  *
  * `initial` branches on the preference, which the storefront's card does too:
