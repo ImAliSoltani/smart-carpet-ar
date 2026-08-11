@@ -19,6 +19,7 @@ from app.core.config import get_settings
 from app.models import Carpet, CarpetImage, CarpetVariant, Order
 from app.models.enums import ArAssetStatus, OrderStatus
 from app.schemas.admin import (
+    AdminCarpetDetail,
     AdminCarpetRow,
     AdminOrderOut,
     AdminStats,
@@ -191,6 +192,24 @@ async def list_admin_carpets(
         )
 
     return Page[AdminCarpetRow](items=items, total=total, page=page, page_size=page_size)
+
+
+@router.get(
+    "/carpets/{carpet_id}", response_model=AdminCarpetDetail,
+    dependencies=[Depends(require_admin)],
+)
+async def get_admin_carpet(session: DbSession, carpet_id: int) -> AdminCarpetDetail:
+    """One carpet for the edit screen — by id, and without the active filter.
+
+    The shop's own `/carpets/{slug}` cannot serve this. It looks up by slug and
+    requires `is_active`, so the moment a carpet is deactivated the panel could
+    no longer open the page that would turn it back on. By id, because the slug
+    is one of the things being edited.
+    """
+    carpet = await session.get(Carpet, carpet_id)
+    if carpet is None:
+        raise HTTPException(404, detail="فرش پیدا نشد")
+    return AdminCarpetDetail.model_validate(carpet)
 
 
 @router.post(

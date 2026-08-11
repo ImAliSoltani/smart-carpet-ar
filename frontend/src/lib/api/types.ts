@@ -33,6 +33,7 @@ export type ArAssetStatus = Schemas["ArAssetStatus"];
  */
 export type AdminStats = Schemas["AdminStats"];
 export type AdminCarpetRow = Schemas["AdminCarpetRow"];
+export type AdminCarpetDetail = Schemas["AdminCarpetDetail"];
 export type AdminCarpetPage = Schemas["Page_AdminCarpetRow_"];
 export type AdminOrder = Schemas["AdminOrderOut"];
 export type ArVariantStatus = Schemas["ArVariantStatus"];

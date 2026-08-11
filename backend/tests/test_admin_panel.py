@@ -184,6 +184,27 @@ def test_admin_listing_summarises_each_row(admin_client):
     assert row["ar_ready"] == 0
 
 
+def test_admin_can_open_a_deactivated_carpet(admin_client):
+    """The edit screen has to reach the carpet that the shop is hiding."""
+    carpet = _carpet(admin_client, "nain-cream", "فرش نایین کرم")
+    admin_client.patch(f"/api/v1/admin/carpets/{carpet['id']}", json={"is_active": False})
+
+    # The shop's own lookup is gone, which is correct.
+    assert admin_client.get("/api/v1/carpets/nain-cream").status_code == 404
+
+    detail = admin_client.get(f"/api/v1/admin/carpets/{carpet['id']}")
+    assert detail.status_code == 200, detail.text
+    body = detail.json()
+    assert body["slug"] == "nain-cream"
+    assert body["name"] == "فرش نایین کرم"
+    # Everything the form needs to render itself.
+    assert "variants" in body and "images" in body and "suitable_rooms" in body
+
+
+def test_admin_carpet_detail_404s_for_a_missing_id(admin_client):
+    assert admin_client.get("/api/v1/admin/carpets/99999").status_code == 404
+
+
 def test_admin_listing_searches_by_name(admin_client):
     _carpet(admin_client, "kashan-red", "فرش کاشان قرمز")
     _carpet(admin_client, "nain-cream", "فرش نایین کرم")

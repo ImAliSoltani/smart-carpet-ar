@@ -1,6 +1,99 @@
 {
   "components": {
     "schemas": {
+      "AdminCarpetDetail": {
+        "description": "A carpet as the edit screen needs it: everything the shop sees, plus\nwhether the shop is allowed to see it.\n\n`is_active` is absent from the public shape for a good reason — the\nstorefront only ever receives active carpets, so the field would be a\nconstant `true` on every response and mean nothing. Here it is the state a\nwhole button exists to change.",
+        "properties": {
+          "colors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Colors",
+            "type": "array"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/ImageOut"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "material": {
+            "$ref": "#/components/schemas/CarpetMaterial"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Origin"
+          },
+          "pattern": {
+            "$ref": "#/components/schemas/CarpetPattern"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "suitable_rooms": {
+            "items": {
+              "$ref": "#/components/schemas/RoomType"
+            },
+            "title": "Suitable Rooms",
+            "type": "array"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/VariantOut"
+            },
+            "title": "Variants",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description",
+          "pattern",
+          "material",
+          "colors",
+          "suitable_rooms",
+          "origin",
+          "variants",
+          "images",
+          "is_active"
+        ],
+        "title": "AdminCarpetDetail",
+        "type": "object"
+      },
       "AdminCarpetRow": {
         "description": "One row of the carpet management table (ROADMAP §6-15).\n\nDeliberately not `CarpetListItem`. That one is the shop's view and hides\neverything a shopper must not see — above all it only ever returns active\ncarpets, so an admin who deactivated a carpet could never find it again to\nturn it back on.",
         "properties": {
@@ -1588,6 +1681,63 @@
       }
     },
     "/api/v1/admin/carpets/{carpet_id}": {
+      "get": {
+        "description": "One carpet for the edit screen — by id, and without the active filter.\n\nThe shop's own `/carpets/{slug}` cannot serve this. It looks up by slug and\nrequires `is_active`, so the moment a carpet is deactivated the panel could\nno longer open the page that would turn it back on. By id, because the slug\nis one of the things being edited.",
+        "operationId": "get_admin_carpet_api_v1_admin_carpets__carpet_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "carpet_id",
+            "required": true,
+            "schema": {
+              "title": "Carpet Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "farsh_admin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Farsh Admin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCarpetDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Admin Carpet",
+        "tags": [
+          "admin"
+        ]
+      },
       "patch": {
         "operationId": "update_carpet_api_v1_admin_carpets__carpet_id__patch",
         "parameters": [

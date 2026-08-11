@@ -36,7 +36,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Admin Carpet
+         * @description One carpet for the edit screen — by id, and without the active filter.
+         *
+         *     The shop's own `/carpets/{slug}` cannot serve this. It looks up by slug and
+         *     requires `is_active`, so the moment a carpet is deactivated the panel could
+         *     no longer open the page that would turn it back on. By id, because the slug
+         *     is one of the things being edited.
+         */
+        get: operations["get_admin_carpet_api_v1_admin_carpets__carpet_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -439,6 +448,40 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AdminCarpetDetail
+         * @description A carpet as the edit screen needs it: everything the shop sees, plus
+         *     whether the shop is allowed to see it.
+         *
+         *     `is_active` is absent from the public shape for a good reason — the
+         *     storefront only ever receives active carpets, so the field would be a
+         *     constant `true` on every response and mean nothing. Here it is the state a
+         *     whole button exists to change.
+         */
+        AdminCarpetDetail: {
+            /** Colors */
+            colors: string[];
+            /** Description */
+            description: string | null;
+            /** Id */
+            id: number;
+            /** Images */
+            images: components["schemas"]["ImageOut"][];
+            /** Is Active */
+            is_active: boolean;
+            material: components["schemas"]["CarpetMaterial"];
+            /** Name */
+            name: string;
+            /** Origin */
+            origin: string | null;
+            pattern: components["schemas"]["CarpetPattern"];
+            /** Slug */
+            slug: string;
+            /** Suitable Rooms */
+            suitable_rooms: components["schemas"]["RoomType"][];
+            /** Variants */
+            variants: components["schemas"]["VariantOut"][];
+        };
         /**
          * AdminCarpetRow
          * @description One row of the carpet management table (ROADMAP §6-15).
@@ -989,6 +1032,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CarpetDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_admin_carpet_api_v1_admin_carpets__carpet_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                carpet_id: number;
+            };
+            cookie?: {
+                farsh_admin_session?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminCarpetDetail"];
                 };
             };
             /** @description Validation Error */

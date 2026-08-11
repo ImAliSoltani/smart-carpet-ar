@@ -6,6 +6,7 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.enums import CarpetMaterial, CarpetPattern, OrderStatus, RoomType
+from app.schemas.catalog import CarpetDetail
 from app.schemas.orders import OrderItemOut
 
 _HEX = r"^#[0-9a-fA-F]{6}$"
@@ -161,6 +162,19 @@ class AdminCarpetRow(BaseModel):
     # Enough to show «۳ از ۴ آماده» without asking for each carpet's AR status
     # one request at a time.
     ar_ready: int
+
+
+class AdminCarpetDetail(CarpetDetail):
+    """A carpet as the edit screen needs it: everything the shop sees, plus
+    whether the shop is allowed to see it.
+
+    `is_active` is absent from the public shape for a good reason — the
+    storefront only ever receives active carpets, so the field would be a
+    constant `true` on every response and mean nothing. Here it is the state a
+    whole button exists to change.
+    """
+
+    is_active: bool
 
 
 class CornerPoint(BaseModel):

@@ -15,6 +15,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { ApiError, request } from "./client";
 import type {
+  AdminCarpetDetail,
   AdminCarpetPage,
   AdminOrder,
   AdminStats,
@@ -36,6 +37,7 @@ export const adminKeys = {
   me: () => ["admin", "me"] as const,
   stats: () => ["admin", "stats"] as const,
   carpets: (filters: AdminCarpetFilters) => ["admin", "carpets", filters] as const,
+  carpet: (carpetId: number) => ["admin", "carpet", carpetId] as const,
   orders: (status: OrderStatus | undefined) => ["admin", "orders", status ?? "all"] as const,
   ar: (carpetId: number) => ["admin", "ar", carpetId] as const,
   corners: (carpetId: number) => ["admin", "corners", carpetId] as const,
@@ -109,6 +111,28 @@ export function adminCarpetsQuery(filters: AdminCarpetFilters = {}) {
   return queryOptions({
     queryKey: adminKeys.carpets(filters),
     queryFn: ({ signal }) => listAdminCarpets(filters, signal),
+    retry: (count, error) => !isUnauthorized(error) && count < 2,
+  });
+}
+
+/**
+ * One carpet for the edit screen.
+ *
+ * By id and through the admin route, not `getCarpet(slug)` — the shop's lookup
+ * requires `is_active`, so a deactivated carpet could not be opened to be
+ * reactivated, and the slug is itself one of the editable fields.
+ */
+export function getAdminCarpet(
+  carpetId: number,
+  signal?: AbortSignal,
+): Promise<AdminCarpetDetail> {
+  return request(`/api/v1/admin/carpets/${carpetId}`, { signal });
+}
+
+export function adminCarpetQuery(carpetId: number) {
+  return queryOptions({
+    queryKey: adminKeys.carpet(carpetId),
+    queryFn: ({ signal }) => getAdminCarpet(carpetId, signal),
     retry: (count, error) => !isUnauthorized(error) && count < 2,
   });
 }
