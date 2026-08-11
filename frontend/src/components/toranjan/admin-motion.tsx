@@ -99,13 +99,18 @@ export function Rise({
  * The one place gold is allowed to be a *line* rather than a dot: §4 keeps the
  * accent to small marks so it stays a detail, and a rule one pixel tall is
  * still a detail. It is what makes a plain card read as finished.
+ *
+ * Inset from the edges rather than clipped by them. Clipping means
+ * `overflow: hidden` on the card, and a card that clips is a scrollport — which
+ * silently disables `position: sticky` for everything inside it. That cost the
+ * carpet form its pinned save bar once, and the rail its pinned footer.
  */
 export function GoldRule({ delay = 0 }: { delay?: number }) {
   const reduced = useReducedMotion();
   return (
     <motion.span
       aria-hidden
-      className="absolute inset-x-0 top-0 h-px origin-right bg-gradient-to-l from-accent/70 via-accent/25 to-transparent"
+      className="absolute inset-x-4 top-0 h-px origin-right bg-gradient-to-l from-accent/70 via-accent/25 to-transparent"
       initial={reduced ? false : { scaleX: 0 }}
       animate={{ scaleX: 1 }}
       transition={{ duration: reduced ? 0 : 0.8, ease: EASE_OUT, delay: reduced ? 0 : delay }}

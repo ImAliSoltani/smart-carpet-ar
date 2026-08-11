@@ -128,8 +128,12 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
             className={cn(
               "flex h-11 items-center gap-2 rounded-full border px-4 text-[13.5px]",
               "transition-colors duration-[--dur-feedback] disabled:opacity-60",
+              // Red while it *would* deactivate, green while it would bring the
+              // carpet back. The button is named for what it does next, so its
+              // colour has to answer the same question — a grey «غیرفعال کردن»
+              // reads as one more quiet control on a page full of them.
               data.is_active
-                ? "border-line-2 text-ink-2 hover:text-ink"
+                ? "border-status-cancelled/40 text-status-cancelled hover:bg-status-cancelled/10"
                 : "border-status-confirmed/40 text-status-confirmed hover:bg-status-confirmed/10",
             )}
           >
@@ -150,7 +154,7 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
         initial={reduced ? false : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={ENTER}
-        className="glass relative overflow-hidden rounded-xl p-5 shadow-panel sm:p-6"
+        className="glass relative rounded-xl p-5 shadow-panel sm:p-6"
       >
         <GoldRule delay={0.15} />
 

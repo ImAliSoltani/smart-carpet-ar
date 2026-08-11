@@ -24,6 +24,8 @@ import {
   staggerDelay,
 } from "@/components/toranjan/admin-motion";
 import { OrderStatusBadge } from "@/components/toranjan/order-status-badge";
+import { useRowLink } from "@/components/toranjan/row-link";
+import type { AdminOrder } from "@/lib/api/types";
 import { formatDate, formatNumber, formatToman } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -229,65 +231,13 @@ export function DashboardView() {
               </TableHeader>
               <TableBody>
                 {recent.map((order, i) => (
-                  // A `<tr>` cannot be wrapped without breaking the table, so
-                  // the row itself is the motion element. Opacity and a small
-                  // rise only — transforming a table row's width or height
-                  // would fight the layout algorithm every frame.
-                  <motion.tr
+                  <RecentOrderRow
                     key={order.id}
-                    initial={reduced ? false : { opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.46,
-                      ease: EASE_OUT,
-                      // `listStagger`, not the fixed step: at 45ms with a 0.36s
-                      // cap the last rows landed together, which reads as a
-                      // block arriving late rather than a list filling in one
-                      // row at a time. The lead-in waits for the counters above
-                      // to finish, so the eye is handed down the page.
-                      delay: reduced ? 0 : 0.34 + listStagger(i, recent.length),
-                    }}
-                    className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]"
-                  >
-                    <TableCell>
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        // Latin figures: a tracking code is typed and read back
-                        // character by character, and Persian digits in a code
-                        // somebody has to compare against an SMS is a trap.
-                        //
-                        // `min-h-11` because the cell's own padding leaves the
-                        // link 37px tall, and a row you tap to open an order is
-                        // exactly what the §3-5 floor is about.
-                        className="inline-flex min-h-11 items-center font-figure text-[14px] underline-offset-4 hover:underline"
-                        dir="ltr"
-                      >
-                        {order.reference}
-                      </Link>
-                      {/* On a phone the customer moves under the reference
-                          instead of losing its column. Four columns at 375
-                          overflowed by 15px — «در انتظار تأیید» alone takes
-                          122 of them — and dropping the name outright would
-                          have made this a list of codes. Height is the axis a
-                          phone has; it is the same answer the compare table
-                          arrived at. */}
-                      <span className="block truncate text-[13px] text-ink-2 sm:hidden">
-                        {order.customer_name}
-                      </span>
-                    </TableCell>
-                    <TableCell className="hidden text-[14px] sm:table-cell">
-                      {order.customer_name}
-                    </TableCell>
-                    <TableCell className="hidden text-[13.5px] text-ink-2 sm:table-cell">
-                      {formatDate(order.created_at)}
-                    </TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell className="text-end text-[14px]">
-                      {formatToman(order.total)}
-                    </TableCell>
-                  </motion.tr>
+                    order={order}
+                    index={i}
+                    total={recent.length}
+                    reduced={reduced}
+                  />
                 ))}
               </TableBody>
             </Table>
@@ -295,5 +245,79 @@ export function DashboardView() {
         </div>
       </section>
     </div>
+  );
+}
+
+function RecentOrderRow({
+  order,
+  index,
+  total,
+  reduced,
+}: {
+  order: AdminOrder;
+  index: number;
+  total: number;
+  reduced: boolean | null;
+}) {
+  const row = useRowLink(`/admin/orders/${order.id}`);
+  return (
+<motion.tr
+                initial={reduced ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.46,
+          ease: EASE_OUT,
+          // `listStagger`, not the fixed step: at 45ms with a 0.36s
+          // cap the last rows landed together, which reads as a
+          // block arriving late rather than a list filling in one
+          // row at a time. The lead-in waits for the counters above
+          // to finish, so the eye is handed down the page.
+          delay: reduced ? 0 : 0.34 + listStagger(index, total),
+        }}
+        onClick={row.onClick}
+  className={cn(
+    "border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]",
+    row.className,
+  )}
+      >
+        <TableCell>
+          <Link
+            href={`/admin/orders/${order.id}`}
+            // Latin figures: a tracking code is typed and read back
+            // character by character, and Persian digits in a code
+            // somebody has to compare against an SMS is a trap.
+            //
+            // `min-h-11` because the cell's own padding leaves the
+            // link 37px tall, and a row you tap to open an order is
+            // exactly what the §3-5 floor is about.
+            className="inline-flex min-h-11 items-center font-figure text-[14px] underline-offset-4 hover:underline"
+            dir="ltr"
+          >
+            {order.reference}
+          </Link>
+          {/* On a phone the customer moves under the reference
+              instead of losing its column. Four columns at 375
+              overflowed by 15px — «در انتظار تأیید» alone takes
+              122 of them — and dropping the name outright would
+              have made this a list of codes. Height is the axis a
+              phone has; it is the same answer the compare table
+              arrived at. */}
+          <span className="block truncate text-[13px] text-ink-2 sm:hidden">
+            {order.customer_name}
+          </span>
+        </TableCell>
+        <TableCell className="hidden text-[14px] sm:table-cell">
+          {order.customer_name}
+        </TableCell>
+        <TableCell className="hidden text-[13.5px] text-ink-2 sm:table-cell">
+          {formatDate(order.created_at)}
+        </TableCell>
+        <TableCell>
+          <OrderStatusBadge status={order.status} />
+        </TableCell>
+        <TableCell className="text-end text-[14px]">
+          {formatToman(order.total)}
+        </TableCell>
+      </motion.tr>
   );
 }

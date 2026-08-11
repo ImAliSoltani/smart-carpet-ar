@@ -41,7 +41,7 @@ export function useToast() {
   return context;
 }
 
-const LIFETIME = 4200;
+const LIFETIME = { success: 4200, failure: 7000 } as const;
 
 export function AdminToaster({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
@@ -55,10 +55,12 @@ export function AdminToaster({ children }: { children: React.ReactNode }) {
     (message: string, tone: Tone = "success") => {
       const id = Date.now() + Math.random();
       setToasts((prev) => [...prev, { id, tone, message }]);
-      // Failures stay until dismissed. A message you needed to read and missed
-      // is the whole problem this component exists to fix, and a failure is the
-      // one you most need to read.
-      if (tone === "success") window.setTimeout(() => dismiss(id), LIFETIME);
+      // Both kinds expire; a failure is simply given longer to be read.
+      // Making failures wait to be dismissed was the first version and it was
+      // wrong in a small, constant way: the message is already recorded beside
+      // the field it belongs to, so leaving a second copy hanging over the page
+      // turns every mistake into a thing that must also be tidied up.
+      window.setTimeout(() => dismiss(id), LIFETIME[tone]);
     },
     [dismiss],
   );

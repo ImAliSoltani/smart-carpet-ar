@@ -7,7 +7,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
-import { CarpetForm, type CarpetFormResult } from "@/components/toranjan/carpet-form";
+import {
+  CarpetForm,
+  type CarpetFieldError,
+  type CarpetFormResult,
+} from "@/components/toranjan/carpet-form";
 import { ENTER, GoldRule } from "@/components/toranjan/admin-motion";
 import { useToast } from "@/components/toranjan/admin-toast";
 import { adminKeys, createCarpet } from "@/lib/api/admin";
@@ -27,11 +31,11 @@ export function NewCarpet() {
   const reduced = useReducedMotion();
   const queryClient = useQueryClient();
   const { show } = useToast();
-  const [failure, setFailure] = React.useState<string | null>(null);
+  const [fieldError, setFieldError] = React.useState<CarpetFieldError | null>(null);
 
   const create = useMutation({
     mutationFn: (values: CarpetFormResult) => createCarpet(values),
-    onMutate: () => setFailure(null),
+    onMutate: () => setFieldError(null),
     onSuccess: (carpet) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.all });
       // Named, not «موفق». The page is about to change under them, and the
@@ -43,7 +47,12 @@ export function NewCarpet() {
     },
     onError: (error) => {
       const message = error instanceof ApiError ? error.message : "ثبت فرش انجام نشد.";
-      setFailure(message);
+      // 409 is the one rejection that names a field: the slug is taken. It goes
+      // on the slug box, where it clears itself as soon as the box is edited,
+      // rather than sitting at the bottom of the panel as a notice to close.
+      if (error instanceof ApiError && error.status === 409) {
+        setFieldError({ field: "slug", message });
+      }
       show(message, "failure");
     },
   });
@@ -62,7 +71,7 @@ export function NewCarpet() {
         initial={reduced ? false : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={ENTER}
-        className="glass relative overflow-hidden rounded-xl p-5 shadow-panel sm:p-6"
+        className="glass relative rounded-xl p-5 shadow-panel sm:p-6"
       >
         <GoldRule delay={0.15} />
         <h2 className="mb-1 text-[16px] font-medium">فرش تازه</h2>
@@ -73,17 +82,9 @@ export function NewCarpet() {
         <CarpetForm
           submitLabel="ثبت فرش"
           submitting={create.isPending}
+          fieldError={fieldError}
           onSubmit={(values) => create.mutate(values)}
         />
-
-        {failure && (
-          <p
-            role="alert"
-            className="mt-5 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-[13px] leading-loose"
-          >
-            {failure}
-          </p>
-        )}
       </motion.div>
     </div>
   );

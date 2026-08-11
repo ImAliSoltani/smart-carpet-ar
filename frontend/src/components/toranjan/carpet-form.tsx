@@ -117,15 +117,23 @@ function Field({
 const selectClass =
   "h-12 w-full rounded-md border border-line-2 bg-white/[0.04] px-3 text-base text-ink focus:border-accent/50 focus:outline-none";
 
+export interface CarpetFieldError {
+  field: keyof CarpetFormValues;
+  message: string;
+}
+
 export function CarpetForm({
   carpet,
   submitting,
   submitLabel,
+  fieldError,
   onSubmit,
 }: {
   carpet?: AdminCarpetDetail;
   submitting?: boolean;
   submitLabel: string;
+  /** A rejection the server made that belongs to one field — a taken slug. */
+  fieldError?: CarpetFieldError | null;
   onSubmit: (values: CarpetFormResult) => void;
 }) {
   const editing = Boolean(carpet);
@@ -144,6 +152,16 @@ export function CarpetForm({
       colors: (carpet?.colors ?? []).join("، "),
     },
   });
+
+  // A server rejection that names a field belongs *on* that field. «این شناسه
+  // قبلاً استفاده شده» is about the slug box and nothing else, so it is shown
+  // there — where the correction is made (§8) — and react-hook-form clears it
+  // the moment the box is edited. That is also why it does not need dismissing:
+  // it goes away by being fixed.
+  const { setError } = form;
+  React.useEffect(() => {
+    if (fieldError) setError(fieldError.field, { message: fieldError.message });
+  }, [fieldError, setError]);
 
   const submit = form.handleSubmit((values) => {
     onSubmit({
@@ -280,14 +298,29 @@ export function CarpetForm({
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="flex h-12 items-center justify-center gap-2 rounded-full bg-cta px-6 text-[14px] text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover disabled:opacity-60 sm:w-fit"
-      >
-        {submitting && <Loader2 className="size-4 animate-spin" />}
-        {submitLabel}
-      </button>
+      {/* Pinned to the bottom of the viewport while the form is on screen, and
+          settling into place at its end.
+
+          The button was simply the last thing in a tall form, which meant that
+          after working down the page — and, on the edit screen, after adding
+          sizes and photographs below — the way to save was somewhere above and
+          had to be hunted for by scrolling back. `sticky`, not `fixed`, for the
+          reason the shop already recorded: a fixed bar sits on top of whatever
+          the page ends with, and the usual cure is padding the body by a height
+          that changes with its own contents.
+
+          The negative margins let the bar's ground run to the panel's edges
+          while the button stays on the form's own alignment. */}
+      <div className="sticky bottom-0 -mx-5 -mb-5 mt-1 border-t border-line bg-paper/80 px-5 py-4 backdrop-blur-sm sm:-mx-6 sm:-mb-6 sm:px-6">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-cta px-6 text-[14px] text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover disabled:opacity-60 sm:w-fit"
+        >
+          {submitting && <Loader2 className="size-4 animate-spin" />}
+          {submitLabel}
+        </button>
+      </div>
     </form>
   );
 }
