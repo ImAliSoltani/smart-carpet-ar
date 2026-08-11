@@ -6,7 +6,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ExternalLink, Loader2 } from "lucide-react";
 
-import { CarpetForm, type CarpetFormResult } from "@/components/toranjan/carpet-form";
+import {
+  CarpetForm,
+  CarpetSubmit,
+  type CarpetFormResult,
+} from "@/components/toranjan/carpet-form";
 import { ENTER, GoldRule, staggerDelay } from "@/components/toranjan/admin-motion";
 import { useToast } from "@/components/toranjan/admin-toast";
 import { adminCarpetQuery, adminKeys, updateCarpet } from "@/lib/api/admin";
@@ -24,6 +28,9 @@ import { VariantEditor } from "./variant-editor";
  * endpoints, and a save button that pretended to commit all three at once
  * would have to explain what it means when the middle one fails.
  */
+
+/** Ties the details form to the save bar that sits at the foot of the page. */
+const FORM_ID = "carpet-details-form";
 export function EditCarpet({ carpetId }: { carpetId: number }) {
   const reduced = useReducedMotion();
   const queryClient = useQueryClient();
@@ -170,6 +177,10 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
           carpet={data}
           submitLabel="ذخیره‌ی مشخصات"
           submitting={save.isPending}
+          // The button lives at the foot of the page, below the photographs.
+          // See the bar at the end of this component for why.
+          formId={FORM_ID}
+          hideSubmit
           onSubmit={(values) => save.mutate(values)}
         />
 
@@ -198,6 +209,27 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
       >
         <ImageManager carpet={data} />
       </motion.div>
+
+      {/* The save bar, at the foot of the whole page rather than inside the
+          panel it belongs to.
+
+          This form is the first of three, and the other two — sizes and
+          photographs — write themselves the moment they are used. So the last
+          thing anyone does on this screen is upload a picture, and a save
+          button pinned inside a card near the top has stopped being reachable
+          by then: it asks for a scroll back up to a control the work has
+          already moved past.
+
+          It submits through the `form` attribute, which is what lets a button
+          sit outside the `<form>` it belongs to. The label still says
+          «مشخصات», because that is honestly all it saves. */}
+      <div className="sticky bottom-0 z-20 -mx-4 border-t border-line bg-bg/80 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6">
+        <CarpetSubmit
+          submitting={save.isPending}
+          label="ذخیره‌ی مشخصات"
+          formId={FORM_ID}
+        />
+      </div>
     </div>
   );
 }

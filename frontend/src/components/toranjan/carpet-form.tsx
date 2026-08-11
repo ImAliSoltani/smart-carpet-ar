@@ -127,6 +127,8 @@ export function CarpetForm({
   submitting,
   submitLabel,
   fieldError,
+  formId,
+  hideSubmit = false,
   onSubmit,
 }: {
   carpet?: AdminCarpetDetail;
@@ -134,6 +136,17 @@ export function CarpetForm({
   submitLabel: string;
   /** A rejection the server made that belongs to one field — a taken slug. */
   fieldError?: CarpetFieldError | null;
+  /**
+   * Names the `<form>` so a submit button can live outside it.
+   *
+   * HTML's own `form` attribute is what makes that legal: a button anywhere in
+   * the document submits the form it names. The edit screen needs it because
+   * this form is only the *first* of three panels, and its save button belongs
+   * at the bottom of the page rather than in the middle of it.
+   */
+  formId?: string;
+  /** For pages that render the submit button themselves, at page level. */
+  hideSubmit?: boolean;
   onSubmit: (values: CarpetFormResult) => void;
 }) {
   const editing = Boolean(carpet);
@@ -177,7 +190,7 @@ export function CarpetForm({
   });
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-5" noValidate>
+    <form id={formId} onSubmit={submit} className="flex flex-col gap-5" noValidate>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field label="نام فرش" error={form.formState.errors.name?.message}>
           <Input
@@ -298,29 +311,51 @@ export function CarpetForm({
         </div>
       </div>
 
-      {/* Pinned to the bottom of the viewport while the form is on screen, and
-          settling into place at its end.
+      {/* Pinned to the bottom of the viewport while the form is on screen.
 
-          The button was simply the last thing in a tall form, which meant that
-          after working down the page — and, on the edit screen, after adding
-          sizes and photographs below — the way to save was somewhere above and
-          had to be hunted for by scrolling back. `sticky`, not `fixed`, for the
-          reason the shop already recorded: a fixed bar sits on top of whatever
-          the page ends with, and the usual cure is padding the body by a height
-          that changes with its own contents.
+          `sticky`, not `fixed`, for the reason the shop already recorded: a
+          fixed bar sits on top of whatever the page ends with, and the usual
+          cure is padding the body by a height that changes with its contents.
 
           The negative margins let the bar's ground run to the panel's edges
-          while the button stays on the form's own alignment. */}
-      <div className="sticky bottom-0 -mx-5 -mb-5 mt-1 border-t border-line bg-paper/80 px-5 py-4 backdrop-blur-sm sm:-mx-6 sm:-mb-6 sm:px-6">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-cta px-6 text-[14px] text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover disabled:opacity-60 sm:w-fit"
-        >
-          {submitting && <Loader2 className="size-4 animate-spin" />}
-          {submitLabel}
-        </button>
-      </div>
+          while the button stays on the form's own alignment.
+
+          Not rendered when the page places the button itself — on the edit
+          screen this form is the first of three panels, and a save bar pinned
+          inside it stops being reachable exactly where the work continues. */}
+      {!hideSubmit && (
+        <div className="sticky bottom-0 -mx-5 -mb-5 mt-1 border-t border-line bg-paper/80 px-5 py-4 backdrop-blur-sm sm:-mx-6 sm:-mb-6 sm:px-6">
+          <CarpetSubmit submitting={submitting} label={submitLabel} />
+        </div>
+      )}
     </form>
+  );
+}
+
+/**
+ * The save button, so the page and the form draw the same one.
+ *
+ * `form` is set by the caller when it renders this outside the `<form>`; inside
+ * it, the attribute is unnecessary and harmless.
+ */
+export function CarpetSubmit({
+  submitting,
+  label,
+  formId,
+}: {
+  submitting?: boolean;
+  label: string;
+  formId?: string;
+}) {
+  return (
+    <button
+      type="submit"
+      form={formId}
+      disabled={submitting}
+      className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-cta px-6 text-[14px] text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover disabled:opacity-60 sm:w-fit"
+    >
+      {submitting && <Loader2 className="size-4 animate-spin" />}
+      {label}
+    </button>
   );
 }
