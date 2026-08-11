@@ -243,11 +243,32 @@
 }
 
 /* Smoked glass. Dark-tinted rather than white-tinted, which is the whole
-   reason it clears contrast over a photograph containing white. */
+   reason it clears contrast over a photograph containing white.
+
+   **It sets no `position`, and that is load-bearing.** The lit top edge
+   used to be a `::before`, which needs a positioned parent, so this rule
+   carried `position: relative` — and because this stylesheet is
+   unlayered it outranks every Tailwind utility, including the `fixed` on
+   the mobile drawer. Radix opened the drawer perfectly; it was just laid
+   out in the document flow 1382px down a 812px screen, so pressing the
+   button did nothing you could see. Measured, not guessed: computed
+   `position: relative`, rect top 1382, `isOnScreen: false`.
+
+   The highlight is a background layer now — a 1px gradient pinned to the
+   top edge — which draws the same line and asks nothing of positioning.
+   A custom class must never quietly decide an element's `position`. */
 :is([data-surface="admin"] .glass, [data-surface="admin"].glass),
 :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
-  position: relative;
-  background: rgba(26, 25, 34, 0.66);
+  background-color: rgba(26, 25, 34, 0.66);
+  background-image: linear-gradient(
+    to left,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 1px;
+  background-position: top center;
   backdrop-filter: blur(22px) saturate(1.25);
   -webkit-backdrop-filter: blur(22px) saturate(1.25);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -256,25 +277,7 @@
 /* The login card carries text over a deliberately lighter scrim, so it
    is denser: 0.80 puts the weakest text at 4.66:1 there. */
 :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
-  background: rgba(26, 25, 34, 0.8);
-}
-
-/* The lit top edge — what actually reads as «glass» rather than «dark
-   box», and the cheapest part of the effect. */
-:is([data-surface="admin"] .glass, [data-surface="admin"].glass)::before,
-:is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong)::before {
-  content: "";
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(
-    to left,
-    transparent,
-    rgba(255, 255, 255, 0.28),
-    transparent
-  );
-  pointer-events: none;
+  background-color: rgba(26, 25, 34, 0.8);
 }
 
 /* Two ways out, and both land on the solid `--paper` that every token
@@ -287,14 +290,18 @@
 @supports not (backdrop-filter: blur(1px)) {
   :is([data-surface="admin"] .glass, [data-surface="admin"].glass),
   :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
-    background: var(--paper);
+    background-color: var(--paper);
+    background-image: none;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   :is([data-surface="admin"] .glass, [data-surface="admin"].glass),
   :is([data-surface="admin"] .glass-strong, [data-surface="admin"].glass-strong) {
-    background: var(--paper);
+    background-color: var(--paper);
+    /* The lit edge stays. It is a hairline on an opaque panel, not a
+       transparency effect, and it is what keeps the panels legible as
+       separate surfaces once the blur is gone. */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
