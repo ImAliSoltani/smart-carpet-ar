@@ -154,7 +154,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <SheetContent
                 title="منوی مدیریت"
                 data-surface="admin"
-                className="glass w-[276px] border-y-0 p-0 text-ink"
+                // `glass-overlay`, not `glass`: this one covers the page's own
+                // text rather than a photograph, and at the card's density the
+                // two layers of type read through each other.
+                className="glass-overlay w-[276px] border-y-0 p-0 text-ink"
               >
                 <AdminNav
                   onNavigate={() => setDrawerOpen(false)}
