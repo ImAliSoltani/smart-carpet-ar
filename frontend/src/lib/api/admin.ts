@@ -17,6 +17,7 @@ import { ApiError, request } from "./client";
 import type {
   AdminCarpetDetail,
   AdminCarpetPage,
+  AdminCarpetRow,
   AdminOrder,
   AdminStats,
   ArCornerSuggestion,
@@ -40,6 +41,7 @@ export const adminKeys = {
   carpet: (carpetId: number) => ["admin", "carpet", carpetId] as const,
   orders: (status: OrderStatus | undefined) => ["admin", "orders", status ?? "all"] as const,
   ar: (carpetId: number) => ["admin", "ar", carpetId] as const,
+  arQueue: () => ["admin", "ar", "queue"] as const,
   corners: (carpetId: number) => ["admin", "corners", carpetId] as const,
 };
 
@@ -111,6 +113,52 @@ export function adminCarpetsQuery(filters: AdminCarpetFilters = {}) {
   return queryOptions({
     queryKey: adminKeys.carpets(filters),
     queryFn: ({ signal }) => listAdminCarpets(filters, signal),
+    retry: (count, error) => !isUnauthorized(error) && count < 2,
+  });
+}
+
+/**
+ * Every carpet, walked a page at a time.
+ *
+ * The AR queue asks a question the endpoint cannot answer: «which carpets have
+ * a size still missing its files». There is no server-side filter for it, and
+ * `ar_ready` is the only AR figure on a row — so the filtering happens here.
+ *
+ * Which is exactly why this walks rather than fetching one large page. Asking
+ * for `page_size: 100` and filtering the result reads as working, because the
+ * catalogue is seventy; at a hundred and one it would quietly drop carpets from
+ * a list whose entire job is to be the complete set of things needing
+ * attention, and the count above it would agree with the omission. Walking
+ * costs one request today and stays correct at any size.
+ *
+ * Admin-only, behind a login, and cached by the query below — so the cost of
+ * being right here is a request per hundred carpets, for one person.
+ */
+export async function listAllAdminCarpets(signal?: AbortSignal): Promise<AdminCarpetRow[]> {
+  const PAGE = 100;
+  const first = await listAdminCarpets({ page: 1, page_size: PAGE }, signal);
+  const rows = [...first.items];
+  const pages = Math.ceil(first.total / PAGE);
+  for (let page = 2; page <= pages; page += 1) {
+    const next = await listAdminCarpets({ page, page_size: PAGE }, signal);
+    rows.push(...next.items);
+    // A page that comes back empty ends the walk rather than spinning: `total`
+    // is counted in one query and the rows in another, so a carpet deleted
+    // between them would otherwise leave a page short forever.
+    if (next.items.length === 0) break;
+  }
+  return rows;
+}
+
+/** True when some size of this carpet has no AR file yet. */
+export function needsArAttention(carpet: AdminCarpetRow): boolean {
+  return carpet.variants_count > 0 && carpet.ar_ready < carpet.variants_count;
+}
+
+export function arQueueQuery() {
+  return queryOptions({
+    queryKey: adminKeys.arQueue(),
+    queryFn: ({ signal }) => listAllAdminCarpets(signal),
     retry: (count, error) => !isUnauthorized(error) && count < 2,
   });
 }
