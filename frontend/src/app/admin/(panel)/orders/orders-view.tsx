@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EASE_OUT, listStagger } from "@/components/toranjan/admin-motion";
+import { useRowLink } from "@/components/toranjan/row-link";
 import { OrderStatusBadge } from "@/components/toranjan/order-status-badge";
 import { ordersQuery } from "@/lib/api/admin";
 import type { AdminOrder, OrderStatus } from "@/lib/api/types";
@@ -186,55 +187,13 @@ export function OrdersView() {
             </TableHeader>
             <TableBody>
               {rows.map((order, i) => (
-                <motion.tr
+                <OrderRow
                   key={order.id}
-                  initial={reduced ? false : { opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: 0.46,
-                    ease: EASE_OUT,
-                    delay: reduced ? 0 : listStagger(i, rows.length),
-                  }}
-                  className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]"
-                >
-                  <TableCell>
-                    <Link
-                      href={`/admin/orders/${order.id}`}
-                      // Latin figures, and latin direction. A tracking code is
-                      // compared character by character against an SMS.
-                      className="inline-flex min-h-11 items-center font-figure text-[14px] underline-offset-4 hover:underline"
-                      dir="ltr"
-                    >
-                      {order.reference}
-                    </Link>
-                    <span className="block truncate text-[13px] text-ink-2 sm:hidden">
-                      {order.customer_name}
-                    </span>
-                  </TableCell>
-                  <TableCell className="hidden text-[14px] sm:table-cell">
-                    {order.customer_name}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <a
-                      href={`tel:${order.customer_phone}`}
-                      // `min-h-11`: this dials a phone, and a 17px line of
-                      // digits is not something a thumb can hit.
-                      className="inline-flex min-h-11 items-center font-figure text-[13.5px] text-ink-2 underline-offset-4 hover:text-ink hover:underline"
-                      dir="ltr"
-                    >
-                      {order.customer_phone}
-                    </a>
-                  </TableCell>
-                  <TableCell className="hidden text-[13.5px] text-ink-2 lg:table-cell">
-                    {formatDate(order.created_at)}
-                  </TableCell>
-                  <TableCell>
-                    <OrderStatusBadge status={order.status} />
-                  </TableCell>
-                  <TableCell className="text-end text-[14px]">
-                    {formatToman(order.total)}
-                  </TableCell>
-                </motion.tr>
+                  order={order}
+                  index={i}
+                  total={rows.length}
+                  reduced={reduced}
+                />
               ))}
             </TableBody>
           </Table>
@@ -248,5 +207,73 @@ export function OrdersView() {
         </p>
       )}
     </div>
+  );
+}
+
+function OrderRow({
+  order,
+  index,
+  total,
+  reduced,
+}: {
+  order: AdminOrder;
+  index: number;
+  total: number;
+  reduced: boolean | null;
+}) {
+  const row = useRowLink(`/admin/orders/${order.id}`);
+  return (
+          <motion.tr
+            onClick={row.onClick}
+            initial={reduced ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.46,
+              ease: EASE_OUT,
+              delay: reduced ? 0 : listStagger(index, total),
+            }}
+            className={cn(
+              "border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]",
+              row.className,
+            )}
+          >
+            <TableCell>
+              <Link
+                href={`/admin/orders/${order.id}`}
+                // Latin figures, and latin direction. A tracking code is
+                // compared character by character against an SMS.
+                className="inline-flex min-h-11 items-center font-figure text-[14px] underline-offset-4 hover:underline"
+                dir="ltr"
+              >
+                {order.reference}
+              </Link>
+              <span className="block truncate text-[13px] text-ink-2 sm:hidden">
+                {order.customer_name}
+              </span>
+            </TableCell>
+            <TableCell className="hidden text-[14px] sm:table-cell">
+              {order.customer_name}
+            </TableCell>
+            <TableCell className="hidden md:table-cell">
+              <a
+                href={`tel:${order.customer_phone}`}
+                // `min-h-11`: this dials a phone, and a 17px line of
+                // digits is not something a thumb can hit.
+                className="inline-flex min-h-11 items-center font-figure text-[13.5px] text-ink-2 underline-offset-4 hover:text-ink hover:underline"
+                dir="ltr"
+              >
+                {order.customer_phone}
+              </a>
+            </TableCell>
+            <TableCell className="hidden text-[13.5px] text-ink-2 lg:table-cell">
+              {formatDate(order.created_at)}
+            </TableCell>
+            <TableCell>
+              <OrderStatusBadge status={order.status} />
+            </TableCell>
+            <TableCell className="text-end text-[14px]">
+              {formatToman(order.total)}
+            </TableCell>
+          </motion.tr>
   );
 }

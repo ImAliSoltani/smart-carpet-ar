@@ -214,6 +214,30 @@
 }
 
 
+/* ---- native selects on a dark ground ---------------------------------
+   A `<select>`'s dropdown is drawn by the operating system, not by the
+   page, and it paints the list against the *control's own*
+   `background-color`. Ours was `bg-white/[0.04]` — four percent white,
+   which over the browser's white canvas is white — while the options
+   inherited `--ink`, which is nearly white too. The menu opened white on
+   white and the choices could not be read at all.
+
+   So the colour has to be opaque, and it has to be set on the `option`
+   elements as well: they do not inherit it from the control on Windows.
+   `color-scheme: dark` is the other half — it tells the platform to draw
+   the scrollbar and the highlight of that popup in dark too, which no
+   amount of styling the element itself can reach. */
+[data-surface="admin"] select {
+  color-scheme: dark;
+  background-color: #1f1e28;
+  color: var(--ink);
+}
+
+[data-surface="admin"] select option {
+  background-color: #1f1e28;
+  color: var(--ink);
+}
+
 /* ---- the panel's small type ------------------------------------------
    Every column header, every counter caption, every «label above a
    value» in the panel. It replaces `text-[11px] tracking-[0.14em]

@@ -9,6 +9,7 @@ import { ArrowRight } from "lucide-react";
 
 import { CarpetForm, type CarpetFormResult } from "@/components/toranjan/carpet-form";
 import { ENTER, GoldRule } from "@/components/toranjan/admin-motion";
+import { useToast } from "@/components/toranjan/admin-toast";
 import { adminKeys, createCarpet } from "@/lib/api/admin";
 import { ApiError } from "@/lib/api/client";
 
@@ -25,6 +26,7 @@ export function NewCarpet() {
   const router = useRouter();
   const reduced = useReducedMotion();
   const queryClient = useQueryClient();
+  const { show } = useToast();
   const [failure, setFailure] = React.useState<string | null>(null);
 
   const create = useMutation({
@@ -32,12 +34,18 @@ export function NewCarpet() {
     onMutate: () => setFailure(null),
     onSuccess: (carpet) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.all });
+      // Named, not «موفق». The page is about to change under them, and the
+      // useful sentence is the one that says what is still missing.
+      show(`«${carpet.name}» ثبت شد. حالا سایز و عکس اضافه کنید.`);
       // Straight on to the screen where its sizes and photographs go, because
       // a carpet with neither is not yet sellable.
       router.replace(`/admin/carpets/${carpet.id}`);
     },
-    onError: (error) =>
-      setFailure(error instanceof ApiError ? error.message : "ثبت فرش انجام نشد."),
+    onError: (error) => {
+      const message = error instanceof ApiError ? error.message : "ثبت فرش انجام نشد.";
+      setFailure(message);
+      show(message, "failure");
+    },
   });
 
   return (

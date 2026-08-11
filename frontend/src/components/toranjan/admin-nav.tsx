@@ -158,8 +158,15 @@ export function AdminNav({
   const { data: stats } = useQuery({ ...statsQuery(), staleTime: 60 * 1000 });
 
   return (
-    <div className="flex h-full flex-col gap-1 p-3">
-      <div className="flex flex-col gap-0.5">
+    // `flex-1 min-h-0`, not `h-full`. The rail's column already carries a 56px
+    // wordmark above this, so `h-full` made the nav a full 100dvh *inside* a
+    // container that was already full — and «دیدن فروشگاه» and «خروج», pinned
+    // to its bottom by `mt-auto`, were pinned 56px below the fold. `min-h-0`
+    // is what lets the scrolling list above them actually shrink; without it a
+    // flex child refuses to go below its content height and the same overflow
+    // comes back the moment the menu grows.
+    <div className="flex min-h-0 flex-1 flex-col gap-1 p-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
         {MAIN.map((entry) => (
           <NavLink
             key={entry.href}

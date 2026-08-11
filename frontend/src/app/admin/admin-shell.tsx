@@ -90,8 +90,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           than a class, which also lets the width and the fade share one curve —
           the panel slides out from under its own edge instead of the contents
           reflowing as the box narrows. */}
+      {/* **The rail is the sticky element itself, not its child.** It was the
+          child, and it silently did not stick: `overflow-hidden` — which this
+          element needs, so the fixed-width contents are clipped as the width
+          animates to zero — makes the nearest scrollport for anything inside
+          it, and `position: sticky` has nothing left to stick to. Measured:
+          after scrolling 700px the logout button had travelled from y=849 to
+          y=149, i.e. straight up the page with the content.
+          `self-start` is the other half — a flex child stretches to the row's
+          full height by default, and an element as tall as the whole document
+          cannot stick to anything either. */}
       <motion.aside
-        className="glass hidden shrink-0 overflow-hidden border-y-0 border-e-0 md:block"
+        className="glass sticky top-0 hidden h-dvh shrink-0 self-start overflow-hidden border-y-0 border-e-0 md:block"
         initial={false}
         // Width and opacity only. The border needs no separate treatment — it
         // fades with everything else — and the logical `border-s` has no
@@ -100,7 +110,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         animate={{ width: railOpen ? 248 : 0, opacity: railOpen ? 1 : 0 }}
         transition={reduced ? { duration: 0 } : { duration: 0.46, ease: EASE_OUT }}
       >
-        <div className="sticky top-0 flex h-dvh w-[248px] flex-col">
+        <div className="flex h-full w-[248px] flex-col">
           <div className="flex h-14 items-center px-5">
             <Link
               href="/admin"
@@ -157,7 +167,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 // `glass-overlay`, not `glass`: this one covers the page's own
                 // text rather than a photograph, and at the card's density the
                 // two layers of type read through each other.
-                className="glass-overlay w-[276px] border-y-0 p-0 text-ink"
+                className="glass-overlay flex w-[276px] flex-col border-y-0 p-0 text-ink"
               >
                 <AdminNav
                   onNavigate={() => setDrawerOpen(false)}

@@ -17,7 +17,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EASE_OUT, listStagger } from "@/components/toranjan/admin-motion";
+import { useRowLink } from "@/components/toranjan/row-link";
 import { adminCarpetsQuery } from "@/lib/api/admin";
+import type { AdminCarpetRow } from "@/lib/api/types";
 import { mediaUrl } from "@/lib/api/client";
 import { formatNumber, formatToman } from "@/lib/format";
 import { MATERIAL_LABEL, PATTERN_LABEL } from "@/lib/taxonomy";
@@ -226,95 +228,15 @@ export function CarpetsView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((carpet, i) => {
-                const cover = mediaUrl(carpet.primary_image);
-                return (
-                  <motion.tr
-                    key={carpet.id}
-                    initial={reduced ? false : { opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.46,
-                      ease: EASE_OUT,
-                      delay: reduced ? 0 : listStagger(i, rows.length),
-                    }}
-                    className="border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]"
-                  >
-                    <TableCell>
-                      <span className="relative block size-12 overflow-hidden rounded-md bg-white/[0.04]">
-                        {cover ? (
-                          <Image
-                            src={cover}
-                            alt=""
-                            fill
-                            sizes="48px"
-                            // `contain`: these photographs are cut out to the
-                            // weave, and cropping one cuts the border off the
-                            // pattern — the same reason the shop's card does it.
-                            className="object-contain p-1"
-                          />
-                        ) : (
-                          <ImageOff
-                            className="absolute inset-0 m-auto size-4 text-muted"
-                            strokeWidth={1.5}
-                            aria-hidden
-                          />
-                        )}
-                      </span>
-                    </TableCell>
-
-                    <TableCell>
-                      <Link
-                        href={`/admin/carpets/${carpet.id}`}
-                        className="inline-flex min-h-11 items-center text-[14px] leading-relaxed underline-offset-4 hover:underline"
-                      >
-                        {carpet.name}
-                      </Link>
-                      <span className="block truncate text-[13px] text-ink-2 md:hidden">
-                        {PATTERN_LABEL[carpet.pattern]} · {MATERIAL_LABEL[carpet.material]}
-                      </span>
-                    </TableCell>
-
-                    <TableCell className="hidden text-[13.5px] text-ink-2 md:table-cell">
-                      {PATTERN_LABEL[carpet.pattern]} · {MATERIAL_LABEL[carpet.material]}
-                    </TableCell>
-
-                    <TableCell className="hidden text-[13.5px] sm:table-cell">
-                      {formatNumber(carpet.variants_count)}
-                    </TableCell>
-
-                    <TableCell className="hidden whitespace-nowrap text-[13.5px] lg:table-cell">
-                      {carpet.min_price ? formatToman(carpet.min_price) : "—"}
-                    </TableCell>
-
-                    <TableCell className="hidden sm:table-cell">
-                      <ArReadiness ready={carpet.ar_ready} total={carpet.variants_count} />
-                    </TableCell>
-
-                    <TableCell className="text-end">
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[12.5px]",
-                          carpet.is_active
-                            ? "border-status-confirmed/35 bg-status-confirmed/12 text-status-confirmed"
-                            : "border-line-2 text-muted",
-                        )}
-                      >
-                        <span
-                          aria-hidden
-                          className={cn(
-                            "size-1.5 shrink-0 rounded-full",
-                            carpet.is_active
-                              ? "bg-status-confirmed"
-                              : "border border-muted bg-transparent",
-                          )}
-                        />
-                        {carpet.is_active ? "فعال" : "غیرفعال"}
-                      </span>
-                    </TableCell>
-                  </motion.tr>
-                );
-              })}
+              {rows.map((carpet, i) => (
+                <CarpetRow
+                  key={carpet.id}
+                  carpet={carpet}
+                  index={i}
+                  total={rows.length}
+                  reduced={reduced}
+                />
+              ))}
             </TableBody>
           </Table>
         )}
@@ -346,5 +268,113 @@ export function CarpetsView() {
         </div>
       )}
     </div>
+  );
+}
+
+
+function CarpetRow({
+  carpet,
+  index,
+  total,
+  reduced,
+}: {
+  carpet: AdminCarpetRow;
+  index: number;
+  total: number;
+  reduced: boolean | null;
+}) {
+  const row = useRowLink(`/admin/carpets/${carpet.id}`);
+  const cover = mediaUrl(carpet.primary_image);
+  return (
+<motion.tr
+                    initial={reduced ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: 0.46,
+            ease: EASE_OUT,
+            delay: reduced ? 0 : listStagger(index, total),
+          }}
+          onClick={row.onClick}
+  className={cn(
+    "border-b border-line transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]",
+    row.className,
+  )}
+        >
+          <TableCell>
+            <span className="relative block size-12 overflow-hidden rounded-md bg-white/[0.04]">
+              {cover ? (
+                <Image
+                  src={cover}
+                  alt=""
+                  fill
+                  sizes="48px"
+                  // `contain`: these photographs are cut out to the
+                  // weave, and cropping one cuts the border off the
+                  // pattern — the same reason the shop's card does it.
+                  className="object-contain p-1"
+                />
+              ) : (
+                <ImageOff
+                  className="absolute inset-0 m-auto size-4 text-muted"
+                  strokeWidth={1.5}
+                  aria-hidden
+                />
+              )}
+            </span>
+          </TableCell>
+
+          <TableCell>
+            <Link
+              href={`/admin/carpets/${carpet.id}`}
+              className="inline-flex min-h-11 items-center text-[14px] leading-relaxed underline-offset-4 hover:underline"
+            >
+              {carpet.name}
+            </Link>
+            <span className="block truncate text-[13px] text-ink-2 md:hidden">
+              {PATTERN_LABEL[carpet.pattern]} · {MATERIAL_LABEL[carpet.material]}
+            </span>
+          </TableCell>
+
+          <TableCell className="hidden text-[13.5px] text-ink-2 md:table-cell">
+            {PATTERN_LABEL[carpet.pattern]} · {MATERIAL_LABEL[carpet.material]}
+          </TableCell>
+
+          <TableCell className="hidden text-[13.5px] sm:table-cell">
+            {formatNumber(carpet.variants_count)}
+          </TableCell>
+
+          <TableCell className="hidden whitespace-nowrap text-[13.5px] lg:table-cell">
+            {carpet.min_price ? formatToman(carpet.min_price) : "—"}
+          </TableCell>
+
+          <TableCell className="hidden sm:table-cell">
+            <ArReadiness ready={carpet.ar_ready} total={carpet.variants_count} />
+          </TableCell>
+
+          <TableCell className="text-end">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[12.5px]",
+                // Red, not grey. «Not on sale» is a state the shopkeeper needs
+                // to spot while scanning, and grey is what every quiet thing on
+                // this page already looks like.
+                carpet.is_active
+                  ? "border-status-confirmed/35 bg-status-confirmed/12 text-status-confirmed"
+                  : "border-status-cancelled/40 bg-status-cancelled/12 text-status-cancelled",
+              )}
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  "size-1.5 shrink-0 rounded-full",
+                  carpet.is_active
+                    ? "bg-status-confirmed"
+                    : "border border-status-cancelled bg-transparent",
+                )}
+              />
+              {carpet.is_active ? "فعال" : "غیرفعال"}
+            </span>
+          </TableCell>
+        </motion.tr>
   );
 }

@@ -1,3 +1,5 @@
+import { AdminToaster } from "@/components/toranjan/admin-toast";
+
 import { AdminShell } from "../admin-shell";
 
 /**
@@ -6,5 +8,9 @@ import { AdminShell } from "../admin-shell";
  * bounce it back to itself.
  */
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <AdminToaster>
+      <AdminShell>{children}</AdminShell>
+    </AdminToaster>
+  );
 }

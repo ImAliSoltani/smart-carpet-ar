@@ -4,10 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowRight, ExternalLink, Loader2 } from "lucide-react";
 
 import { CarpetForm, type CarpetFormResult } from "@/components/toranjan/carpet-form";
 import { ENTER, GoldRule, staggerDelay } from "@/components/toranjan/admin-motion";
+import { useToast } from "@/components/toranjan/admin-toast";
 import { adminCarpetQuery, adminKeys, updateCarpet } from "@/lib/api/admin";
 import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
@@ -26,8 +27,8 @@ import { VariantEditor } from "./variant-editor";
 export function EditCarpet({ carpetId }: { carpetId: number }) {
   const reduced = useReducedMotion();
   const queryClient = useQueryClient();
+  const { show } = useToast();
   const [failure, setFailure] = React.useState<string | null>(null);
-  const [saved, setSaved] = React.useState(false);
 
   const carpet = useQuery(adminCarpetQuery(carpetId));
 
@@ -42,22 +43,35 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
         pattern: values.pattern,
         material: values.material,
         origin: values.origin,
-        colors: values.colors,
+        // `undefined`, not `[]`, when the field is left empty — and that
+        // distinction is a bug this screen used to have. The backend fills the
+        // colours from the first photograph, but only while the carpet has
+        // none; sending an empty array afterwards *cleared* what it had just
+        // extracted, and the shop's card lost its colour dots. Empty here means
+        // «leave them alone», which is what the field's own hint promises.
+        colors: values.colors.length ? values.colors : undefined,
         suitable_rooms: values.suitable_rooms,
       }),
     onMutate: () => setFailure(null),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.all });
-      setSaved(true);
-      window.setTimeout(() => setSaved(false), 2200);
+      show("مشخصات فرش ذخیره شد.");
     },
-    onError: (error) =>
-      setFailure(error instanceof ApiError ? error.message : "ذخیره‌ی تغییرات انجام نشد."),
+    onError: (error) => {
+      const message =
+        error instanceof ApiError ? error.message : "ذخیره‌ی تغییرات انجام نشد.";
+      setFailure(message);
+      show(message, "failure");
+    },
   });
 
   const toggleActive = useMutation({
     mutationFn: (next: boolean) => updateCarpet(carpetId, { is_active: next }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
+    onSuccess: (_result, next) => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.all });
+      show(next ? "فرش فعال شد و در فروشگاه دیده می‌شود." : "فرش غیرفعال شد.");
+    },
+    onError: () => show("تغییر وضعیت فرش انجام نشد.", "failure"),
   });
 
   if (carpet.isPending) {
@@ -126,7 +140,7 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
       </div>
 
       {!data.is_active && (
-        <p className="rounded-xl border border-line-2 bg-white/[0.03] px-5 py-4 text-[13.5px] leading-loose text-ink-2">
+        <p className="rounded-xl border border-status-cancelled/40 bg-status-cancelled/10 px-5 py-4 text-[13.5px] leading-loose text-ink-2">
           این فرش غیرفعال است: در فروشگاه دیده نمی‌شود و سفارش تازه‌ای برایش ثبت نمی‌شود.
           سفارش‌های قبلی دست‌نخورده می‌مانند.
         </p>
@@ -140,21 +154,15 @@ export function EditCarpet({ carpetId }: { carpetId: number }) {
       >
         <GoldRule delay={0.15} />
 
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <h2 className="text-[16px] font-medium">مشخصات</h2>
-          {saved && (
-            <motion.span
-              initial={reduced ? false : { scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="flex items-center gap-1.5 text-[13px] text-status-confirmed"
-            >
-              <Check className="size-4" strokeWidth={2.5} />
-              ذخیره شد
-            </motion.span>
-          )}
-        </div>
+        <h2 className="mb-5 text-[16px] font-medium">مشخصات</h2>
 
         <CarpetForm
+          // Keyed on the colours so the form re-reads its defaults when they
+          // change from *outside* it. Uploading the first photograph fills them
+          // on the server, and react-hook-form reads `defaultValues` once at
+          // mount — without this the field stayed visibly empty and the next
+          // save sent that emptiness back.
+          key={data.colors.join(",")}
           carpet={data}
           submitLabel="ذخیره‌ی مشخصات"
           submitting={save.isPending}
