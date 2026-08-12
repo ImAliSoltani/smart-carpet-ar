@@ -79,13 +79,26 @@ export function ProductDetail({
   const compare = useCompare();
   const addToCart = useCartStore((state) => state.add);
 
-  // Each photograph twice over: the 800px derivative for the page, and the
-  // 1600px one for the lightbox. `full_url` is null on rows ingested before the
-  // derivative columns existed, and there the card file has to stand in — a
-  // soft zoom is worse than a sharp one but far better than a 404.
+  // The large derivative for both, and this is the debt the roadmap logged as
+  // «the real srcset still does not use `full_url`».
+  //
+  // The page used the card file, whose long edge is capped at 800 — so a
+  // portrait carpet arrived 461px wide for a slot measured at 582 CSS px, and
+  // 1164 on a retina screen. `next/image` cannot invent detail it was not
+  // given: the browser asked the srcset for a 750px variant and was handed 398
+  // real pixels. `full_url` is the same photograph at 730x1268 — 58% more width
+  // on the two measured here.
+  //
+  // It costs nothing to the phone. `sizes` still decides which variant is
+  // fetched, so a small screen gets a small file either way; the source only
+  // sets the ceiling, and the ceiling was the problem.
+  //
+  // `full_url` is null on rows ingested before the derivative columns existed,
+  // and there the card file stands in — soft is worse than sharp and far better
+  // than a 404.
   const gallery = carpet.images
     .map((image) => ({
-      src: mediaUrl(image.url),
+      src: mediaUrl(image.full_url ?? image.url),
       zoomSrc: mediaUrl(image.full_url ?? image.url),
     }))
     .filter((entry): entry is { src: string; zoomSrc: string } => Boolean(entry.src));
