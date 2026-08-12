@@ -420,7 +420,23 @@ export function CompareTable() {
                   key={entry.id}
                   scope="col"
                   className={cn(
-                    "w-1/2 px-1.5 pb-5 align-bottom text-center font-normal",
+                    // `align-top`, and this is the whole reason the pictures
+                    // line up. The heading is photograph-then-name, and a name
+                    // wraps to as many lines as it needs — two for «فرش ماشینی
+                    // هانوکس کد HAM.136.03», four for one of the 1000-شانه
+                    // اورکوم names. Bottom-aligning equal-height cells means the
+                    // taller block starts higher, so the tiles were identical
+                    // (154x230, measured) while their tops sat 51px apart, and
+                    // the row read as ragged even though nothing was the wrong
+                    // size. Aligning to the top pins every photograph to the
+                    // same line and lets the names run ragged underneath, which
+                    // is the half nobody is comparing.
+                    //
+                    // Not solved by clamping the name: in a comparison the
+                    // distinguishing words are often the last ones («زمینه کرم»
+                    // against «زمینه طوسی»), so truncating would hide exactly
+                    // what the page is for.
+                    "w-1/2 px-1.5 pb-5 align-top text-center font-normal",
                     // 190, not 200. Four columns at 200 plus the 150 label is
                     // 950 against the 945 a 1024 window leaves, so the widest
                     // laptop breakpoint the roadmap tests scrolled by five
