@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { AddToCart } from "@/components/toranjan/add-to-cart";
+import { ACTION_LABEL, AddToCart } from "@/components/toranjan/add-to-cart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ZoomableImage } from "@/components/ui/zoomable-image";
@@ -414,26 +414,43 @@ export function ProductDetail({
                 It looked right on desktop, where the row is a row and the same
                 declaration governs width. Reported from a phone.
 
-                Gold rather than the near-black `--cta`, matching the heart. */}
+                Gold rather than the near-black `--cta`, matching the heart.
+
+                Everything about the box is matched to the cart button beside
+                it, because on a phone they stack and any difference reads as a
+                mistake: 53px tall, `rounded-full`, 15px/500, a 1px border (the
+                cart has one, so without it the two content boxes differ), 18px
+                icon, 10px gap, 24px padding.
+
+                That leaves the labels, which are not the same length — and with
+                centred content, unequal labels put the two icons at different
+                x. Hence `ACTION_LABEL`: a shared minimum width on the label of
+                *both* buttons, so the icon-and-label block is one size and
+                centres to one place. A minimum rather than a fixed width, so a
+                longer string still fits instead of spilling. */}
             <Button
               size="lg"
               className={cn(
                 // 53px, not `h-13`: the cart button beside it takes its height
                 // from padding and a border and lands on 53, and these two are
                 // meant to read as one row.
-                "h-[53px] w-full gap-2 rounded-full text-[15px] sm:flex-1",
-                arReady && "bg-accent text-accent-foreground hover:bg-accent-strong",
+                "h-[53px] w-full gap-2.5 rounded-full border px-6 text-[15px] sm:flex-1",
+                arReady
+                  ? "border-accent bg-accent text-accent-foreground hover:border-accent-strong hover:bg-accent-strong"
+                  : "border-transparent",
               )}
               disabled={!arReady}
               asChild={arReady}
             >
               {arReady ? (
                 <Link href={`/carpets/${carpet.slug}/ar?variant=${selected?.id}`}>
-                  <Cuboid className="size-5" /> در خانه‌ی من ببین
+                  <Cuboid className="size-[18px]" />
+                  <span className={ACTION_LABEL}>در خانه‌ی من ببین</span>
                 </Link>
               ) : (
                 <span>
-                  <Cuboid className="size-5" /> فایل واقعیت افزوده هنوز آماده نیست
+                  <Cuboid className="size-[18px]" />
+                  <span className={ACTION_LABEL}>فایل واقعیت افزوده هنوز آماده نیست</span>
                 </span>
               )}
             </Button>

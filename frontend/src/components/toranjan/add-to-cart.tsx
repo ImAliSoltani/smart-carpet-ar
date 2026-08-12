@@ -63,6 +63,27 @@ function DrawnCheck({ play }: { play: boolean }) {
   );
 }
 
+/**
+ * The label box shared by the two actions on the product page.
+ *
+ * They sit side by side on a desktop and stack on a phone, and stacked is where
+ * it matters: two full-width buttons whose contents are centred put their icons
+ * at different x as soon as their labels differ in length — «در خانه‌ی من ببین»
+ * is 107px and «افزودن به سبد خرید» is 119px, so the icons sat 8px apart and
+ * the labels 10px. Reported as exactly that: the icons should be under each
+ * other and the titles under each other.
+ *
+ * Giving the label a shared *minimum* width makes both icon-and-label blocks
+ * one size, so they centre to one place. A minimum rather than a fixed width
+ * because a label that outgrows it — the AR button's «not ready yet» sentence,
+ * or a future translation — should still fit rather than spill out of the
+ * button.
+ *
+ * It also settles this button's own three states, which are three different
+ * lengths and used to shift the icon as they swapped.
+ */
+export const ACTION_LABEL = "min-w-32 text-center";
+
 /** One label swapped for another, each leaving and arriving behind a mask. */
 function SwapLabel({ show, children }: { show: boolean; children: React.ReactNode }) {
   return (
@@ -177,17 +198,17 @@ export function AddToCart({
       <span className="grid place-items-center">
         <SwapLabel show={!done && !working}>
           <ShoppingBag className="size-[18px]" />
-          <span>افزودن به سبد</span>
+          <span className={ACTION_LABEL}>افزودن به سبد خرید</span>
         </SwapLabel>
 
         <SwapLabel show={working}>
           <Loader2 className="size-[18px] animate-spin" />
-          <span>در حال افزودن…</span>
+          <span className={ACTION_LABEL}>در حال افزودن…</span>
         </SwapLabel>
 
         <SwapLabel show={done}>
           <DrawnCheck play={done && !holdConfirmed} />
-          <span>به سبد اضافه شد</span>
+          <span className={ACTION_LABEL}>به سبد اضافه شد</span>
         </SwapLabel>
       </span>
     </button>

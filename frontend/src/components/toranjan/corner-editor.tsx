@@ -150,7 +150,17 @@ export function CornerEditor({
 }: CornerEditorProps) {
   const frameRef = React.useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = React.useState<number | null>(null);
-  const [focused, setFocused] = React.useState<number | null>(null);
+  // Set by an arrow key, not by focus.
+  //
+  // Letting go is the decision: the corner is where it was put, and a
+  // magnifier still hanging over the photograph after the finger has left says
+  // the opposite — that something is still being chosen. So the loupe belongs
+  // to the *gesture*, and both gestures end on their own. A press ends at
+  // `pointerup`; keyboard editing ends when the handle is left.
+  //
+  // It cannot key off focus: pressing a handle focuses it too, so «shown while
+  // focused» is «shown forever after the first press».
+  const [keying, setKeying] = React.useState<number | null>(null);
   const [announcement, setAnnouncement] = React.useState("");
 
   // The frame's painted size, kept current by the element itself.
@@ -231,6 +241,11 @@ export function CornerEditor({
 
   const onKeyDown = (index: number) => (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (disabled) return;
+    // A way to put the magnifier away without leaving the handle.
+    if (event.key === "Escape") {
+      setKeying(null);
+      return;
+    }
     const coarse = event.shiftKey;
     let dx = 0;
     let dy = 0;
@@ -253,15 +268,19 @@ export function CornerEditor({
     // Before anything else: arrows scroll the page, and a handle that moves the
     // page under itself is unusable.
     event.preventDefault();
+    // Keyboard editing has started, so the magnifier is wanted — this is the
+    // case that cannot see what it is doing either, for the opposite reason:
+    // nothing is covering the point, but a nudge of a few source pixels is
+    // invisible at the size the photograph is drawn.
+    setKeying(index);
     const current = corners[index];
     const next = clamp({ x: current.x + dx, y: current.y + dy });
     replace(index, next);
     announce(index, next);
   };
 
-  // A drag wins over focus: pressing a handle focuses it too, and the finger is
-  // the one that needs the magnifier pointed at it.
-  const active = dragging ?? focused;
+  // A drag wins: while the pointer is down it is the thing being aimed.
+  const active = dragging ?? keying;
 
   const valid = corners.length === 4;
   const outline = valid
@@ -342,10 +361,11 @@ export function CornerEditor({
               disabled={disabled}
               aria-label={`گوشه‌ی ${CORNER_LABELS[index]}`}
               onKeyDown={onKeyDown(index)}
-              onFocus={() => setFocused(index)}
-              onBlur={() => setFocused((current) => (current === index ? null : current))}
+              onBlur={() => setKeying((current) => (current === index ? null : current))}
               onPointerDown={(event) => {
                 if (disabled) return;
+                // A press supersedes keyboard editing of any handle.
+                setKeying(null);
                 // Capture first: without it the drag dies the moment the
                 // pointer leaves the 44px button, which is immediately.
                 event.currentTarget.setPointerCapture(event.pointerId);
