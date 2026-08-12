@@ -392,7 +392,16 @@ export function CompareTable() {
           guessed: `elementFromPoint` at x=365 of 375 returned a `<td>` that
           should have been behind the label. */}
       <div className="overflow-x-auto">
-        <table className="w-full border-separate border-spacing-0 text-sm">
+        {/* `table-fixed`, so the columns are equal instead of being sized by
+            the longest carpet name. With automatic layout the photographs came
+            out 524px and 475px wide side by side — measured — because the
+            column had `w-auto` and a name is not a width. Fixed layout takes
+            the widths from this row and ignores the text, which is the whole
+            point: these columns are meant to be interchangeable.
+
+            `min-w` keeps the old behaviour that a cramped table scrolls rather
+            than squeezing: 150 for the label plus 190 a carpet. */}
+        <table className="w-full table-fixed border-separate border-spacing-0 text-sm sm:min-w-[910px]">
           <caption className="sr-only">
             مقایسه‌ی مشخصات فرش‌های انتخاب‌شده. روی صفحه‌ی بزرگ ستون نخست نام ویژگی است؛
             روی گوشی نام ویژگی بالای مقدارهایش می‌آید و دو فرش نشان داده می‌شود.
@@ -417,7 +426,11 @@ export function CompareTable() {
                     // laptop breakpoint the roadmap tests scrolled by five
                     // pixels to show nothing. At 190 the four fit and then grow
                     // to fill, which is 199 each — the same picture, unscrolled.
-                    "sm:w-auto sm:min-w-[190px] sm:px-3 sm:text-start",
+                    //
+                    // An explicit width now rather than `w-auto`: under fixed
+                    // layout equal widths share the spare room equally, so every
+                    // carpet column is the same width at every viewport.
+                    "sm:w-[190px] sm:px-3 sm:text-start",
                     !shownOnPhone.has(entry.id) && "hidden sm:table-cell",
                   )}
                 >
@@ -596,7 +609,19 @@ function CarpetHeading({ entry, onRemove }: { entry: Entry; onRemove: () => void
         href={`/carpets/${entry.item.slug}`}
         className="group/h block overflow-hidden rounded border border-line bg-paper"
       >
-        <span className="relative block aspect-square">
+        {/* Portrait, not square, and that is what makes the row read as one
+            thing. Carpets are photographed upright — the two on screen when
+            this was measured were 0.58 and 0.72 wide-to-tall — and `contain`
+            inside a *square* leaves each of them a different band of empty
+            frame at the sides: one rug fills 58% of its tile's width, the next
+            72%, and the row looks like a set of mismatched stamps. At 2:3 both
+            all but fill the tile, so the pictures line up.
+
+            Still `contain`, never `cover`. Cropping would make the tiles
+            identical the lazy way, by cutting the border off the pattern — and
+            the border is one of the things somebody is on this page to
+            compare. */}
+        <span className="relative block aspect-[2/3]">
           {image && (
             <Image
               src={image}

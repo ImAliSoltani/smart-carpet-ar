@@ -49,13 +49,28 @@ function CloseTray({ onClose, className }: { onClose: () => void; className?: st
       onClick={onClose}
       aria-label="بستن نوار و پاک کردن فهرست مقایسه"
       title="بستن نوار و پاک کردن فهرست مقایسه"
-      className={cn(
-        "grid size-11 shrink-0 place-items-center rounded-full text-muted",
-        "transition-colors duration-[--dur-feedback] hover:bg-line hover:text-ink",
-        className,
-      )}
+      // 44px of target with a 32px disc drawn inside it — the same trade the
+      // card's corner controls make, and for the same reason: §3-5's floor is on
+      // the area a thumb has to find, not on the amount of paper that has to be
+      // painted. A bare 44px circle of hover colour on a quiet bar is a lot of
+      // furniture for a control most people never press.
+      className={cn("group grid size-11 shrink-0 place-items-center rounded-full", className)}
     >
-      <X className="size-4" />
+      <span
+        className={cn(
+          "grid size-8 place-items-center rounded-full border border-line-2 text-muted",
+          // Colour and border move together on hover so the disc reads as one
+          // object filling in, rather than an icon that changed colour inside a
+          // ring that did not.
+          "transition-[background-color,border-color,color] duration-[--dur-feedback]",
+          "group-hover:border-cta group-hover:bg-cta group-hover:text-on-cta",
+          "group-focus-visible:border-cta group-focus-visible:bg-cta group-focus-visible:text-on-cta",
+          // A press that gives nothing back reads as a press that missed.
+          "group-active:scale-95",
+        )}
+      >
+        <X className="size-3.5" strokeWidth={2} />
+      </span>
     </button>
   );
 }
@@ -101,7 +116,15 @@ export function CompareTray() {
           // picture with none of that: it is the last element in the flow, so
           // it floats above the page while there is page left and comes to rest
           // under the footer at the end. Nothing is ever covered.
-          className="sticky bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur-md shadow-[0_-18px_44px_-32px_rgba(24,24,27,0.55)]"
+          // Rounded across the top only, so the bar reads as a sheet that has
+          // risen over the page rather than a strip welded to the bottom of the
+          // window. The corners are the one edge that is ever seen — the bottom
+          // two sit against the end of the page — so `rounded-t-2xl` and
+          // nothing else. `overflow-hidden` would make this a scrollport and
+          // break `sticky`, which is already written down; the corners are
+          // clipped by the radius on this element alone, and nothing inside
+          // reaches them.
+          className="sticky bottom-0 z-40 rounded-t-2xl border-x border-t border-line bg-paper/95 backdrop-blur-md shadow-[0_-18px_44px_-32px_rgba(24,24,27,0.55)]"
           role="region"
           aria-label="فهرست مقایسه"
         >
