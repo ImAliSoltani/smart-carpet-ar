@@ -111,7 +111,10 @@ function ChipRow({
               })
             }
             aria-label={`${label(value)}، ${formatNumber(count)} فرش`}
-            className="gap-2 rounded-full"
+            // `h-11` over the registry's 36px `size="sm"`. These are the most
+            // pressed controls on the listing and they were four short of the
+            // §3-5 floor; the size stays `sm` for its type scale and padding.
+            className="h-11 gap-2 rounded-full"
           >
             <span>{label(value)}</span>
             <span className={cn("text-[11px]", on ? "opacity-70" : "text-muted")}>

@@ -39,10 +39,16 @@ export function FiltersShell({ children }: { children: React.ReactNode }) {
         <SheetContent title="فیلترها" side="start" className="w-[90%] max-w-md overflow-y-auto">
           <p className="mb-5 mt-1 text-lg">فیلترها</p>
           <FilterPanel />
+          {/* `shrink-0`, or the declared 48px is not what you get. The sheet is
+              a flex column and the filters inside it are taller than the panel,
+              so flexbox shrank this button to 26.6px — `h-12` sat in the class
+              list looking correct while the primary action of the sheet was
+              barely over half the §3-5 floor. Measured, not guessed; the same
+              trap as `flex-1` collapsing a button on the product page. */}
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="mt-6 h-12 w-full rounded-full bg-cta text-sm text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover"
+            className="mt-6 h-12 w-full shrink-0 rounded-full bg-cta text-sm text-on-cta transition-colors duration-[--dur-feedback] hover:bg-cta-hover"
           >
             دیدن نتیجه‌ها
           </button>

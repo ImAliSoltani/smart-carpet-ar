@@ -625,9 +625,15 @@ function CarpetHeading({ entry, onRemove }: { entry: Entry; onRemove: () => void
         </span>
       </button>
 
+      {/* `min-h-11` with the line centred inside it: the name was a 26px
+          target. The photograph above is a link to the same carpet and is far
+          larger, so this was never a dead end — but a title that wraps to two
+          lines already clears the floor and a one-line one should not be the
+          exception. `content-center` keeps the type where it was rather than
+          pinning it to the top of a taller box. */}
       <Link
         href={`/carpets/${entry.item.slug}`}
-        className="mt-3 block text-[13.5px] leading-[1.9] hover:text-accent"
+        className="mt-3 block min-h-11 content-center text-[13.5px] leading-[1.9] hover:text-accent"
       >
         {entry.item.name}
       </Link>

@@ -176,10 +176,19 @@ export const RangeSlider = React.forwardRef<HTMLDivElement, RangeSliderProps>(
       onValueCommit?.([lo, hi]);
     };
 
+    // 44px of target around a 20px disc — the pattern `corner-toggle` settled:
+    // §3-5's floor is on the area a thumb has to find, not on the area that
+    // gets painted, and a 44px disc on a price track would swallow the
+    // histogram behind it. The ring is put on the disc rather than the button
+    // so focus still outlines the thing the eye is following.
     const thumb =
-      "absolute top-1/2 size-5 -translate-y-1/2 cursor-grab rounded-full " +
-      "border-2 border-ink bg-paper shadow-sm transition-shadow active:cursor-grabbing " +
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
+      "absolute top-1/2 grid size-11 -translate-y-1/2 cursor-grab place-items-center " +
+      "rounded-full active:cursor-grabbing focus-visible:outline-none " +
+      "[&:focus-visible>span]:ring-2 [&:focus-visible>span]:ring-accent " +
+      "[&:focus-visible>span]:ring-offset-2";
+    const thumbDot =
+      "pointer-events-none block size-5 rounded-full border-2 border-ink bg-paper " +
+      "shadow-sm transition-shadow";
 
     return (
       <div ref={ref} className={cn("w-full", className)} {...props}>
@@ -217,7 +226,9 @@ export const RangeSlider = React.forwardRef<HTMLDivElement, RangeSliderProps>(
               // Logical, so the cheapest end sits at the edge the page starts
               // from; the translate centres it and works either way round.
               style={{ insetInlineStart: `${minPercent}%`, translate: "50% 0" }}
-            />
+            >
+              <span aria-hidden className={thumbDot} />
+            </button>
             <button
               type="button"
               role="slider"
@@ -231,7 +242,9 @@ export const RangeSlider = React.forwardRef<HTMLDivElement, RangeSliderProps>(
               onKeyDown={(e) => onKeyDown(e, "max")}
               className={thumb}
               style={{ insetInlineStart: `${maxPercent}%`, translate: "50% 0" }}
-            />
+            >
+              <span aria-hidden className={thumbDot} />
+            </button>
           </div>
         </div>
 

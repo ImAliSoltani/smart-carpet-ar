@@ -60,13 +60,22 @@ const NavigationMenuItem = NavigationMenuPrimitive.Item;
  * from the trailing edge, the same gesture every other link on the site uses,
  * over a surface that fades up underneath it. Both stay put while the entry's
  * panel is open, so the bar always says which panel you are looking at.
+ *
+ * The entry is 44px tall, not the registry's 36px. The bar only renders from
+ * `lg` up, but that breakpoint still catches touchscreen laptops and tablets
+ * held in landscape, where 36px is under the target the roadmap asks for
+ * (§3-5); it is also the height the header's icon buttons already are, so the
+ * row reads as one set of targets rather than two. The rule underneath is
+ * offset against that height so that it sits just under the text — the two are
+ * one measurement, and changing the height without the offset lifts the rule
+ * off the word by half the difference.
  */
 const navigationMenuTriggerStyle = cva(
-  "group relative inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm text-ink-2 " +
+  "group relative inline-flex h-11 w-max items-center justify-center rounded-md px-4 py-2 text-sm text-ink-2 " +
     "transition-[color,background-color] duration-[--dur-feedback] ease-[cubic-bezier(.65,0,.35,1)] " +
     "hover:bg-paper hover:text-ink focus-visible:text-ink " +
     "data-[state=open]:bg-paper data-[state=open]:text-ink " +
-    "after:absolute after:inset-x-4 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink " +
+    "after:absolute after:inset-x-4 after:bottom-2 after:h-px after:origin-right after:scale-x-0 after:bg-ink " +
     "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] " +
     "hover:after:scale-x-100 data-[state=open]:after:scale-x-100 " +
     "disabled:pointer-events-none disabled:opacity-50",

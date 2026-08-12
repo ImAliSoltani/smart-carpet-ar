@@ -457,8 +457,13 @@ export function SiteHeader({
                   href={item.href}
                   className={cn(
                     navigationMenuTriggerStyle(),
-                    "after:absolute after:inset-x-0 after:bottom-1 after:h-px after:origin-right after:scale-x-0 after:bg-ink",
-                    "after:transition-transform after:duration-[450ms] after:ease-[cubic-bezier(.16,1,.3,1)] hover:after:scale-x-100",
+                    // The one thing that differs from the shared style: the rule
+                    // runs the full width of the entry instead of stopping at
+                    // the padding. Its vertical offset and its draw-in are left
+                    // with the shared style, which is measured against the
+                    // entry's height — restating them here is how the underline
+                    // ends up floating off the word the next time that changes.
+                    "after:inset-x-0",
                     pathname === item.href && "text-ink after:scale-x-100",
                   )}
                 >

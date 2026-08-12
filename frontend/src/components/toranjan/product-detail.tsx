@@ -148,12 +148,21 @@ export function ProductDetail({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-5 pb-24 sm:px-8">
-      <nav aria-label="مسیر" className="mb-4 flex items-center gap-1 pt-8 text-sm text-muted">
-        <Link href="/" className="transition-colors duration-[--dur-feedback] hover:text-ink">
+      {/* The two crumbs are 44px of press area around type that has not moved:
+          `min-h-11` on the links, and the row's bottom margin pulled in to give
+          most of the added height back. They were 20px tall. */}
+      <nav aria-label="مسیر" className="-mx-2 mb-1 flex items-center pt-8 text-sm text-muted">
+        <Link
+          href="/"
+          className="inline-flex min-h-11 items-center px-2 transition-colors duration-[--dur-feedback] hover:text-ink"
+        >
           ترنجان
         </Link>
         <ChevronRight className="size-4 rotate-180" />
-        <Link href="/carpets" className="transition-colors duration-[--dur-feedback] hover:text-ink">
+        <Link
+          href="/carpets"
+          className="inline-flex min-h-11 items-center px-2 transition-colors duration-[--dur-feedback] hover:text-ink"
+        >
           فرش‌ها
         </Link>
         <ChevronRight className="size-4 rotate-180" />
@@ -331,23 +340,48 @@ export function ProductDetail({
           )}
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex gap-2">
+          {/* Wraps rather than overflows: the widest carpet in the catalogue
+              has seven images, and seven dots beside «فرش‌های مشابه» do not fit
+              375px on one line. */}
+          <div className="flex flex-wrap items-center justify-between gap-y-3">
+            {/* The dots keep their 8px and the press area around them does not:
+                §3-5's floor is on what a thumb has to hit, not on what gets
+                drawn — the trade `corner-toggle` already made.
+                **Height is the full 44; width is 24.** Seven targets 44 wide
+                would be 308px of dots, which is why the row above has to wrap,
+                and a row of dots spaced 44px apart stops reading as one
+                control. 24px with no gap is the spacing rule instead: no two
+                press areas overlap, the gallery also swipes, and the arrows
+                and the photograph itself reach the same images.
+                `-mx-2` puts the row back where the bare dots used to sit. */}
+            <div className="-mx-2 flex">
               {gallery.map((_, index) => (
                 <button
                   key={index}
                   type="button"
                   onClick={() => goToImage(index)}
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-300",
-                    currentImageIndex === index ? "w-5 bg-ink" : "w-2 bg-ink/25 hover:bg-ink/40",
-                  )}
+                  className="grid h-11 place-items-center px-2"
                   aria-label={`تصویر ${formatNumber(index + 1)}`}
                   aria-current={currentImageIndex === index}
-                />
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "block h-2 rounded-full transition-all duration-300",
+                      currentImageIndex === index ? "w-5 bg-ink" : "w-2 bg-ink/25 hover:bg-ink/40",
+                    )}
+                  />
+                </button>
               ))}
             </div>
-            <Button variant="outline" size="sm" className="gap-2 rounded-full border-line-2" asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              // `h-11`: `size="sm"` is 36px and this is a real action, not a
+              // caption.
+              className="h-11 gap-2 rounded-full border-line-2"
+              asChild
+            >
               <a href="#similar">
                 <Camera className="size-4" /> فرش‌های مشابه
               </a>
@@ -387,7 +421,11 @@ export function ProductDetail({
                       onClick={() => setSelectedId(variant.id)}
                       aria-pressed={on}
                       className={cn(
-                        "rounded-md border px-4 py-2.5 text-sm transition-colors duration-[--dur-feedback]",
+                        // `h-11` rather than the padding's 42px. Two pixels is
+                        // nothing to look at and still under the floor, and
+                        // choosing a size is the one thing this column exists
+                        // for.
+                        "h-11 rounded-md border px-4 text-sm transition-colors duration-[--dur-feedback]",
                         on
                           ? "border-ink bg-cta text-on-cta"
                           : "border-line-2 hover:border-ink hover:bg-bg",
