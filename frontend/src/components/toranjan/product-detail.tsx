@@ -404,10 +404,26 @@ export function ProductDetail({
 
           <div className="my-6 flex flex-col gap-2 sm:flex-row">
             {/* The shop's argument takes the primary slot the component gave to
-                «buy now». Nobody buys a rug they have not seen on their floor. */}
+                «buy now». Nobody buys a rug they have not seen on their floor.
+
+                `w-full sm:flex-1`, never a bare `flex-1`. This row is a column
+                on a phone, and `flex-1` there is `flex-basis: 0` on the
+                *height*: the button collapsed to one line of text — 23px, half
+                the §3-5 floor — while `h-13` sat in the class list doing
+                nothing, because flex-basis wins over `height` on the main axis.
+                It looked right on desktop, where the row is a row and the same
+                declaration governs width. Reported from a phone.
+
+                Gold rather than the near-black `--cta`, matching the heart. */}
             <Button
               size="lg"
-              className="h-13 flex-1 gap-2 rounded-full text-[15px]"
+              className={cn(
+                // 53px, not `h-13`: the cart button beside it takes its height
+                // from padding and a border and lands on 53, and these two are
+                // meant to read as one row.
+                "h-[53px] w-full gap-2 rounded-full text-[15px] sm:flex-1",
+                arReady && "bg-accent text-accent-foreground hover:bg-accent-strong",
+              )}
               disabled={!arReady}
               asChild={arReady}
             >
@@ -421,7 +437,10 @@ export function ProductDetail({
                 </span>
               )}
             </Button>
-            <div className="flex-1">
+            {/* Same `w-full sm:flex-1` for the same reason. This one only ever
+                looked right because the button inside is `w-full` and takes its
+                height from padding, so the collapsing wrapper never showed. */}
+            <div className="w-full sm:flex-1">
               <AddToCart
                 // Out of stock is the one case where the button must not
                 // pretend: the order endpoint would refuse the line anyway.

@@ -47,6 +47,86 @@ import { cn } from "@/lib/utils";
 /** The order the backend reads them in, and the label for each. */
 const CORNER_LABELS = ["بالا چپ", "بالا راست", "پایین راست", "پایین چپ"] as const;
 
+/** Diameter of the magnifier, and how much it enlarges what is on screen. */
+const LOUPE_SIZE = 132;
+const LOUPE_ZOOM = 3;
+/** Gap between the corner and the magnifier, clear of a fingertip. */
+const LOUPE_OFFSET = 40;
+
+/**
+ * The patch of photograph under the finger, shown beside it.
+ *
+ * The thing being placed is exactly the thing a fingertip covers, and on a
+ * phone that makes precise placement guesswork — the same reason photo editors
+ * and erasers put a loupe on screen the moment you touch the canvas. So the
+ * corner is drawn again, enlarged, somewhere the hand is not.
+ *
+ * It is the same file as a background rather than a second `<img>`: the
+ * background box is already a window onto a scaled image, which is all a
+ * magnifier is. Enlargement is relative to the *painted* size, not the source,
+ * because the point is to show more than the screen is showing.
+ *
+ * It flips below the corner when there is no room above, which is what the top
+ * two corners always want.
+ */
+function Loupe({
+  src,
+  corner,
+  imageWidth,
+  imageHeight,
+  frameSize,
+}: {
+  src: string;
+  corner: CornerPoint;
+  imageWidth: number;
+  imageHeight: number;
+  frameSize: { width: number; height: number };
+}) {
+  const px = (corner.x / imageWidth) * frameSize.width;
+  const py = (corner.y / imageHeight) * frameSize.height;
+  const below = py < LOUPE_SIZE + LOUPE_OFFSET;
+
+  // Kept inside the frame horizontally. Centred on a corner that sits on the
+  // image's own edge, half the circle hangs past it — and measured at a narrow
+  // width that was enough to put the whole page into horizontal scroll, which
+  // §3-5 does not allow. Sliding the *box* costs nothing: the background offset
+  // below is written relative to the circle's centre, so the crosshair keeps
+  // pointing at the corner wherever the circle ends up.
+  const half = LOUPE_SIZE / 2;
+  const boxX =
+    frameSize.width < LOUPE_SIZE
+      ? frameSize.width / 2
+      : Math.min(Math.max(px, half), frameSize.width - half);
+
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute z-10 overflow-hidden rounded-full border-2 border-accent/80 bg-black shadow-panel"
+      style={{
+        left: `${boxX}px`,
+        top: `${(corner.y / imageHeight) * 100}%`,
+        width: LOUPE_SIZE,
+        height: LOUPE_SIZE,
+        transform: below
+          ? `translate(-50%, ${LOUPE_OFFSET}px)`
+          : `translate(-50%, calc(-100% - ${LOUPE_OFFSET}px))`,
+        backgroundImage: `url("${src}")`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: `${frameSize.width * LOUPE_ZOOM}px ${frameSize.height * LOUPE_ZOOM}px`,
+        // The corner's magnified position, pulled back to the centre of the
+        // circle — so the middle of the loupe is always the point itself.
+        backgroundPosition: `${-(px * LOUPE_ZOOM - LOUPE_SIZE / 2)}px ${-(py * LOUPE_ZOOM - LOUPE_SIZE / 2)}px`,
+      }}
+    >
+      {/* Without a mark, a magnified patch of weave does not say which pixel is
+          the corner. The crosshair is that answer. */}
+      <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-accent/80" />
+      <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-accent/80" />
+      <span className="absolute left-1/2 top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/90" />
+    </div>
+  );
+}
+
 export interface CornerEditorProps {
   src: string;
   /** Natural size of the source photograph, from `GET …/ar/corners`. */
@@ -70,7 +150,28 @@ export function CornerEditor({
 }: CornerEditorProps) {
   const frameRef = React.useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = React.useState<number | null>(null);
+  const [focused, setFocused] = React.useState<number | null>(null);
   const [announcement, setAnnouncement] = React.useState("");
+
+  // The frame's painted size, kept current by the element itself.
+  //
+  // Placing the handles never needs this — percentages do that — but the
+  // magnifier does: it has to enlarge relative to what is actually on screen,
+  // and «what is on screen» changes with the window, the rail opening, and the
+  // 65vh cap. An observer is the one way to hold this number without it going
+  // stale, and writing state from its callback is a subscription, not an
+  // effect body.
+  const [frameSize, setFrameSize] = React.useState({ width: 0, height: 0 });
+  React.useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const box = entry.contentRect;
+      setFrameSize({ width: box.width, height: box.height });
+    });
+    observer.observe(frame);
+    return () => observer.disconnect();
+  }, []);
 
   const clamp = React.useCallback(
     (point: CornerPoint): CornerPoint => ({
@@ -158,6 +259,10 @@ export function CornerEditor({
     announce(index, next);
   };
 
+  // A drag wins over focus: pressing a handle focuses it too, and the finger is
+  // the one that needs the magnifier pointed at it.
+  const active = dragging ?? focused;
+
   const valid = corners.length === 4;
   const outline = valid
     ? `M${corners.map((c) => `${c.x} ${c.y}`).join("L")}Z`
@@ -237,12 +342,21 @@ export function CornerEditor({
               disabled={disabled}
               aria-label={`گوشه‌ی ${CORNER_LABELS[index]}`}
               onKeyDown={onKeyDown(index)}
+              onFocus={() => setFocused(index)}
+              onBlur={() => setFocused((current) => (current === index ? null : current))}
               onPointerDown={(event) => {
                 if (disabled) return;
                 // Capture first: without it the drag dies the moment the
                 // pointer leaves the 44px button, which is immediately.
                 event.currentTarget.setPointerCapture(event.pointerId);
                 event.preventDefault();
+                // `preventDefault` on `pointerdown` also cancels the default
+                // *focus*, so pressing a handle left it unfocused and the arrow
+                // keys went to the page — «the keyboard does nothing», reported
+                // from a desktop. It cannot simply be dropped: it is what stops
+                // the press selecting text and starting a native image drag.
+                // So focus is asked for explicitly.
+                event.currentTarget.focus();
                 setDragging(index);
                 moveToPointer(index, event.clientX, event.clientY);
               }}
@@ -298,7 +412,24 @@ export function CornerEditor({
               />
             </button>
           ))}
+
+        {/* Shown for whichever corner is being worked on — dragged under a
+            finger, or focused and being nudged by the arrow keys, which is the
+            case that also wanted magnification. */}
+        {valid && !disabled && active !== null && frameSize.width > 0 && (
+          <Loupe
+            src={src}
+            corner={corners[active]}
+            imageWidth={imageWidth}
+            imageHeight={imageHeight}
+            frameSize={frameSize}
+          />
+        )}
       </div>
+
+      <p className="text-[12.5px] leading-relaxed text-muted">
+        هنگام جابه‌جا کردن هر گوشه، همان نقطه بزرگ‌شده کنار انگشت نشان داده می‌شود.
+      </p>
 
       {/* Arrow-key movement has to be spoken; the handle's own label does not
           change, so without this a screen reader user gets silence. */}
