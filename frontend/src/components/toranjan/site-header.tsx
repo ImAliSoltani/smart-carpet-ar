@@ -103,12 +103,38 @@ const DRAWER_LINKS = [
   { href: "/contact", label: "تماس" },
 ];
 
+/**
+ * Two thresholds, not one — and the gap between them is the whole point.
+ *
+ * With a single line at 24px the bar oscillated forever at that exact scroll
+ * position: reproduced at 390px wide, the height flickering between 73 and 77
+ * while `scrollY` bounced 21↔25 with nothing touching the wheel.
+ *
+ * The bar is `sticky`, so it is *in flow*: shrinking it from 78 to 62 takes
+ * 16px out of the page above everything else. The browser's scroll anchoring
+ * sees content above the viewport change size and compensates by moving
+ * `scrollY` to keep the view still — straight back across the 24px line, which
+ * grows the bar, which moves `scrollY` again. The 500ms height transition feeds
+ * it continuously, so it never settles.
+ *
+ * Hysteresis breaks the cycle: it takes 72px of scrolling to shrink and a
+ * return under 24px to grow again. A 48px gap cannot be crossed by a 16px
+ * layout correction, whichever way it goes. `overflow-anchor: none` on the bar
+ * itself is the second half — it tells the browser not to treat this element's
+ * own resize as something to compensate for.
+ */
+const SHRINK_BELOW = 72;
+const GROW_ABOVE = 24;
+
 function useScrolled() {
   const [scrolled, setScrolled] = React.useState(false);
   React.useEffect(() => {
     let ticking = false;
     const apply = () => {
-      setScrolled(window.scrollY > 24);
+      const y = window.scrollY;
+      // Read the previous state rather than a bare comparison: which threshold
+      // applies depends on which way the bar currently is.
+      setScrolled((was) => (was ? y > GROW_ABOVE : y > SHRINK_BELOW));
       ticking = false;
     };
     const onScroll = () => {
@@ -235,6 +261,11 @@ export function SiteHeader({
         // stacked wordmark instead of a rounding error. It falls between a
         // 44px button and the wordmark, so nothing looks crowded for it.
         "sticky top-0 z-50 flex items-center gap-2 bg-bg/85 px-5 backdrop-blur-md sm:gap-4 sm:px-8",
+        // The bar changes its own height, and scroll anchoring answers a size
+        // change above the viewport by moving the scroll position. That is the
+        // other half of the oscillation `useScrolled` describes: excluded here,
+        // the browser stops correcting for this element resizing itself.
+        "[overflow-anchor:none]",
         "border-b border-line transition-[height,box-shadow] duration-500 ease-[cubic-bezier(.16,1,.3,1)]",
         scrolled ? "h-[62px] shadow-[0_10px_30px_-24px_rgba(24,24,27,0.5)]" : "h-[78px]",
       )}

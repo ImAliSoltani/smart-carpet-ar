@@ -12,6 +12,7 @@ import { carpetListQuery } from "@/lib/api/catalog";
 import { mediaUrl } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
 import { COMPARE_LIMIT, useCompare } from "@/lib/store/compare";
+import { cn } from "@/lib/utils";
 
 /**
  * The shortlist, following the reader around.
@@ -28,6 +29,37 @@ import { COMPARE_LIMIT, useCompare } from "@/lib/store/compare";
  * link for the case where somebody wants the empty page, and nothing else needs
  * to: with an empty shortlist there is nothing to go back to.
  */
+/**
+ * Shuts the bar in one press.
+ *
+ * It empties the shortlist, and the label says so rather than only saying
+ * «close»: the bar exists only while there is something in it, so there is no
+ * way to put it away that leaves the list untouched — a dismissed bar with four
+ * carpets still chosen would be a shortlist with nowhere to reach it. Naming it
+ * for both halves is the honest version of the same press.
+ *
+ * Nothing is lost that is expensive to rebuild: the list is four taps, it is
+ * gone at the end of the visit anyway, and each picture removes itself
+ * one at a time for the case where only one is wrong.
+ */
+function CloseTray({ onClose, className }: { onClose: () => void; className?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClose}
+      aria-label="بستن نوار و پاک کردن فهرست مقایسه"
+      title="بستن نوار و پاک کردن فهرست مقایسه"
+      className={cn(
+        "grid size-11 shrink-0 place-items-center rounded-full text-muted",
+        "transition-colors duration-[--dur-feedback] hover:bg-line hover:text-ink",
+        className,
+      )}
+    >
+      <X className="size-4" />
+    </button>
+  );
+}
+
 export function CompareTray() {
   const compare = useCompare();
   const pathname = usePathname();
@@ -73,7 +105,25 @@ export function CompareTray() {
           role="region"
           aria-label="فهرست مقایسه"
         >
-          <div className="mx-auto flex w-full max-w-7xl items-center gap-2 px-5 py-3 sm:gap-5 sm:px-8">
+          {/* Tighter vertical padding on a phone. The strip above the row is
+              44px tall whatever is written in it, because that is the close
+              button's own target size, and a sticky bar 121px deep on an 812px
+              screen is a seventh of it. */}
+          <div className="mx-auto w-full max-w-7xl px-5 py-2 sm:px-8 sm:py-3">
+            {/* A phone gets its own strip for this, because the row below has
+                no room to give: measured at 375, it spends 335px of the 335px
+                it has, so a fifth control does not fit on that line at any
+                size. Height is the axis that is free. The count comes back with
+                it — it was dropped from the row for exactly the same width
+                reason. */}
+            <div className="flex items-center justify-between sm:hidden">
+              <p className="text-xs text-muted">
+                {formatNumber(chosen.length)} فرش برای مقایسه
+              </p>
+              <CloseTray onClose={compare.clear} className="-me-2" />
+            </div>
+
+            <div className="flex items-center gap-2 sm:gap-5">
             {/* The thumbnails are the whole point of the bar: they are what
                 tells someone who has been scrolling for five minutes which four
                 carpets they picked. The empty slots are there for the same
@@ -151,13 +201,11 @@ export function CompareTray() {
             </div>
 
             <div className="flex shrink-0 items-center gap-1.5">
-              <button
-                type="button"
-                onClick={compare.clear}
-                className="hidden h-11 rounded-full px-4 text-[13px] text-muted transition-colors duration-[--dur-feedback] hover:text-ink sm:block"
-              >
-                پاک کردن
-              </button>
+              {/* The same control as the one in the phone's strip above, from
+                  `sm` up where the row can afford it. One definition, two
+                  places it is mounted — the alternative is two crosses that
+                  drift. */}
+              <CloseTray onClose={compare.clear} className="hidden sm:grid" />
               {/* One carpet is a product page, not a comparison. The button
                   stays visible and goes quiet rather than disappearing — a
                   control that vanishes when you remove an item is a control
@@ -181,6 +229,7 @@ export function CompareTray() {
                   مقایسه
                 </Button>
               )}
+            </div>
             </div>
           </div>
         </motion.div>
