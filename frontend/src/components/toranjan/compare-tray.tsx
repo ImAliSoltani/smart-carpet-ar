@@ -80,20 +80,36 @@ export function CompareTray() {
                 reason a shopping list has lines — they say how many more the
                 table will take.
 
-                **Everything but the pictures and the button goes at 375.** Four
-                thumbnails at 56px, a corner cross on each, a count and a «پاک
-                کردن» want 412px of a 375px bar, and the site scrolls sideways —
-                measured, the same failure the wordmark was stacked to fix. So on
-                a phone the discs shrink to 44, the crosses go (the card's own
-                toggle removes a carpet, and the table has a cross per column),
-                the empty slots go, and the count goes with them: four pictures
+                **The picture is the remove control, and that is what fixed the
+                phone.** The cross used to be a 44px target hung off the corner
+                of the thumbnail, and it could only be afforded from `sm` up:
+                measured at 375, this row uses 335px of the 335px it has, so
+                there was no width for a fifth thing — and on a phone the
+                shortlist could be seen but not edited. Moving the target onto
+                the picture costs nothing, because the picture is already 44px
+                and was doing nothing at all. The × is drawn inside its corner
+                as the affordance.
+
+                It retires the old outside-hanging cross with its own recorded
+                bug — an `absolute` child ten pixels past the row counted in
+                `scrollWidth` — and leaves one structure for every width instead
+                of a phone shape and a desktop shape.
+
+                Still gone at 375: the empty slots and the count. Four pictures
                 already say four. */}
             <ul className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               {chosen.map(({ id, carpet }) => {
                 const image = mediaUrl(carpet?.primary_image);
                 return (
-                  <li key={id} className="relative">
-                    <span className="grid size-11 place-items-center overflow-hidden rounded border border-line bg-bg sm:size-16">
+                  <li key={id}>
+                    <button
+                      type="button"
+                      onClick={() => compare.remove(id)}
+                      aria-label={
+                        carpet ? `برداشتن ${carpet.name} از مقایسه` : "برداشتن از مقایسه"
+                      }
+                      className="group relative grid size-11 place-items-center overflow-hidden rounded border border-line bg-bg transition-colors duration-[--dur-feedback] hover:border-cta sm:size-16"
+                    >
                       {image && (
                         <Image
                           src={image}
@@ -103,20 +119,11 @@ export function CompareTray() {
                           className="size-full object-contain p-1"
                         />
                       )}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => compare.remove(id)}
-                      aria-label={
-                        carpet ? `برداشتن ${carpet.name} از مقایسه` : "برداشتن از مقایسه"
-                      }
-                      // 44px of hit area hanging off the corner of a 64px
-                      // thumbnail, with a 20px disc drawn inside it — the same
-                      // trade the card's corner controls make.
-                      className="absolute -end-3 -top-3 hidden size-11 place-items-center sm:grid"
-                    >
-                      <span className="grid size-5 place-items-center rounded-full border border-line bg-paper text-ink-2 shadow-sm transition-colors duration-[--dur-feedback] hover:border-cta hover:bg-cta hover:text-on-cta">
-                        <X className="size-3" />
+                      <span
+                        aria-hidden
+                        className="absolute end-0.5 top-0.5 grid size-4 place-items-center rounded-full border border-line bg-paper text-ink-2 shadow-sm transition-colors duration-[--dur-feedback] group-hover:border-cta group-hover:bg-cta group-hover:text-on-cta sm:size-5"
+                      >
+                        <X className="size-2.5 sm:size-3" />
                       </span>
                     </button>
                   </li>
