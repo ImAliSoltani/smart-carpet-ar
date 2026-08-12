@@ -55,19 +55,18 @@ const STATUS: Record<string, { label: string; className: string; dot: string }> 
     className: "border-status-waiting/35 bg-status-waiting/12 text-status-waiting",
     dot: "bg-status-waiting",
   },
-  // Red, not grey — the same call the carpets table already made for
-  // «غیرفعال»: a size with no AR file is the thing this screen exists to fix,
-  // and grey is what every quiet, settled thing in the panel looks like. It
-  // read as «nothing to see here» while being exactly the opposite.
+  // Grey on purpose, and it was briefly red before being put back.
   //
-  // `failed` is red too, so the two are told apart the way that table tells
-  // «فعال» from «غیرفعال»: a hollow dot for the state that is merely waiting,
-  // a filled one for the state that went wrong. The words differ as well, and
-  // a failure carries its error message underneath.
+  // The argument for red was the carpets table's own — «غیرفعال» is red there
+  // because grey is what every settled thing looks like. It does not carry
+  // here, because on this screen red is already taken: `failed` below is red,
+  // and it means something worse and rarer. Two reds a shade apart make the
+  // list harder to read, not easier — a size that has simply not been built yet
+  // is the ordinary state of most of the catalogue, not a fault.
   missing: {
     label: "ساخته نشده",
-    className: "border-status-cancelled/40 bg-status-cancelled/12 text-status-cancelled",
-    dot: "border border-status-cancelled bg-transparent",
+    className: "border-line-2 bg-white/[0.04] text-muted",
+    dot: "border border-muted bg-transparent",
   },
   failed: {
     label: "شکست خورد",
