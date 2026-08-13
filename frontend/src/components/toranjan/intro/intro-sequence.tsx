@@ -269,7 +269,14 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
           key={scene}
           className={cn(
             "pointer-events-none absolute inset-x-0 bottom-36 px-8 text-center",
-            "text-[clamp(1.25rem,3.6vw,2.25rem)] font-extralight leading-[1.9] text-[#faf9f7]",
+            // Weight 500 at up to 3rem, not 200 at 2.25. Extra-light is an
+            // editorial weight and it needs a quiet page to work on; over a
+            // moving film at a distance it just looked underexposed. This is
+            // still far lighter than the reference the client pointed at
+            // (600–700 at 48px), which belongs to a shouting brand — but the
+            // line now has enough body to be read as a statement rather than a
+            // caption.
+            "text-[clamp(1.5rem,4.2vw,3rem)] font-medium leading-[1.85] text-[#faf9f7]",
             "[text-shadow:0_1px_24px_rgba(7,6,10,.75)]",
             "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3",
             "motion-safe:duration-700",

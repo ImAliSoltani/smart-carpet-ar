@@ -537,6 +537,18 @@ html[data-intro="play"] [data-intro-content] {
   transform: translateY(100%);
 }
 
+/* **Above the film, not behind it.**
+   The sequence is a fixed layer at z-100. Without a stacking position of its
+   own the page slid up *underneath* it and was invisible for the whole
+   journey — then appeared all at once when the film unmounted. The rounded
+   sheet arriving over the carpet is the entire handover, and none of it could
+   be seen. It has to out-rank the layer it is covering. */
+html[data-intro="play"] [data-intro-content],
+html[data-intro="rising"] [data-intro-content] {
+  position: relative;
+  z-index: 110;
+}
+
 /* The rise. 900ms is the top of the entrance band in §3-5 — this is the
    slowest thing on the site and the only one that earns it, because it is the
    moment the entrance hands over. */
