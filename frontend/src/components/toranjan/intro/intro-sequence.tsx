@@ -33,12 +33,29 @@ import { cn } from "@/lib/utils";
  * before this mounts.
  */
 
-const SCENE_LABELS = [
-  "دار قالی در تاریکی",
-  "دست‌های بافنده",
-  "فرش نیمه‌بافته",
-  "نمای درشت از گره‌ها",
-  "فرش کامل زیر نور",
+/**
+ * What each resting scene says.
+ *
+ * The film is the story of a carpet being woven, and the visitor advances it —
+ * so the lines follow the making, not the selling, until the last one. Four
+ * beats of craft, then the promise: material, labour, pattern, time, and only
+ * then what any of it has to do with them. Leading with «ببینید در خانه‌تان» over
+ * a picture of an empty loom would be an advertisement interrupting its own
+ * story.
+ *
+ * The fifth scene carries no line. It is where the wordmark lands, and a slogan
+ * competing with the brand name at the same moment weakens both.
+ *
+ * `label` is what a screen reader hears — it describes the picture, which the
+ * line does not. Someone who cannot see the loom is not served by «هر فرش از
+ * چند تار خالی آغاز می‌شود».
+ */
+const SCENES: { label: string; line: string | null }[] = [
+  { label: "دار قالی در تاریکی", line: "هر فرش، از چند تار خالی آغاز می‌شود." },
+  { label: "دست‌های بافنده", line: "و هزاران گره، که همه با دست بسته می‌شوند." },
+  { label: "فرش نیمه‌بافته", line: "نقش، گره به گره پیدا می‌شود." },
+  { label: "نمای درشت از گره‌ها", line: "در هر سانتی‌متر، ساعت‌ها وقت." },
+  { label: "فرش کامل زیر نور", line: null },
 ];
 
 export function IntroSequence({ onDone }: { onDone: () => void }) {
@@ -46,6 +63,13 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
   const skipRef = React.useRef<HTMLButtonElement>(null);
   const frameRef = React.useRef<HTMLDivElement>(null);
   const engineRef = React.useRef<IntroEngine | null>(null);
+
+  // True from the moment the film is over until the parent unmounts this, which
+  // is the 900ms the shop spends rising over it. During that window the canvas
+  // must stay on screen but must stop behaving like a modal: nothing in here is
+  // reachable any more, and holding focus would strand a keyboard visitor on a
+  // button that is about to disappear.
+  const [closing, setClosing] = React.useState(false);
 
   const [cue, setCue] = React.useState("در حال آماده‌سازی");
   const [chapter, setChapter] = React.useState(0);
@@ -76,6 +100,11 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
         if (finished) return;
         finished = true;
         markIntroSeen();
+        setClosing(true);
+        // Focus is handed back to the document rather than left on a button
+        // inside a layer that is about to be covered and removed. Without this
+        // the next Tab starts from nowhere.
+        skipRef.current?.blur();
         doneRef.current();
       },
     });
@@ -157,8 +186,11 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
       }
     };
 
-    // Focus must not escape behind the curtain while the curtain is up.
+    // Focus must not escape behind the curtain while the curtain is up — and
+    // must be released the moment it starts coming down, or the shop rising
+    // into view cannot be tabbed into.
     const onFocusIn = (e: FocusEvent) => {
+      if (finished) return;
       const frame = frameRef.current;
       if (frame && e.target instanceof Node && !frame.contains(e.target)) {
         skipRef.current?.focus();
@@ -188,13 +220,18 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
     };
   }, []);
 
-  const scene = Math.min(chapter, SCENE_LABELS.length - 1);
+  const scene = Math.min(chapter, SCENES.length - 1);
+  const line = SCENES[scene].line;
 
   return (
     <div
       ref={frameRef}
       role="dialog"
-      aria-modal="true"
+      // Modal only while it is actually in the way. Once the shop is rising
+      // over it this is scenery, and telling a screen reader the page is still
+      // behind a modal would hide the very thing that just arrived.
+      aria-modal={closing ? undefined : "true"}
+      aria-hidden={closing || undefined}
       aria-label="مقدمه‌ی تصویری: بافته شدن فرش"
       className="fixed inset-0 z-[100] overflow-hidden bg-[#07060a]"
     >
@@ -213,8 +250,34 @@ export function IntroSequence({ onDone }: { onDone: () => void }) {
       {/* What a canvas cannot say. Chapters are announced as they land; the
           region is polite so it never interrupts mid-sentence. */}
       <p role="status" aria-live="polite" className="sr-only">
-        {`صحنه‌ی ${formatNumber(scene + 1)} از ${formatNumber(SCENE_LABELS.length)}: ${SCENE_LABELS[scene]}`}
+        {`صحنه‌ی ${formatNumber(scene + 1)} از ${formatNumber(SCENES.length)}: ${SCENES[scene].label}`}
+        {line ? ` — ${line}` : ""}
       </p>
+
+      {/* The line for this scene.
+          Vazirmatn at 200, which is the same face the whole site is set in and
+          a weight it is never otherwise used at — the shop's type is 400 and
+          up. Light and large is what makes it read as a title card rather than
+          as interface, and it costs nothing: the family is loaded as a variable
+          font, so every weight between 100 and 900 is already here.
+
+          Keyed on the scene so React replaces the node instead of editing it,
+          which is what lets each line fade in on its own rather than the words
+          swapping inside a paragraph that never moved. */}
+      {line && (
+        <p
+          key={scene}
+          className={cn(
+            "pointer-events-none absolute inset-x-0 bottom-36 px-8 text-center",
+            "text-[clamp(1.25rem,3.6vw,2.25rem)] font-extralight leading-[1.9] text-[#faf9f7]",
+            "[text-shadow:0_1px_24px_rgba(7,6,10,.75)]",
+            "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-3",
+            "motion-safe:duration-700",
+          )}
+        >
+          {line}
+        </p>
+      )}
 
       <div
         className={cn(

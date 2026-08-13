@@ -19,7 +19,31 @@
  */
 
 export const INTRO_SEEN_KEY = "toranjan.introSeenAt";
-export const INTRO_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * How long «already seen» lasts — and it is a *rest*, not a retirement.
+ *
+ * The brief said 24 hours and that turned out to be the wrong shape once it was
+ * used: coming back the same afternoon, the entrance was simply gone, and a
+ * brand moment that never returns is one the visitor sees exactly once in their
+ * life. What it is actually for is not interrupting the visit in progress —
+ * somebody who bounces between the grid and a product page and the basket
+ * should not be shown the film again on the way.
+ *
+ * Half an hour covers that visit and lets a later one have the film back.
+ */
+export const INTRO_WINDOW_MS = 30 * 60 * 1000;
+
+/**
+ * In development it plays every time, because a thing you are working on has to
+ * be watchable on refresh, and the honest alternative — clearing localStorage
+ * by hand between every reload — is how a rule quietly stops being tested at
+ * all. `?intro=0` is the way to get past it while working on something else.
+ *
+ * `NODE_ENV` is substituted at build time, so the production bundle carries the
+ * literal `false` and none of this reasoning.
+ */
+export const INTRO_ALWAYS_PLAYS = process.env.NODE_ENV !== "production";
 
 /**
  * The same rule as the inline script, for the client component to agree with.
@@ -34,7 +58,9 @@ export function shouldPlayIntro(): boolean {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
 
   const params = new URLSearchParams(window.location.search);
+  if (params.get("intro") === "0") return false;
   if (params.get("intro") === "1") return true;
+  if (INTRO_ALWAYS_PLAYS) return true;
 
   try {
     const seenAt = Number.parseInt(
@@ -78,10 +104,11 @@ export const INTRO_HEAD_SCRIPT = `
   try {
     var d = document.documentElement;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var off = /[?&]intro=0(?:&|$)/.test(location.search);
     var forced = /[?&]intro=1(?:&|$)/.test(location.search);
     var home = location.pathname === '/';
-    if (!home || reduce) { d.setAttribute('data-intro','skip'); return; }
-    if (forced) { d.setAttribute('data-intro','play'); return; }
+    if (!home || reduce || off) { d.setAttribute('data-intro','skip'); return; }
+    if (forced || ${INTRO_ALWAYS_PLAYS}) { d.setAttribute('data-intro','play'); return; }
     var seen = parseInt(localStorage.getItem('${INTRO_SEEN_KEY}') || '0', 10);
     var fresh = seen > 0 && (Date.now() - seen) < ${INTRO_WINDOW_MS};
     d.setAttribute('data-intro', fresh ? 'skip' : 'play');

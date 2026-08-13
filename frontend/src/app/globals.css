@@ -527,7 +527,9 @@
 /* While the film runs nothing behind it scrolls, and the page waits one screen
    below the fold. */
 html[data-intro="play"],
-html[data-intro="play"] body {
+html[data-intro="play"] body,
+html[data-intro="rising"],
+html[data-intro="rising"] body {
   overflow: hidden;
 }
 
@@ -539,7 +541,30 @@ html[data-intro="play"] [data-intro-content] {
    slowest thing on the site and the only one that earns it, because it is the
    moment the entrance hands over. */
 [data-intro-content] {
-  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* **The shop arrives as a sheet, not as a wipe.**
+   While it is travelling it has rounded top corners, its own ground, and a
+   shadow cast upward onto the film — so it reads as an object sliding over the
+   dark, with the finished carpet still visible behind its corners. A full-bleed
+   rectangle sliding up is a scene change; this is a thing arriving.
+
+   The corners flatten as it lands, because a page permanently rounded at the
+   top would show the void behind it the moment anybody scrolled.
+
+   `overflow: hidden` is the one thing that must not outlive this state — it
+   makes the element a scrollport and silently kills `position: sticky` for the
+   header and the compare tray, which this repository has already paid for
+   twice. It is safe *here* precisely because nothing scrolls during the rise:
+   the body is still locked. `done` drops it. */
+html[data-intro="rising"] [data-intro-content] {
+  border-radius: 28px 28px 0 0;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 -30px 80px -24px rgba(7, 6, 10, 0.65);
 }
 
 /* Reduced motion never reaches the film — the gate skips it outright — but the

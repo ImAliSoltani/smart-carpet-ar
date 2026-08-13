@@ -30,6 +30,9 @@ import { IntroSequence } from "./intro-sequence";
 // sanctioned way to read something like that without lying to hydration: the
 // server snapshot is always `false`, so the server and the first client render
 // agree, and the truth arrives immediately after.
+/** Must match the transform transition in `globals.css`. */
+const RISE_MS = 900;
+
 const listeners = new Set<() => void>();
 
 function subscribe(listener: () => void) {
@@ -40,17 +43,34 @@ function subscribe(listener: () => void) {
 }
 
 function readPlaying() {
-  return document.documentElement.getAttribute("data-intro") === "play";
+  // `rising` counts. The shop travels up *over* the film, so the last frame has
+  // to still be on screen behind it for those 900ms — unmounting the canvas the
+  // moment the film ends would raise the card over a blank rectangle and lose
+  // the one shot the whole sequence was building towards.
+  const state = document.documentElement.getAttribute("data-intro");
+  return state === "play" || state === "rising";
 }
 
 export function IntroCurtain({ children }: { children: React.ReactNode }) {
   const playing = React.useSyncExternalStore(subscribe, readPlaying, () => false);
 
   const finish = React.useCallback(() => {
-    // `done` rather than removing the attribute: the stylesheet transitions the
-    // page up from this state, and a missing attribute would snap it instead.
-    document.documentElement.setAttribute("data-intro", "done");
+    // Two states, not one. `rising` is the 900ms the shop spends travelling up
+    // over the film: rounded at the top, on its own ground, casting a shadow
+    // down onto the dark — an object arriving rather than a wipe. `done` is
+    // afterwards, and it is what takes the rounding and the clipping back off.
+    //
+    // The clipping in particular must not outlive the journey: it makes the
+    // element a scrollport and kills `sticky` for the header and the tray. It
+    // is only safe while nothing scrolls, which is exactly this window.
+    const html = document.documentElement;
+    html.setAttribute("data-intro", "rising");
     listeners.forEach((l) => l());
+
+    window.setTimeout(() => {
+      html.setAttribute("data-intro", "done");
+      listeners.forEach((l) => l());
+    }, RISE_MS);
   }, []);
 
   return (
