@@ -516,6 +516,40 @@
   --font-figure: var(--font-lat-body), sans-serif;
 }
 
+/* ============================================================
+   THE CINEMATIC ENTRANCE
+   The page is held down and lifted by CSS rather than by React, because the
+   attribute these rules read is stamped on <html> by a blocking script before
+   the first paint. React only arrives after hydration — too late to stop the
+   shop being seen and then covered. See `intro-curtain.tsx`.
+   ============================================================ */
+
+/* While the film runs nothing behind it scrolls, and the page waits one screen
+   below the fold. */
+html[data-intro="play"],
+html[data-intro="play"] body {
+  overflow: hidden;
+}
+
+html[data-intro="play"] [data-intro-content] {
+  transform: translateY(100%);
+}
+
+/* The rise. 900ms is the top of the entrance band in §3-5 — this is the
+   slowest thing on the site and the only one that earns it, because it is the
+   moment the entrance hands over. */
+[data-intro-content] {
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reduced motion never reaches the film — the gate skips it outright — but the
+   curtain is a transform on the whole page and has to answer for itself. */
+@media (prefers-reduced-motion: reduce) {
+  [data-intro-content] {
+    transition: none;
+  }
+}
+
 body {
   background: var(--bg);
   color: var(--ink);

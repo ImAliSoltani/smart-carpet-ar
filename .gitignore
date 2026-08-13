@@ -21,6 +21,11 @@ npm-debug.log*
 data/
 assets/
 docs/prototypes/**/frames/
+# The intro's frame sets — hundreds of files and tens of megabytes, rebuilt
+# from the film in `assets/` by `backend/scripts/extract_intro_frames.py`.
+# Derived, reproducible, and far too heavy for git; deployment ships them as
+# static files like any other asset.
+frontend/public/intro/
 *.glb
 *.usdz
 models/weights/

@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/toranjan/site-header";
 import { SiteFooter } from "@/components/toranjan/site-footer";
 import { CompareTray } from "@/components/toranjan/compare-tray";
+import { IntroCurtain } from "@/components/toranjan/intro/intro-curtain";
 
 /**
  * The shop's chrome.
@@ -14,7 +15,14 @@ import { CompareTray } from "@/components/toranjan/compare-tray";
  */
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    // The entrance wraps the shop's chrome, not just the page: the curtain that
+    // rises is the whole storefront — header included — coming up over the dark
+    // film. Wrapping only the page body would raise the content and leave the
+    // header sitting on top of the film the entire time.
+    //
+    // It draws nothing anywhere but «/», and the head script settles that
+    // before the first paint.
+    <IntroCurtain>
       <SiteHeader />
       {children}
       <SiteFooter />
@@ -22,6 +30,6 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           filled on one page and read on another. It draws nothing until
           something is in it. */}
       <CompareTray />
-    </>
+    </IntroCurtain>
   );
 }
