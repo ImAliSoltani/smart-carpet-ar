@@ -140,6 +140,59 @@ def main() -> None:
     print("\nPSNR compares each encode with the resized source frame.")
     print("Equal PSNR at a smaller size means the same picture in fewer bytes.")
 
+    prune(out_root, count)
+
+
+# The five frames the sequence is allowed to rest on. Kept here as well as in
+# the page because this script is what decides which files survive, and a prune
+# that disagreed with the player would delete frames it then asks for.
+STOPS = (0, 38, 75, 105, 136)
+
+
+def prune(out_root: Path, count: int) -> None:
+    """Delete what the page will never ask for.
+
+    The four sets above are produced so the encodes can be *compared* — that is
+    the point of measuring PSNR. What actually ships is narrower, and leaving
+    the rest behind means carrying tens of megabytes to a server to serve none
+    of it.
+
+    Two rules, both taken from how the player fetches:
+
+    - In hybrid mode — every browser that decodes AVIF, which is all of them
+      that matter now — the five resting frames come from `avif-*` and all 132
+      others come from `motion-*`. So the AVIF sets need those five files and
+      nothing else.
+    - The WebP sets exist only for a browser too old for AVIF. That is a rare
+      visitor and one width serves them; `webp-1920` is the single largest
+      folder produced and would be downloaded by almost nobody.
+    """
+    freed = 0
+    kept = 0
+
+    for folder in out_root.glob("avif-*"):
+        for path in folder.glob("f-*"):
+            index = int(path.stem.split("-")[1])
+            if index in STOPS:
+                kept += 1
+                continue
+            freed += path.stat().st_size
+            path.unlink()
+
+    wide = out_root / "webp-1920"
+    if wide.is_dir():
+        for path in wide.glob("f-*"):
+            freed += path.stat().st_size
+            path.unlink()
+        wide.rmdir()
+
+    remaining = sum(p.stat().st_size for p in out_root.rglob("f-*"))
+    print(
+        f"\npruned {freed / 1_048_576:.1f} MB the page never requests "
+        f"({kept} resting frames kept per AVIF set, webp-1920 dropped)"
+    )
+    print(f"shipping {remaining / 1_048_576:.1f} MB across {len(list(out_root.rglob('f-*')))} files")
+
 
 if __name__ == "__main__":
     main()

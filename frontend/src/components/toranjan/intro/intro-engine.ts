@@ -133,7 +133,13 @@ export class IntroEngine {
       // just under a laptop and just over the widest phone.
       this.motionSet = need > 1000 ? "motion-1280" : "motion-960";
     } else {
-      this.set = `webp-${width}`;
+      // One width for the fallback, deliberately. This path is only reached by
+      // a browser too old to decode AVIF, and it fetches all 137 frames because
+      // there is no motion set to pair it with — so a second width would be the
+      // largest folder built for the smallest audience. `webp-1920` is not
+      // shipped at all; the prune step in `extract_intro_frames.py` deletes it,
+      // and asking for it here would be asking for a 404.
+      this.set = "webp-1280";
       this.ext = ".webp";
       this.motionSet = null;
     }

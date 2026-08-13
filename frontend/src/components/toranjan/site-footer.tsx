@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ReplayIntro } from "@/components/toranjan/intro/replay-intro";
 import { contactChannels } from "@/lib/content/contact";
 
 /**
@@ -107,10 +108,17 @@ export function SiteFooter() {
           </ul>
         )}
 
-        <p className="mt-10 border-t border-line pt-6 text-[12px] leading-loose text-muted">
-          ترنجان — پروژه‌ی پایانی کارشناسی. کاتالوگ این نسخه برای نمایش و ارزیابی سامانه
-          است، نه فروش.
-        </p>
+        <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[12px] leading-loose text-muted">
+            ترنجان — پروژه‌ی پایانی کارشناسی. کاتالوگ این نسخه برای نمایش و ارزیابی سامانه
+            است، نه فروش.
+          </p>
+          {/* The end of the shop is where this belongs: somebody who has reached
+              the bottom of the page has already been given everything else, and
+              the entrance is the one thing on the site with no other door to
+              it. */}
+          <ReplayIntro className="inline-flex h-11 shrink-0 items-center gap-2 self-start rounded-full border border-line-2 px-4 text-[12.5px] text-muted transition-colors duration-[--dur-feedback] hover:border-line hover:text-ink sm:self-auto" />
+        </div>
       </div>
     </footer>
   );
