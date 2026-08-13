@@ -62,16 +62,12 @@ export default function RootLayout({
       dir="rtl"
       className={`${vazirmatn.variable} ${playfair.variable} ${inter.variable} h-full antialiased`}
     >
-      <head>
-        {/* Satoshi carries latin figures only. It is not on Google Fonts, so it
-            comes from Fontshare for now; self-hosting it subset to digits is a
-            task of its own before deployment. */}
-        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
-        />
-      </head>
+      {/* No <head> of our own any more. It held one thing: a render-blocking
+          stylesheet on api.fontshare.com for Satoshi, which set latin figures
+          in about eight places. A third-party origin on the critical rendering
+          path is a poor trade for eight tracking codes and a phone number — and
+          self-hosting it instead turned out not to be ours to do. See the note
+          over `--font-figure` in globals.css. */}
       {/* The document, the fonts and the query client — everything both the shop
           and the panel need. The shop's own chrome moved down into `(shop)`,
           because it was reaching places it had no business being: the admin

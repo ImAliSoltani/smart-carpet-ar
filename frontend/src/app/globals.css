@@ -488,14 +488,32 @@
   --font-sans: var(--font-fa), system-ui, sans-serif;
   --font-display: var(--font-lat-display), serif;
   --font-label: var(--font-lat-body), sans-serif;
-  /* LATIN FIGURES ONLY. Satoshi is subset to its digit glyphs (۰-۹ are not
-     among them) and Inter behind it has no Persian figures either, so a
-     Persian number wearing `font-figure` falls through both to whatever
-     generic sans the machine happens to have — which is visibly not the face
-     the rest of the page is set in. It cost the cart page its prices once.
-     Anything printed by `formatNumber`/`formatToman` is Persian and belongs
-     in Vazirmatn, i.e. no font class at all. */
-  --font-figure: "Satoshi", var(--font-lat-body), sans-serif;
+  /* LATIN FIGURES ONLY. Inter has no Persian figures, so a Persian number
+     wearing `font-figure` falls through to whatever generic sans the machine
+     happens to have — visibly not the face the rest of the page is set in. It
+     cost the cart page its prices once. Anything printed by
+     `formatNumber`/`formatToman` is Persian and belongs in Vazirmatn, i.e. no
+     font class at all.
+
+     Satoshi used to sit in front of Inter here, loaded from Fontshare's CDN by
+     a render-blocking <link> in the document head. It is gone, and not for
+     performance — **the licence does not allow what closing that debt
+     required.** The ITF Free Font Licence forbids modifying the font software
+     ("you cannot modify, make changes or reverse engineer the original font
+     software"), which is exactly what subsetting it is; and it forbids
+     redistributing the files ("may not ... be distributed, duplicated ...
+     including ... uploading"), which is what committing a woff2 to this
+     repository would be. The licence names the API link as its intended web
+     delivery — "delivered directly from the servers used by Indian Type
+     Foundry ... without the Licensee having to download the Font Software" —
+     so the only two lawful options were «keep the third-party request» or
+     «drop the face». Eight tracking codes are not worth an external origin on
+     the critical rendering path, so: Inter, which is already self-hosted by
+     next/font and was already the fallback behind it.
+
+     If Satoshi's exact digits are ever wanted back, the lawful way is the
+     Fontshare <link> in `layout.tsx` — not a file in this repository. */
+  --font-figure: var(--font-lat-body), sans-serif;
 }
 
 body {

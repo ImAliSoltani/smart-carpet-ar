@@ -121,7 +121,7 @@ function FaqRow({
     };
   }, [ref, open]);
 
-  // Persian figures, so no `font-figure` — Satoshi is subset to latin digits
+  // Persian figures, so no `font-figure` — that face carries latin digits only
   // and a Persian one wearing that class falls through to the system face.
   // Padded to two so the column stays a column past the ninth question.
   const marker = formatNumber(index + 1).padStart(2, "۰");
