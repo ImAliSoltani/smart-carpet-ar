@@ -407,6 +407,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/room/adviser": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Room Adviser
+         * @description عکس اتاق → فرش‌هایی که به آن می‌آیند، با دلیل هر کدام.
+         *
+         *     Shares its first half with the size guide — the same depth, the same floor
+         *     mask — and then asks a different question of it. That one measures the floor
+         *     and answers «چه اندازه‌ای»; this one reads the colours on either side of the
+         *     same mask and answers «کدام فرش». Both are deliberately separate endpoints:
+         *     a shopper who wants a size does not want to wait for a ranking, and the two
+         *     answers belong on different pages.
+         */
+        post: operations["room_adviser_api_v1_room_adviser_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/room/size-guide": {
         parameters: {
             query?: never;
@@ -684,6 +711,11 @@ export interface components {
             /** Width Cm */
             width_cm: number;
         };
+        /** Body_room_adviser_api_v1_room_adviser_post */
+        Body_room_adviser_api_v1_room_adviser_post: {
+            /** Image */
+            image: string;
+        };
         /** Body_size_guide_api_v1_room_size_guide_post */
         Body_size_guide_api_v1_room_size_guide_post: {
             /** Image */
@@ -698,6 +730,25 @@ export interface components {
         Body_visual_search_api_v1_search_visual_post: {
             /** Image */
             image: string;
+        };
+        /** CarpetAdvice */
+        CarpetAdvice: {
+            carpet: components["schemas"]["CarpetListItem"];
+            /**
+             * Caution
+             * @description اگر نکته‌ای هست که خریدار باید بداند، جدا از دلایل
+             */
+            caution?: string | null;
+            /**
+             * Reasons
+             * @description چرا این فرش به این اتاق می‌آید، هر قاعده یک جمله
+             */
+            reasons?: string[];
+            /**
+             * Score
+             * @description مجموع امتیاز قواعد؛ فقط برای مرتب‌سازی معنا دارد
+             */
+            score: number;
         };
         /** CarpetCreate */
         CarpetCreate: {
@@ -999,6 +1050,56 @@ export interface components {
             page_size: number;
             /** Total */
             total: number;
+        };
+        /**
+         * RoomAdviserResponse
+         * @description One room photo, and the carpets that suit it with the reason for each.
+         */
+        RoomAdviserResponse: {
+            /**
+             * Confidence
+             * @description ۰ تا ۱؛ اطمینان تشخیص کف. زیر ۰٫۴ یعنی خواندنِ رنگ‌ها هم مطمئن نیست
+             */
+            confidence: number;
+            reading: components["schemas"]["RoomReading"];
+            /** Suggestions */
+            suggestions?: components["schemas"]["CarpetAdvice"][];
+        };
+        /**
+         * RoomReading
+         * @description What the photograph said about the room, before any carpet is proposed.
+         *
+         *     Returned to the shopper rather than kept behind the ranking, because the
+         *     advice below rests on it: somebody who disagrees with «اتاق شما کم‌رنگ است»
+         *     should be able to see that premise and stop reading, instead of wondering
+         *     why the shop keeps offering them red.
+         */
+        RoomReading: {
+            /**
+             * Colourfulness
+             * @description ۰ تا ۱؛ چقدر از اتاق رنگِ نام‌بردنی دارد
+             */
+            colourfulness: number;
+            /**
+             * Floor Colors
+             * @description رنگ‌های غالب کفِ فعلی اتاق
+             */
+            floor_colors?: components["schemas"]["ColorFamily"][];
+            /**
+             * Lightness
+             * @description ۰ تا ۱؛ روشنایی کلی اتاق بدون کف
+             */
+            lightness: number;
+            /**
+             * Room Colors
+             * @description رنگ‌های غالب دیوارها و مبلمان
+             */
+            room_colors?: components["schemas"]["ColorFamily"][];
+            /**
+             * Warmth
+             * @description warm | cool | neutral
+             */
+            warmth: string;
         };
         /**
          * RoomType
@@ -1992,6 +2093,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    room_adviser_api_v1_room_adviser_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_room_adviser_api_v1_room_adviser_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomAdviserResponse"];
                 };
             };
             /** @description Validation Error */

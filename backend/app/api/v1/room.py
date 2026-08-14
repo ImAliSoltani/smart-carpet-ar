@@ -5,10 +5,20 @@ from fastapi import APIRouter, HTTPException, UploadFile
 
 from app.api.deps import DbSession
 from app.core.config import get_settings
+from app.room.adviser import advise
 from app.room.compose import RoomAnalysisError, analyze_room
+from app.room.palette import read_palette
 from app.room.scale import find_a4_scale
 from app.room.sizing import measure_free_floor, sizes_that_fit
-from app.schemas.room import ScaleReferenceOut, SizeGuideResponse, SizeSuggestion
+from app.schemas.catalog import CatalogFilters
+from app.schemas.room import (
+    CarpetAdvice,
+    RoomAdviserResponse,
+    RoomReading,
+    ScaleReferenceOut,
+    SizeGuideResponse,
+    SizeSuggestion,
+)
 from app.services import catalog as catalog_service
 from app.services.images import InvalidImageError, load_image
 
@@ -26,6 +36,11 @@ MAX_EDGE_PX = 900
 # trivially and is a different decision, made on the listing page with the size
 # filter these chips link to.
 MAX_SUGGESTIONS = 6
+
+# How many carpets the adviser proposes. Fewer than a listing page on purpose:
+# every one of these carries a sentence explaining itself, and a wall of thirty
+# justified recommendations is read as none.
+MAX_ADVICE = 8
 
 
 @router.post("/room/size-guide", response_model=SizeGuideResponse)
@@ -89,5 +104,70 @@ async def size_guide(session: DbSession, image: UploadFile) -> SizeGuideResponse
         recommended=[
             SizeSuggestion(width_cm=w, length_cm=length, carpet_count=counts[(w, length)])
             for w, length in fitting[:MAX_SUGGESTIONS]
+        ],
+    )
+
+
+@router.post("/room/adviser", response_model=RoomAdviserResponse)
+async def room_adviser(session: DbSession, image: UploadFile) -> RoomAdviserResponse:
+    """عکس اتاق → فرش‌هایی که به آن می‌آیند، با دلیل هر کدام.
+
+    Shares its first half with the size guide — the same depth, the same floor
+    mask — and then asks a different question of it. That one measures the floor
+    and answers «چه اندازه‌ای»; this one reads the colours on either side of the
+    same mask and answers «کدام فرش». Both are deliberately separate endpoints:
+    a shopper who wants a size does not want to wait for a ranking, and the two
+    answers belong on different pages.
+    """
+    data = await image.read()
+    if len(data) > get_settings().max_upload_mb * 1024 * 1024:
+        raise HTTPException(413, detail="حجم تصویر بیش از حد مجاز است")
+    try:
+        photo = load_image(data).convert("RGB")
+    except InvalidImageError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+
+    photo.thumbnail((MAX_EDGE_PX, MAX_EDGE_PX))
+
+    def read():
+        scene = analyze_room(photo)
+        return scene, read_palette(scene.image, scene.floor_mask)
+
+    try:
+        scene, palette = await anyio.to_thread.run_sync(read)
+    except RoomAnalysisError as exc:
+        raise HTTPException(422, detail=str(exc)) from exc
+
+    carpets, _ = await catalog_service.list_carpets(
+        session, CatalogFilters(page_size=60)
+    )
+
+    scored = []
+    for carpet in carpets:
+        advice = advise(list(carpet.color_families), palette)
+        # A carpet the rules had nothing to say about is not a recommendation.
+        # Padding the list to a round number with silent entries is how «چرا
+        # این فرش؟» stops being answerable.
+        if advice.reasons:
+            scored.append((carpet, advice))
+    scored.sort(key=lambda pair: pair[1].score, reverse=True)
+
+    return RoomAdviserResponse(
+        confidence=scene.confidence,
+        reading=RoomReading(
+            floor_colors=palette.floor.families,
+            room_colors=palette.room.families,
+            colourfulness=round(palette.colourfulness, 3),
+            lightness=round(palette.lightness, 3),
+            warmth=palette.warmth,
+        ),
+        suggestions=[
+            CarpetAdvice(
+                carpet=carpet,
+                score=round(advice.score, 3),
+                reasons=advice.reasons,
+                caution=advice.caution,
+            )
+            for carpet, advice in scored[:MAX_ADVICE]
         ],
     )

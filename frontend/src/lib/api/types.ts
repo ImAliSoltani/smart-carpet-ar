@@ -20,6 +20,8 @@ export type ImageOut = Schemas["ImageOut"];
 export type SimilarItem = Schemas["SimilarItem"];
 export type VisualSearchResponse = Schemas["VisualSearchResponse"];
 export type SizeGuideResponse = Schemas["SizeGuideResponse"];
+export type RoomAdviserResponse = Schemas["RoomAdviserResponse"];
+export type CarpetAdvice = Schemas["CarpetAdvice"];
 export type ConversationalSearchResponse = Schemas["ConversationalSearchResponse"];
 export type SizeSuggestion = Schemas["SizeSuggestion"];
 

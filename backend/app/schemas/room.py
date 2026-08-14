@@ -2,6 +2,9 @@
 
 from pydantic import BaseModel, Field
 
+from app.models.enums import ColorFamily
+from app.schemas.catalog import CarpetListItem
+
 
 class ScaleReferenceOut(BaseModel):
     """What the A4 sheet in the photo said about its scale."""
@@ -40,3 +43,44 @@ class SizeGuideResponse(BaseModel):
         default_factory=list,
         description="بزرگ‌ترین اندازه‌های موجود که در این محدوده جا می‌شوند، حداکثر شش تا",
     )
+
+
+class RoomReading(BaseModel):
+    """What the photograph said about the room, before any carpet is proposed.
+
+    Returned to the shopper rather than kept behind the ranking, because the
+    advice below rests on it: somebody who disagrees with «اتاق شما کم‌رنگ است»
+    should be able to see that premise and stop reading, instead of wondering
+    why the shop keeps offering them red.
+    """
+
+    floor_colors: list[ColorFamily] = Field(
+        default_factory=list, description="رنگ‌های غالب کفِ فعلی اتاق"
+    )
+    room_colors: list[ColorFamily] = Field(
+        default_factory=list, description="رنگ‌های غالب دیوارها و مبلمان"
+    )
+    colourfulness: float = Field(description="۰ تا ۱؛ چقدر از اتاق رنگِ نام‌بردنی دارد")
+    lightness: float = Field(description="۰ تا ۱؛ روشنایی کلی اتاق بدون کف")
+    warmth: str = Field(description="warm | cool | neutral")
+
+
+class CarpetAdvice(BaseModel):
+    carpet: CarpetListItem
+    score: float = Field(description="مجموع امتیاز قواعد؛ فقط برای مرتب‌سازی معنا دارد")
+    reasons: list[str] = Field(
+        default_factory=list, description="چرا این فرش به این اتاق می‌آید، هر قاعده یک جمله"
+    )
+    caution: str | None = Field(
+        default=None, description="اگر نکته‌ای هست که خریدار باید بداند، جدا از دلایل"
+    )
+
+
+class RoomAdviserResponse(BaseModel):
+    """One room photo, and the carpets that suit it with the reason for each."""
+
+    confidence: float = Field(
+        description="۰ تا ۱؛ اطمینان تشخیص کف. زیر ۰٫۴ یعنی خواندنِ رنگ‌ها هم مطمئن نیست"
+    )
+    reading: RoomReading
+    suggestions: list[CarpetAdvice] = Field(default_factory=list)

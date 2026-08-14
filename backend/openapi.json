@@ -473,6 +473,20 @@
         "title": "ArVariantStatus",
         "type": "object"
       },
+      "Body_room_adviser_api_v1_room_adviser_post": {
+        "properties": {
+          "image": {
+            "contentMediaType": "application/octet-stream",
+            "title": "Image",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image"
+        ],
+        "title": "Body_room_adviser_api_v1_room_adviser_post",
+        "type": "object"
+      },
       "Body_size_guide_api_v1_room_size_guide_post": {
         "properties": {
           "image": {
@@ -513,6 +527,44 @@
           "image"
         ],
         "title": "Body_visual_search_api_v1_search_visual_post",
+        "type": "object"
+      },
+      "CarpetAdvice": {
+        "properties": {
+          "carpet": {
+            "$ref": "#/components/schemas/CarpetListItem"
+          },
+          "caution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "اگر نکته‌ای هست که خریدار باید بداند، جدا از دلایل",
+            "title": "Caution"
+          },
+          "reasons": {
+            "description": "چرا این فرش به این اتاق می‌آید، هر قاعده یک جمله",
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "score": {
+            "description": "مجموع امتیاز قواعد؛ فقط برای مرتب‌سازی معنا دارد",
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "carpet",
+          "score"
+        ],
+        "title": "CarpetAdvice",
         "type": "object"
       },
       "CarpetCreate": {
@@ -1396,6 +1448,75 @@
           "page_size"
         ],
         "title": "Page[CarpetListItem]",
+        "type": "object"
+      },
+      "RoomAdviserResponse": {
+        "description": "One room photo, and the carpets that suit it with the reason for each.",
+        "properties": {
+          "confidence": {
+            "description": "۰ تا ۱؛ اطمینان تشخیص کف. زیر ۰٫۴ یعنی خواندنِ رنگ‌ها هم مطمئن نیست",
+            "title": "Confidence",
+            "type": "number"
+          },
+          "reading": {
+            "$ref": "#/components/schemas/RoomReading"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/CarpetAdvice"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "confidence",
+          "reading"
+        ],
+        "title": "RoomAdviserResponse",
+        "type": "object"
+      },
+      "RoomReading": {
+        "description": "What the photograph said about the room, before any carpet is proposed.\n\nReturned to the shopper rather than kept behind the ranking, because the\nadvice below rests on it: somebody who disagrees with «اتاق شما کم‌رنگ است»\nshould be able to see that premise and stop reading, instead of wondering\nwhy the shop keeps offering them red.",
+        "properties": {
+          "colourfulness": {
+            "description": "۰ تا ۱؛ چقدر از اتاق رنگِ نام‌بردنی دارد",
+            "title": "Colourfulness",
+            "type": "number"
+          },
+          "floor_colors": {
+            "description": "رنگ‌های غالب کفِ فعلی اتاق",
+            "items": {
+              "$ref": "#/components/schemas/ColorFamily"
+            },
+            "title": "Floor Colors",
+            "type": "array"
+          },
+          "lightness": {
+            "description": "۰ تا ۱؛ روشنایی کلی اتاق بدون کف",
+            "title": "Lightness",
+            "type": "number"
+          },
+          "room_colors": {
+            "description": "رنگ‌های غالب دیوارها و مبلمان",
+            "items": {
+              "$ref": "#/components/schemas/ColorFamily"
+            },
+            "title": "Room Colors",
+            "type": "array"
+          },
+          "warmth": {
+            "description": "warm | cool | neutral",
+            "title": "Warmth",
+            "type": "string"
+          }
+        },
+        "required": [
+          "colourfulness",
+          "lightness",
+          "warmth"
+        ],
+        "title": "RoomReading",
         "type": "object"
       },
       "RoomType": {
@@ -3439,6 +3560,48 @@
         "summary": "Track Order",
         "tags": [
           "orders"
+        ]
+      }
+    },
+    "/api/v1/room/adviser": {
+      "post": {
+        "description": "عکس اتاق → فرش‌هایی که به آن می‌آیند، با دلیل هر کدام.\n\nShares its first half with the size guide — the same depth, the same floor\nmask — and then asks a different question of it. That one measures the floor\nand answers «چه اندازه‌ای»; this one reads the colours on either side of the\nsame mask and answers «کدام فرش». Both are deliberately separate endpoints:\na shopper who wants a size does not want to wait for a ranking, and the two\nanswers belong on different pages.",
+        "operationId": "room_adviser_api_v1_room_adviser_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_room_adviser_api_v1_room_adviser_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomAdviserResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Room Adviser",
+        "tags": [
+          "room"
         ]
       }
     },
