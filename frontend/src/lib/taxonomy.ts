@@ -146,6 +146,65 @@ export const NAV_ROOMS: RoomType[] = [
 ];
 
 /**
+ * Colour, for the filter panel only — never for the navigation menu.
+ *
+ * A menu entry promises a collection («فرش‌های ابریشم»), and «فرش‌های طوسی» is
+ * not one: colour describes a photograph, not a category the shop is organised
+ * by. In the filter panel it is the opposite — colour is often the only thing
+ * a visitor can say about the carpet they have in mind.
+ *
+ * Ordered by how much of the catalogue each family covers, counted rather than
+ * guessed, like the lists above. All thirteen are listed because the chip row
+ * drops whatever the facet does not count, so a family the shop has none of
+ * simply never draws.
+ */
+export const FILTER_COLORS: ColorFamily[] = [
+  "red",
+  "cream",
+  "gray",
+  "brown",
+  "white",
+  "blue",
+  "orange",
+  "green",
+  "turquoise",
+  "gold",
+  "pink",
+  "purple",
+  "black",
+];
+
+/**
+ * One swatch per family, because on this filter the word is not enough.
+ *
+ * Every other chip row is fully described by its label — «ابریشم» leaves
+ * nothing to picture. Colour is the one where the name is a poor stand-in for
+ * the thing, and where two shoppers reading «طلایی» do not picture the same
+ * colour. So each chip carries a dot.
+ *
+ * These are **not** the colours in `Carpet.colors`. Those are read off one
+ * photograph and are that carpet's own; these stand for the whole family, and
+ * are chosen where the family sits in a carpet rather than where it sits on a
+ * colour wheel — «سرمه‌ای» is a navy ground, not a mid blue, and «نخودی» is
+ * the ivory of a Ghom field.
+ */
+export const COLOR_SWATCH: Record<ColorFamily, string> = {
+  red: "#9b2226",
+  pink: "#c2547e",
+  orange: "#c2612b",
+  gold: "#c99a2e",
+  cream: "#e8dcc4",
+  brown: "#6b4a2f",
+  green: "#3e6b4a",
+  turquoise: "#3e9aa3",
+  blue: "#23346b",
+  purple: "#6b4a80",
+  gray: "#8a8a90",
+  black: "#2a2a2e",
+  white: "#f4f4f2",
+};
+
+/**
  * Origin is deliberately absent from the navigation.
  *
  * The column mixes weaving cities with the names of the shop the demo rows were

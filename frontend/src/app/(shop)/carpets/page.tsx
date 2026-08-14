@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 
 import { CarpetGrid } from "./carpet-grid";
 import { FiltersShell } from "./filters-shell";
-import { MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
-import type { CarpetFilters, CarpetMaterial, CarpetPattern, RoomType } from "@/lib/api/types";
+import { COLOR_LABEL, MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
+import type {
+  CarpetFilters,
+  CarpetMaterial,
+  CarpetPattern,
+  ColorFamily,
+  RoomType,
+} from "@/lib/api/types";
 
 export const metadata: Metadata = {
   title: "همه‌ی فرش‌ها",
@@ -34,6 +40,7 @@ function readFilters(params: Record<string, string | string[] | undefined>): Car
   const pattern = many<CarpetPattern>("pattern", PATTERN_LABEL);
   const material = many<CarpetMaterial>("material", MATERIAL_LABEL);
   const room = many<RoomType>("room", ROOM_LABEL);
+  const color = many<ColorFamily>("color", COLOR_LABEL);
   const sort = one("sort");
   const q = one("q")?.trim();
   const page = Number(one("page"));
@@ -52,6 +59,7 @@ function readFilters(params: Record<string, string | string[] | undefined>): Car
     ...(pattern.length ? { pattern } : {}),
     ...(material.length ? { material } : {}),
     ...(room.length ? { room } : {}),
+    ...(color.length ? { color } : {}),
     ...(minPrice !== undefined ? { min_price: minPrice } : {}),
     ...(maxPrice !== undefined ? { max_price: maxPrice } : {}),
     ...(sort === "price_asc" || sort === "price_desc" ? { sort } : {}),
@@ -86,6 +94,15 @@ function headingFor(filters: CarpetFilters): { title: string; lede: string } {
     return {
       title: `فرش مناسب ${ROOM_LABEL[filters.room[0]]}`,
       lede: "اندازه و نقش‌هایی که برای این فضا انتخاب شده‌اند.",
+    };
+  }
+  if (filters.color?.length === 1) {
+    return {
+      title: `فرش‌های ${COLOR_LABEL[filters.color[0]]}`,
+      // Colour is the one heading that owes the visitor a caveat: a carpet is
+      // filed under up to three families, so this list holds every rug where
+      // that colour is one of the main ones rather than the only one.
+      lede: "فرش‌هایی که این رنگ یکی از رنگ‌های اصلی‌شان است.",
     };
   }
   return {

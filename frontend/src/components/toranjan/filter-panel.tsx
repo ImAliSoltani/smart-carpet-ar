@@ -11,6 +11,9 @@ import { Toggle } from "@/components/ui/toggle";
 import { facetsQuery } from "@/lib/api/catalog";
 import { formatNumber, formatToman } from "@/lib/format";
 import {
+  COLOR_LABEL,
+  COLOR_SWATCH,
+  FILTER_COLORS,
   MATERIAL_LABEL,
   NAV_MATERIALS,
   NAV_PATTERNS,
@@ -79,11 +82,14 @@ function ChipRow({
   label,
   counts,
   param,
+  swatch,
 }: {
   values: readonly string[];
   label: (v: string) => string;
   counts: Record<string, number> | undefined;
   param: string;
+  /** A hex to draw before the label. Only colour uses it — see COLOR_SWATCH. */
+  swatch?: (v: string) => string;
 }) {
   const params = useSearchParams();
   const write = useFilterWriter();
@@ -116,6 +122,16 @@ function ChipRow({
             // §3-5 floor; the size stays `sm` for its type scale and padding.
             className="h-11 gap-2 rounded-full"
           >
+            {swatch && (
+              // Hairlined rather than bare: the pale families — نخودی, سفید —
+              // are within a few percent of the paper they sit on, and without
+              // an edge the chip reads as having lost its dot.
+              <span
+                aria-hidden="true"
+                className="size-3.5 shrink-0 rounded-full border border-ink/15"
+                style={{ backgroundColor: swatch(value) }}
+              />
+            )}
             <span>{label(value)}</span>
             <span className={cn("text-[11px]", on ? "opacity-70" : "text-muted")}>
               {formatNumber(count)}
@@ -241,6 +257,7 @@ function AppliedFilters() {
     ["pattern", PATTERN_LABEL],
     ["material", MATERIAL_LABEL],
     ["room", ROOM_LABEL],
+    ["color", COLOR_LABEL],
   ] as const) {
     for (const value of params.getAll(param)) {
       if (value in labels)
@@ -278,6 +295,7 @@ function AppliedFilters() {
             pattern: [],
             material: [],
             room: [],
+            color: [],
             min_price: null,
             max_price: null,
           })
@@ -357,6 +375,20 @@ export function FilterPanel() {
       ),
     },
     {
+      id: "color",
+      title: "رنگ",
+      meta: facets ? formatNumber(Object.keys(facets.colors).length) : undefined,
+      content: (
+        <ChipRow
+          values={FILTER_COLORS}
+          label={(v) => COLOR_LABEL[v as never]}
+          counts={facets?.colors}
+          param="color"
+          swatch={(v) => COLOR_SWATCH[v as never]}
+        />
+      ),
+    },
+    {
       id: "price",
       title: "بازه‌ی قیمت",
       content: <PriceSection facets={facets} />,
@@ -385,7 +417,15 @@ export { SortControl };
 /** The same panel, behind a button, for screens with no room for a sidebar. */
 export function FilterTrigger({ onClick }: { onClick: () => void }) {
   const params = useSearchParams();
-  const count = ["q", "pattern", "material", "room", "min_price", "max_price"].reduce(
+  const count = [
+    "q",
+    "pattern",
+    "material",
+    "room",
+    "color",
+    "min_price",
+    "max_price",
+  ].reduce(
     (n, key) => n + params.getAll(key).length,
     0,
   );
