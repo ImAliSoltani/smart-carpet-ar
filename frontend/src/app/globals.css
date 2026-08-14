@@ -93,6 +93,11 @@
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-feedback: 220ms;
   --dur-entrance: 700ms;
+  /* A photograph travelling from a grid to a page it fills. Its own beat inside
+     the entrance band: 700ms is right for something arriving from nowhere and
+     too slow for something the eye is already following, which reads as the
+     page waiting rather than the carpet moving. */
+  --dur-morph: 520ms;
 }
 
 /* ============================================================
@@ -863,5 +868,59 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   The photograph that crosses the navigation.
+
+   A card in the grid and the frame on the product page are named after the
+   same carpet, so the browser treats them as one thing seen twice and moves
+   the first into the place of the second instead of drawing a new page over
+   the old one. React puts the names on for the length of the navigation only
+   — see `lib/view-transition.ts` for why the names are per-carpet.
+
+   Everything here is styling for a transition that runs somewhere else: with
+   no rules at all the morph still happens, in the browser's default 250ms
+   ease. These give it the shop's beat.
+   ============================================================ */
+
+::view-transition-group(.carpet-photo) {
+  animation-duration: var(--dur-morph);
+  animation-timing-function: var(--ease);
+}
+
+::view-transition-old(.carpet-photo),
+::view-transition-new(.carpet-photo) {
+  /* The two frames are not the same shape — 3:4 in the grid, 4:5 on the page —
+     and each snapshot is otherwise painted at whatever the group measures at
+     that instant, so the weave would stretch on the way across. Contained
+     inside the box, both keep their proportions and only the box changes. */
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: contain;
+  animation-duration: var(--dur-morph);
+  animation-timing-function: var(--ease);
+}
+
+/* Everything not lifted into a named group is the `root` snapshot, and it
+   cross-fades underneath. Shorter than the morph on purpose: the new page
+   should be readable by the time the photograph finishes arriving, rather
+   than appearing after it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-io);
+}
+
+/* The blanket rule above cannot reach any of this. The view transition
+   pseudo-elements hang off the root element in a tree of their own and `*`
+   does not match into it, so a visitor who asked for less motion would get
+   the one animation on the site that ignored them. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

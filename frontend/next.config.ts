@@ -24,6 +24,25 @@ function lanAddresses(): string[] {
 
 const nextConfig: NextConfig = {
   /**
+   * React's `<ViewTransition>`, which is what carries the photograph across a
+   * navigation instead of redrawing it on the other side.
+   *
+   * The flag is the whole opt-in: without it React never calls
+   * `document.startViewTransition`, and a `view-transition-name` written by hand
+   * sits on the element doing nothing, because the app router's navigation is a
+   * React transition and nobody is wrapping it. It does *not* pull the app onto
+   * React's experimental channel — `needsExperimentalReact` in Next lists only
+   * `taint`, `transitionIndicator` and `gestureTransition`, and the component is
+   * exported from the stable build this version already ships.
+   *
+   * Browsers without the API navigate the way they did before: React checks for
+   * `startViewTransition` and commits the update directly when it is absent.
+   */
+  experimental: {
+    viewTransition: true,
+  },
+
+  /**
    * Hosts allowed to pull `/_next/*` in development.
    *
    * Without this the site opens from a phone and stays empty: Next blocks its

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ViewTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
@@ -15,6 +15,7 @@ import { formatNumber, formatToman } from "@/lib/format";
 import { COMPARE_LIMIT } from "@/lib/store/compare";
 import { MATERIAL_LABEL, PATTERN_LABEL } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
+import { CARPET_PHOTO_CLASS, carpetPhotoName } from "@/lib/view-transition";
 
 /**
  * A carpet in the grid.
@@ -110,111 +111,123 @@ export function CarpetCard({
       whileHover={reduced ? undefined : { y: -4 }}
     >
       <Card className="group w-full overflow-hidden rounded-md border-line bg-paper shadow-none transition-shadow duration-300 hover:shadow-[0_24px_50px_-32px_rgba(24,24,27,0.45)]">
-        <Link href={href} className="relative block aspect-3/4 overflow-hidden bg-bg">
-          {gallery[currentImageIndex] && (
-            <Image
-              key={currentImageIndex}
-              src={gallery[currentImageIndex]}
-              alt={carpet.name}
-              fill
-              sizes="(min-width: 1280px) 22vw, (min-width: 768px) 33vw, 50vw"
-              // The first row is above the fold on every breakpoint and is the
-              // largest thing painted; lazy-loading it means measuring our own
-              // LCP against a placeholder. Four covers the widest grid.
-              priority={index < 4}
-              // `contain`, not `cover`: these photographs are cut out to the
-              // weave, and cropping one would cut the border off the pattern.
-              className="object-contain p-4 transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
-            />
-          )}
+        {/* The half of the shared transition that lives in the grid. React adds
+            no element of its own here — it writes `view-transition-name` onto
+            the frame below for the length of the navigation and takes it off
+            again, which is why the name can be per-carpet without twenty-four
+            of them ever being live at once on a page that is not navigating.
 
-          {gallery.length > 1 && (
-            <>
-              <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  aria-label="عکس بعدی"
-                  className="size-9 rounded-full bg-paper/85 shadow-sm backdrop-blur-sm"
-                  onClick={step(1)}
-                >
-                  <ChevronLeft className="size-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  aria-label="عکس قبلی"
-                  className="size-9 rounded-full bg-paper/85 shadow-sm backdrop-blur-sm"
-                  onClick={step(-1)}
-                >
-                  <ChevronRight className="size-4" />
-                </Button>
-              </div>
+            The frame rather than the photograph inside it: the border and the
+            rounding are part of what the eye is following, and a bare `<img>`
+            morphing out of a frame that stays behind reads as two things
+            happening instead of one. */}
+        <ViewTransition name={carpetPhotoName(carpet.slug)} default={CARPET_PHOTO_CLASS}>
+          <Link href={href} className="relative block aspect-3/4 overflow-hidden bg-bg">
+            {gallery[currentImageIndex] && (
+              <Image
+                key={currentImageIndex}
+                src={gallery[currentImageIndex]}
+                alt={carpet.name}
+                fill
+                sizes="(min-width: 1280px) 22vw, (min-width: 768px) 33vw, 50vw"
+                // The first row is above the fold on every breakpoint and is the
+                // largest thing painted; lazy-loading it means measuring our own
+                // LCP against a placeholder. Four covers the widest grid.
+                priority={index < 4}
+                // `contain`, not `cover`: these photographs are cut out to the
+                // weave, and cropping one would cut the border off the pattern.
+                className="object-contain p-4 transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
+              />
+            )}
 
-              <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
-                {gallery.map((_, i) => (
-                  <button
-                    key={i}
+            {gallery.length > 1 && (
+              <>
+                <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                  <Button
                     type="button"
-                    aria-label={`عکس ${formatNumber(i + 1)}`}
-                    className={cn(
-                      "h-1.5 rounded-full transition-all duration-300",
-                      i === currentImageIndex ? "w-4 bg-ink" : "w-1.5 bg-ink/25",
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setCurrentImageIndex(i);
-                    }}
-                  />
-                ))}
+                    variant="secondary"
+                    size="icon"
+                    aria-label="عکس بعدی"
+                    className="size-9 rounded-full bg-paper/85 shadow-sm backdrop-blur-sm"
+                    onClick={step(1)}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    aria-label="عکس قبلی"
+                    className="size-9 rounded-full bg-paper/85 shadow-sm backdrop-blur-sm"
+                    onClick={step(-1)}
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+
+                <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
+                  {gallery.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`عکس ${formatNumber(i + 1)}`}
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300",
+                        i === currentImageIndex ? "w-4 bg-ink" : "w-1.5 bg-ink/25",
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCurrentImageIndex(i);
+                      }}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Shown only once something can receive the press. A control that
+                silently does nothing is worse than no control at all — which is
+                why each of these appears with its handler and not before.
+
+                The column is 1.5 rather than 3 from the corner because the pills
+                inside it are inset 4px of their own: the 44px hit areas touch
+                each other, the 36px discs keep an 8px gap, and the picture is
+                where it was. */}
+            {(onWishlistToggle || onCompareToggle) && (
+              <div className="absolute top-1.5 end-1.5 flex flex-col">
+                {onWishlistToggle && (
+                  <CornerToggle
+                    label={isWishlisted ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+                    pressed={isWishlisted}
+                    onPress={() => onWishlistToggle(carpet.id)}
+                  >
+                    <Heart className={cn("size-4", isWishlisted && "fill-accent text-accent")} />
+                  </CornerToggle>
+                )}
+
+                {onCompareToggle && (
+                  <CornerToggle
+                    label={
+                      isComparing
+                        ? "برداشتن از مقایسه"
+                        : compareFull
+                          ? `فهرست مقایسه پر است — حداکثر ${formatNumber(COMPARE_LIMIT)} فرش`
+                          : "افزودن به مقایسه"
+                    }
+                    pressed={isComparing}
+                    // Full and not already chosen is the only dead case, and it
+                    // is dead with a sentence attached rather than silently.
+                    disabled={compareFull && !isComparing}
+                    onPress={() => onCompareToggle(carpet.id)}
+                  >
+                    <Scale className={cn("size-4", isComparing && "text-accent")} />
+                  </CornerToggle>
+                )}
               </div>
-            </>
-          )}
-
-          {/* Shown only once something can receive the press. A control that
-              silently does nothing is worse than no control at all — which is
-              why each of these appears with its handler and not before.
-
-              The column is 1.5 rather than 3 from the corner because the pills
-              inside it are inset 4px of their own: the 44px hit areas touch
-              each other, the 36px discs keep an 8px gap, and the picture is
-              where it was. */}
-          {(onWishlistToggle || onCompareToggle) && (
-            <div className="absolute top-1.5 end-1.5 flex flex-col">
-              {onWishlistToggle && (
-                <CornerToggle
-                  label={isWishlisted ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
-                  pressed={isWishlisted}
-                  onPress={() => onWishlistToggle(carpet.id)}
-                >
-                  <Heart className={cn("size-4", isWishlisted && "fill-accent text-accent")} />
-                </CornerToggle>
-              )}
-
-              {onCompareToggle && (
-                <CornerToggle
-                  label={
-                    isComparing
-                      ? "برداشتن از مقایسه"
-                      : compareFull
-                        ? `فهرست مقایسه پر است — حداکثر ${formatNumber(COMPARE_LIMIT)} فرش`
-                        : "افزودن به مقایسه"
-                  }
-                  pressed={isComparing}
-                  // Full and not already chosen is the only dead case, and it
-                  // is dead with a sentence attached rather than silently.
-                  disabled={compareFull && !isComparing}
-                  onPress={() => onCompareToggle(carpet.id)}
-                >
-                  <Scale className={cn("size-4", isComparing && "text-accent")} />
-                </CornerToggle>
-              )}
-            </div>
-          )}
-        </Link>
+            )}
+          </Link>
+        </ViewTransition>
 
         <CardContent className="p-4">
           {/* Pattern and material, not origin: the listing endpoint does not

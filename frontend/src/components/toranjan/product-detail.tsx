@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { ViewTransition } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -28,6 +29,7 @@ import { COMPARE_LIMIT, useCompare } from "@/lib/store/compare";
 import { useFavorites } from "@/lib/store/favorites";
 import { MATERIAL_LABEL, PATTERN_LABEL, ROOM_LABEL } from "@/lib/taxonomy";
 import { cn } from "@/lib/utils";
+import { CARPET_PHOTO_CLASS, carpetPhotoName } from "@/lib/view-transition";
 
 /**
  * The product page.
@@ -250,79 +252,92 @@ export function ProductDetail({
               }
             }}
           >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentImageIndex}
-              // `false`, never a branch on `useReducedMotion`. That hook answers
-              // differently on the server than in the browser, so branching on it
-              // rendered `opacity: 0` into the HTML and `opacity: 1` after
-              // hydration — a real mismatch React refuses to patch up.
-              //
-              // It is also the better behaviour: this photograph is the largest
-              // thing painted on the page, and the first one should be there
-              // rather than arrive. The cross-fade is for changing image, which
-              // only ever happens after a click.
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -20 }}
-              transition={{ duration: reduced ? 0 : 0.3 }}
-              // Horizontal drag only, and framer-motion answers it with
-              // `touch-action: pan-y`, so the page still scrolls under the
-              // finger. A carousel that eats the vertical scroll is the
-              // gesture conflict this would otherwise introduce.
-              drag={imageCount > 1 ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.18}
-              dragMomentum={false}
-              onPointerDownCapture={(event) => {
-                pointerStartX.current = event.clientX;
-                swallowNextClick.current = false;
-              }}
-              onPointerUpCapture={(event) => {
-                if (
-                  pointerStartX.current !== null &&
-                  Math.abs(event.clientX - pointerStartX.current) > 8
-                ) {
-                  swallowNextClick.current = true;
-                }
-              }}
-              onClickCapture={(event) => {
-                if (!swallowNextClick.current) return;
-                // The lightbox listens on the photograph itself, below this
-                // handler, so the native event has to be stopped too.
-                event.preventDefault();
-                event.stopPropagation();
-                event.nativeEvent.stopImmediatePropagation();
-              }}
-              onDragEnd={(_, info) => {
-                if (imageCount < 2) return;
-                const travelled =
-                  Math.abs(info.offset.x) > SWIPE_DISTANCE ||
-                  Math.abs(info.velocity.x) > SWIPE_VELOCITY;
-                if (!travelled) return;
-                const forward = Math.sign(info.offset.x) === NEXT_DRAG_SIGN;
-                goToImage(currentImageIndex + (forward ? 1 : -1));
-              }}
-              className={cn(
-                "toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg",
-                imageCount > 1 && "touch-pan-y",
-              )}
-            >
-              {gallery[currentImageIndex] && (
-                <ZoomableImage
-                  src={gallery[currentImageIndex].src}
-                  zoomSrc={gallery[currentImageIndex].zoomSrc}
-                  alt={`${carpet.name} — تصویر ${formatNumber(currentImageIndex + 1)}`}
-                  fill
-                  sizes="(min-width: 1024px) 45vw, 100vw"
-                  priority
-                  // `contain`, not `cover`: these photographs are cut to the
-                  // weave and cropping one takes the border off the pattern.
-                  className="object-contain p-6"
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          {/* The other half of the shared transition. Named from the slug, so
+              the frame the visitor pressed in the grid is the frame that grows
+              into this one — the card and this page never learn about each
+              other, they only agree on the carpet.
+
+              Wrapped around `AnimatePresence` rather than inside it: the
+              cross-fade needs its `motion.div` as a direct child to see it
+              leave, and an element between the two makes every change of
+              photograph an unmount it cannot animate. React looks through
+              `AnimatePresence` for the frame either way, since it renders its
+              child with no element of its own. */}
+          <ViewTransition name={carpetPhotoName(carpet.slug)} default={CARPET_PHOTO_CLASS}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentImageIndex}
+                // `false`, never a branch on `useReducedMotion`. That hook answers
+                // differently on the server than in the browser, so branching on it
+                // rendered `opacity: 0` into the HTML and `opacity: 1` after
+                // hydration — a real mismatch React refuses to patch up.
+                //
+                // It is also the better behaviour: this photograph is the largest
+                // thing painted on the page, and the first one should be there
+                // rather than arrive. The cross-fade is for changing image, which
+                // only ever happens after a click.
+                initial={false}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduced ? { opacity: 0 } : { opacity: 0, y: -20 }}
+                transition={{ duration: reduced ? 0 : 0.3 }}
+                // Horizontal drag only, and framer-motion answers it with
+                // `touch-action: pan-y`, so the page still scrolls under the
+                // finger. A carousel that eats the vertical scroll is the
+                // gesture conflict this would otherwise introduce.
+                drag={imageCount > 1 ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.18}
+                dragMomentum={false}
+                onPointerDownCapture={(event) => {
+                  pointerStartX.current = event.clientX;
+                  swallowNextClick.current = false;
+                }}
+                onPointerUpCapture={(event) => {
+                  if (
+                    pointerStartX.current !== null &&
+                    Math.abs(event.clientX - pointerStartX.current) > 8
+                  ) {
+                    swallowNextClick.current = true;
+                  }
+                }}
+                onClickCapture={(event) => {
+                  if (!swallowNextClick.current) return;
+                  // The lightbox listens on the photograph itself, below this
+                  // handler, so the native event has to be stopped too.
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.nativeEvent.stopImmediatePropagation();
+                }}
+                onDragEnd={(_, info) => {
+                  if (imageCount < 2) return;
+                  const travelled =
+                    Math.abs(info.offset.x) > SWIPE_DISTANCE ||
+                    Math.abs(info.velocity.x) > SWIPE_VELOCITY;
+                  if (!travelled) return;
+                  const forward = Math.sign(info.offset.x) === NEXT_DRAG_SIGN;
+                  goToImage(currentImageIndex + (forward ? 1 : -1));
+                }}
+                className={cn(
+                  "toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg",
+                  imageCount > 1 && "touch-pan-y",
+                )}
+              >
+                {gallery[currentImageIndex] && (
+                  <ZoomableImage
+                    src={gallery[currentImageIndex].src}
+                    zoomSrc={gallery[currentImageIndex].zoomSrc}
+                    alt={`${carpet.name} — تصویر ${formatNumber(currentImageIndex + 1)}`}
+                    fill
+                    sizes="(min-width: 1024px) 45vw, 100vw"
+                    priority
+                    // `contain`, not `cover`: these photographs are cut to the
+                    // weave and cropping one takes the border off the pattern.
+                    className="object-contain p-6"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </ViewTransition>
 
           {/* Pointer devices have no swipe. Hidden below `sm`, where the
               swipe is the gesture and an overlay this size would sit on the
