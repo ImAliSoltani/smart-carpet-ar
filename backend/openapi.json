@@ -981,6 +981,49 @@
         "title": "ColorFamily",
         "type": "string"
       },
+      "ConversationalQuery": {
+        "properties": {
+          "q": {
+            "description": "جمله‌ی فارسی کاربر",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Q",
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "title": "ConversationalQuery",
+        "type": "object"
+      },
+      "ConversationalSearchResponse": {
+        "description": "What the sentence was understood to mean, and what the shop answered.\n\nThe filters come back beside the results on purpose. A search that silently\nnarrowed to four colour families has made a decision the visitor cannot\nargue with; returning it lets the interface show each decision as a chip\nthey can drop, and lets «همه‌ی نتایج» be a real link into the ordinary\ncatalogue rather than a second, parallel view of it.",
+        "properties": {
+          "filters": {
+            "additionalProperties": true,
+            "description": "فیلترهای استخراج‌شده، به شکل پارامترهای همان اندپوینت لیست",
+            "title": "Filters",
+            "type": "object"
+          },
+          "page": {
+            "$ref": "#/components/schemas/Page_CarpetListItem_"
+          },
+          "understood": {
+            "description": "هر تصمیم جست‌وجو، به فارسی، برای بازبینی کاربر",
+            "items": {
+              "type": "string"
+            },
+            "title": "Understood",
+            "type": "array"
+          }
+        },
+        "required": [
+          "page"
+        ],
+        "title": "ConversationalSearchResponse",
+        "type": "object"
+      },
       "CornerPoint": {
         "properties": {
           "x": {
@@ -3438,6 +3481,48 @@
         "summary": "Size Guide",
         "tags": [
           "room"
+        ]
+      }
+    },
+    "/api/v1/search/conversational": {
+      "post": {
+        "description": "جمله‌ی فارسی → فیلتر ساخت‌یافته → همان نتایجی که کاتالوگ می‌دهد.\n\nThe sentence is translated, never answered. Whatever the planner produces is\na `CatalogFilters` like any other, run through the same `list_carpets` the\nlisting page calls — so this endpoint cannot return a carpet the catalogue\nwould not, at a price it does not charge, however the translation went.",
+        "operationId": "conversational_search_api_v1_search_conversational_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversationalQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationalSearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Conversational Search",
+        "tags": [
+          "search"
         ]
       }
     },

@@ -427,6 +427,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/search/conversational": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Conversational Search
+         * @description جمله‌ی فارسی → فیلتر ساخت‌یافته → همان نتایجی که کاتالوگ می‌دهد.
+         *
+         *     The sentence is translated, never answered. Whatever the planner produces is
+         *     a `CatalogFilters` like any other, run through the same `list_carpets` the
+         *     listing page calls — so this endpoint cannot return a carpet the catalogue
+         *     would not, at a price it does not charge, however the translation went.
+         */
+        post: operations["conversational_search_api_v1_search_conversational_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search/visual": {
         parameters: {
             query?: never;
@@ -815,6 +840,39 @@ export interface components {
          * @enum {string}
          */
         ColorFamily: "red" | "pink" | "orange" | "gold" | "cream" | "brown" | "green" | "turquoise" | "blue" | "purple" | "gray" | "black" | "white";
+        /** ConversationalQuery */
+        ConversationalQuery: {
+            /**
+             * Q
+             * @description جمله‌ی فارسی کاربر
+             */
+            q: string;
+        };
+        /**
+         * ConversationalSearchResponse
+         * @description What the sentence was understood to mean, and what the shop answered.
+         *
+         *     The filters come back beside the results on purpose. A search that silently
+         *     narrowed to four colour families has made a decision the visitor cannot
+         *     argue with; returning it lets the interface show each decision as a chip
+         *     they can drop, and lets «همه‌ی نتایج» be a real link into the ordinary
+         *     catalogue rather than a second, parallel view of it.
+         */
+        ConversationalSearchResponse: {
+            /**
+             * Filters
+             * @description فیلترهای استخراج‌شده، به شکل پارامترهای همان اندپوینت لیست
+             */
+            filters?: {
+                [key: string]: unknown;
+            };
+            page: components["schemas"]["Page_CarpetListItem_"];
+            /**
+             * Understood
+             * @description هر تصمیم جست‌وجو، به فارسی، برای بازبینی کاربر
+             */
+            understood?: string[];
+        };
         /** CornerPoint */
         CornerPoint: {
             /** X */
@@ -1967,6 +2025,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SizeGuideResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    conversational_search_api_v1_search_conversational_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConversationalQuery"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationalSearchResponse"];
                 };
             };
             /** @description Validation Error */

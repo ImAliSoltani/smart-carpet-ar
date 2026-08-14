@@ -2,7 +2,16 @@ from fastapi import APIRouter, HTTPException, UploadFile
 
 from app.api.deps import DbSession, EmbeddingDep
 from app.core.config import get_settings
-from app.schemas.catalog import SimilarItem, VisualSearchResponse
+from app.nlq import get_planner
+from app.schemas.catalog import (
+    CarpetListItem,
+    CatalogFilters,
+    ConversationalQuery,
+    ConversationalSearchResponse,
+    Page,
+    SimilarItem,
+    VisualSearchResponse,
+)
 from app.services import catalog as catalog_service
 from app.services import color as color_service
 from app.services.images import InvalidImageError, load_image
@@ -37,6 +46,68 @@ async def visual_search(
     )
     return VisualSearchResponse(
         results=[SimilarItem(carpet=item, similarity=score) for item, score in matches]
+    )
+
+
+@router.post("/search/conversational", response_model=ConversationalSearchResponse)
+async def conversational_search(
+    session: DbSession, body: ConversationalQuery
+) -> ConversationalSearchResponse:
+    """جمله‌ی فارسی → فیلتر ساخت‌یافته → همان نتایجی که کاتالوگ می‌دهد.
+
+    The sentence is translated, never answered. Whatever the planner produces is
+    a `CatalogFilters` like any other, run through the same `list_carpets` the
+    listing page calls — so this endpoint cannot return a carpet the catalogue
+    would not, at a price it does not charge, however the translation went.
+    """
+    facets = await catalog_service.facets(session)
+    plan = await get_planner().plan(
+        body.q, price_floor=facets.min_price, price_ceiling=facets.max_price
+    )
+
+    # Nothing understood means nothing answered. Running the empty plan would
+    # apply no filters and hand back the entire catalogue, which reads as an
+    # answer and is not one — «سلام حالت چطوره» would return seventy carpets
+    # under a heading saying the sentence was not understood.
+    if plan.is_empty:
+        return ConversationalSearchResponse(
+            understood=[],
+            filters={},
+            page=Page[CarpetListItem](items=[], total=0, page=1, page_size=24),
+        )
+
+    filters = CatalogFilters(
+        q=plan.text,
+        color=plan.color or None,
+        pattern=plan.pattern or None,
+        material=plan.material or None,
+        room=plan.room or None,
+        min_price=plan.min_price,
+        max_price=plan.max_price,
+        min_width_cm=plan.min_width_cm,
+        max_width_cm=plan.max_width_cm,
+        min_length_cm=plan.min_length_cm,
+        max_length_cm=plan.max_length_cm,
+        page_size=24,
+    )
+    items, total = await catalog_service.list_carpets(session, filters)
+
+    # Only the fields that were actually set, in the shape the listing endpoint
+    # reads, so the storefront can hand them straight to `/carpets?…` and the
+    # narrowed shop becomes a page that can be shared and reloaded.
+    applied = {
+        key: [str(getattr(v, "value", v)) for v in value]
+        if isinstance(value, list)
+        else str(value)
+        for key, value in filters.model_dump(
+            exclude_none=True, exclude={"page", "page_size", "sort"}
+        ).items()
+    }
+
+    return ConversationalSearchResponse(
+        understood=plan.understood,
+        filters=applied,
+        page=Page[CarpetListItem](items=items, total=total, page=1, page_size=24),
     )
 
 

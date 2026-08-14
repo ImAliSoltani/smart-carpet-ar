@@ -12,6 +12,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { request } from "./client";
 import type {
   CarpetDetail,
+  ConversationalSearchResponse,
   CarpetFilters,
   CarpetPage,
   CatalogFacets,
@@ -67,6 +68,25 @@ export function visualSearch(
   return request<VisualSearchResponse>("/api/v1/search/visual", {
     method: "POST",
     body,
+    signal,
+  });
+}
+
+/**
+ * A Persian sentence in, the same carpets the catalogue would return out.
+ *
+ * A POST rather than a GET even though it reads nothing: the sentence is a body
+ * rather than a key, it must never be cached or retried on its own initiative,
+ * and putting what somebody typed into a URL would put it into every log the
+ * request passes through.
+ */
+export function conversationalSearch(
+  q: string,
+  signal?: AbortSignal,
+): Promise<ConversationalSearchResponse> {
+  return request<ConversationalSearchResponse>("/api/v1/search/conversational", {
+    method: "POST",
+    json: { q },
     signal,
   });
 }

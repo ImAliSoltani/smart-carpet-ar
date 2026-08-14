@@ -151,3 +151,27 @@ class SimilarItem(BaseModel):
 
 class VisualSearchResponse(BaseModel):
     results: list[SimilarItem]
+
+
+class ConversationalQuery(BaseModel):
+    q: str = Field(min_length=1, max_length=200, description="جمله‌ی فارسی کاربر")
+
+
+class ConversationalSearchResponse(BaseModel):
+    """What the sentence was understood to mean, and what the shop answered.
+
+    The filters come back beside the results on purpose. A search that silently
+    narrowed to four colour families has made a decision the visitor cannot
+    argue with; returning it lets the interface show each decision as a chip
+    they can drop, and lets «همه‌ی نتایج» be a real link into the ordinary
+    catalogue rather than a second, parallel view of it.
+    """
+
+    understood: list[str] = Field(
+        default_factory=list, description="هر تصمیم جست‌وجو، به فارسی، برای بازبینی کاربر"
+    )
+    filters: dict[str, object] = Field(
+        default_factory=dict,
+        description="فیلترهای استخراج‌شده، به شکل پارامترهای همان اندپوینت لیست",
+    )
+    page: Page[CarpetListItem]

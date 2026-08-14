@@ -27,6 +27,21 @@ class Settings(BaseSettings):
     storage_public_base: str = "/files"
     max_upload_mb: int = 25
 
+    # --- conversational search ---
+    # Unset means the rule-based planner, which needs no network and no key and
+    # is the default on purpose: the demo must survive a dead API (§10). Setting
+    # both a key and a base URL upgrades the translation without changing
+    # anything else — the model's output is validated against the same schema
+    # either way, and any failure falls back to the rules.
+    #
+    # The base URL is the provider's OpenAI-compatible root, without the path:
+    #   DeepSeek    https://api.deepseek.com/v1        deepseek-chat
+    #   OpenRouter  https://openrouter.ai/api/v1       <vendor>/<model>
+    #   local       http://127.0.0.1:8080/v1           whatever it serves
+    llm_base_url: str = ""
+    llm_api_key: str = ""
+    llm_model: str = "deepseek-chat"
+
     # --- admin ---
     admin_username: str = "admin"
     # bcrypt hash; generate with scripts/hash_password.py. Empty = admin login disabled.
