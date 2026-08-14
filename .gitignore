@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 .pytest_cache/
 .ruff_cache/
+# The upload pipeline writes real derivative files during tests; the fixture
+# points storage here so a run never touches the developer's own catalogue.
+backend/.pytest-tmp/
 
 # --- node / next ---
 node_modules/

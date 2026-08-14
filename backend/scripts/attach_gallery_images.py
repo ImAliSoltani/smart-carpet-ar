@@ -131,6 +131,11 @@ async def run(roots: list[Path], dry_run: bool) -> int:
                     position=next_position,
                     is_primary=False,
                     embedding=None,  # see the module docstring — deliberate
+                    # No histogram either, for the same reason and not a second
+                    # one: the histogram exists only to reorder rows the
+                    # embedding index proposed, and a row with no embedding is
+                    # never proposed, so a value here could not be read.
+                    color_histogram=None,
                 )
             )
             await session.flush()

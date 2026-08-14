@@ -16,6 +16,8 @@ from io import BytesIO
 
 from PIL import Image, ImageOps
 
+from app.models.enums import ColorFamily
+from app.services import color as color_service
 from app.services.storage import Storage
 
 DERIVATIVE_SPECS: dict[str, tuple[int, int]] = {
@@ -40,6 +42,11 @@ class ImageSet:
     width: int
     height: int
     dominant_colors: list[str]
+    # The two forms of the same colour reading — see `app.services.color`. The
+    # histogram belongs to this photograph and rides on the image row; the
+    # families describe the carpet and are lifted onto it by the caller.
+    color_histogram: list[float]
+    color_families: list[ColorFamily]
 
 
 def load_image(data: bytes) -> Image.Image:
@@ -114,10 +121,13 @@ def process_upload(data: bytes, storage: Storage) -> ImageSet:
         derived.save(buffer, format="WEBP", quality=quality, method=6)
         urls[name] = storage.save(buffer.getvalue(), kind=name, ext="webp")
 
+    profile = color_service.analyse(image)
     return ImageSet(
         original_url=original_url,
         urls=urls,
         width=image.width,
         height=image.height,
         dominant_colors=extract_dominant_colors(image),
+        color_histogram=profile.histogram,
+        color_families=profile.families,
     )

@@ -23,6 +23,7 @@ export type VisualSearchResponse = Schemas["VisualSearchResponse"];
 export type CarpetPattern = Schemas["CarpetPattern"];
 export type CarpetMaterial = Schemas["CarpetMaterial"];
 export type RoomType = Schemas["RoomType"];
+export type ColorFamily = Schemas["ColorFamily"];
 export type ArAssetStatus = Schemas["ArAssetStatus"];
 
 /**

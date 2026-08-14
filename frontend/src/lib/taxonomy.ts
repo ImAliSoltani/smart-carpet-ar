@@ -16,7 +16,13 @@
  * fails the build here rather than rendering an empty chip.
  */
 
-import type { CarpetMaterial, CarpetPattern, OrderStatus, RoomType } from "./api/types";
+import type {
+  CarpetMaterial,
+  CarpetPattern,
+  ColorFamily,
+  OrderStatus,
+  RoomType,
+} from "./api/types";
 
 export const PATTERN_LABEL: Record<CarpetPattern, string> = {
   lachak_toranj: "لچک‌ترنج",
@@ -38,6 +44,30 @@ export const MATERIAL_LABEL: Record<CarpetMaterial, string> = {
   polyester: "پلی‌استر",
   viscose: "ویسکوز",
   mixed: "مخلوط",
+};
+
+/**
+ * The colour families, named the way a carpet shop names them.
+ *
+ * Not a translation of the English enum members: «سرمه‌ای» is what a navy
+ * carpet is called here, and «آبی» would send a shopper looking for a lighter
+ * blue than the catalogue's grounds ever are. «نخودی» likewise reads as the
+ * carpet colour where a literal «کرم» reads as the dessert.
+ */
+export const COLOR_LABEL: Record<ColorFamily, string> = {
+  red: "قرمز",
+  pink: "صورتی",
+  orange: "نارنجی",
+  gold: "طلایی",
+  cream: "نخودی",
+  brown: "قهوه‌ای",
+  green: "سبز",
+  turquoise: "فیروزه‌ای",
+  blue: "سرمه‌ای",
+  purple: "بنفش",
+  gray: "طوسی",
+  black: "مشکی",
+  white: "سفید",
 };
 
 export const ROOM_LABEL: Record<RoomType, string> = {

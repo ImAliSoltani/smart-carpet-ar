@@ -30,6 +30,32 @@ class CarpetPattern(StrEnum):
     PLAIN = "plain"
 
 
+class ColorFamily(StrEnum):
+    """The colours a shopper would name, as opposed to the ones a photo holds.
+
+    Dominant colours are stored as exact hex and are therefore nearly unique —
+    useless as a filter. These are the buckets those hexes fall into, assigned
+    in `app.services.color`, and the vocabulary is chosen for carpets rather
+    than for colour theory: CREAM and TURQUOISE earn their place because Persian
+    carpets are full of both and neither survives being called "pale yellow" or
+    "cyan", while colours no carpet ground is woven in are simply absent.
+    """
+
+    RED = "red"
+    PINK = "pink"
+    ORANGE = "orange"
+    GOLD = "gold"
+    CREAM = "cream"
+    BROWN = "brown"
+    GREEN = "green"
+    TURQUOISE = "turquoise"
+    BLUE = "blue"
+    PURPLE = "purple"
+    GRAY = "gray"
+    BLACK = "black"
+    WHITE = "white"
+
+
 class RoomType(StrEnum):
     LIVING_ROOM = "living_room"
     BEDROOM = "bedroom"

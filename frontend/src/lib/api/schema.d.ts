@@ -459,6 +459,8 @@ export interface components {
          *     whole button exists to change.
          */
         AdminCarpetDetail: {
+            /** Color Families */
+            color_families: components["schemas"]["ColorFamily"][];
             /** Colors */
             colors: string[];
             /** Description */
@@ -666,6 +668,8 @@ export interface components {
         };
         /** CarpetDetail */
         CarpetDetail: {
+            /** Color Families */
+            color_families: components["schemas"]["ColorFamily"][];
             /** Colors */
             colors: string[];
             /** Description */
@@ -689,6 +693,8 @@ export interface components {
         };
         /** CarpetListItem */
         CarpetListItem: {
+            /** Color Families */
+            color_families: components["schemas"]["ColorFamily"][];
             /** Colors */
             colors: string[];
             /** Id */
@@ -745,6 +751,10 @@ export interface components {
          *     Members with no stock are simply absent rather than present with a zero.
          */
         CatalogFacets: {
+            /** Colors */
+            colors: {
+                [key: string]: number;
+            };
             /** Materials */
             materials: {
                 [key: string]: number;
@@ -767,6 +777,19 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /**
+         * ColorFamily
+         * @description The colours a shopper would name, as opposed to the ones a photo holds.
+         *
+         *     Dominant colours are stored as exact hex and are therefore nearly unique —
+         *     useless as a filter. These are the buckets those hexes fall into, assigned
+         *     in `app.services.color`, and the vocabulary is chosen for carpets rather
+         *     than for colour theory: CREAM and TURQUOISE earn their place because Persian
+         *     carpets are full of both and neither survives being called "pale yellow" or
+         *     "cyan", while colours no carpet ground is woven in are simply absent.
+         * @enum {string}
+         */
+        ColorFamily: "red" | "pink" | "orange" | "gold" | "cream" | "brown" | "green" | "turquoise" | "blue" | "purple" | "gray" | "black" | "white";
         /** CornerPoint */
         CornerPoint: {
             /** X */
@@ -904,7 +927,7 @@ export interface components {
             carpet: components["schemas"]["CarpetListItem"];
             /**
              * Similarity
-             * @description 1 = عین هم؛ بر اساس فاصله‌ی کسینوسی
+             * @description ۱ = عین هم. ترکیب وزنی شباهت ساختار (امبدینگ) و شباهت رنگ (هیستوگرام HSV)؛ وقتی تصویر پرس‌وجو یا کاندید هیستوگرام نداشته باشد، فقط ساختار.
              */
             similarity: number;
         };
@@ -1646,7 +1669,8 @@ export interface operations {
                 room?: components["schemas"]["RoomType"][] | null;
                 /** @description چند مقدار، با تکرار همین پارامتر */
                 id?: number[] | null;
-                color?: string | null;
+                /** @description چند مقدار، با تکرار همین پارامتر */
+                color?: components["schemas"]["ColorFamily"][] | null;
                 min_width_cm?: number | null;
                 max_width_cm?: number | null;
                 min_length_cm?: number | null;

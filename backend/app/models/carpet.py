@@ -29,10 +29,20 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
-from app.models.enums import ArAssetStatus, CarpetMaterial, CarpetPattern, RoomType
+from app.models.enums import (
+    ArAssetStatus,
+    CarpetMaterial,
+    CarpetPattern,
+    ColorFamily,
+    RoomType,
+)
 
 # DINOv2 ViT-B/14 produces 768-d embeddings; a change here needs a migration.
 EMBEDDING_DIM = 768
+# The HSV histogram beside it — see `app.services.color.HISTOGRAM_DIM`, which is
+# the definition; this repeats the number because a model must not import a
+# service, and the two are pinned together by a test.
+COLOR_HISTOGRAM_DIM = 42
 
 
 class Carpet(Base, TimestampMixin):
@@ -49,6 +59,13 @@ class Carpet(Base, TimestampMixin):
     # Dominant colours as hex, ordered by coverage — extracted from the photo at
     # ingest time and used for colour filtering and the room-matching engine.
     colors: Mapped[list[str]] = mapped_column(ARRAY(String(7)), default=list)
+    # The same colours bucketed into families a shopper would name. Kept beside
+    # the hex rather than instead of it: the hex is what the storefront paints a
+    # swatch with, the family is what it filters on, and neither can do the
+    # other's job. Derived at ingest by `app.services.color`.
+    color_families: Mapped[list[ColorFamily]] = mapped_column(
+        ARRAY(Enum(ColorFamily, native_enum=False)), default=list
+    )
     suitable_rooms: Mapped[list[RoomType]] = mapped_column(
         ARRAY(Enum(RoomType, native_enum=False)), default=list
     )
@@ -135,5 +152,12 @@ class CarpetImage(Base, TimestampMixin):
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
 
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIM))
+    # What the embedding cannot see. DINOv2 reads pattern and weave and is close
+    # to colour-blind, so visual search re-ranks its candidates against this.
+    # No index: it is never searched on its own, only used to reorder a handful
+    # of rows the embedding index already found.
+    color_histogram: Mapped[list[float] | None] = mapped_column(
+        Vector(COLOR_HISTOGRAM_DIM)
+    )
 
     carpet: Mapped[Carpet] = relationship(back_populates="images")

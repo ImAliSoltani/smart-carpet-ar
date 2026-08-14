@@ -6,7 +6,13 @@ from typing import Annotated, Literal
 from fastapi import Query
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import ArAssetStatus, CarpetMaterial, CarpetPattern, RoomType
+from app.models.enums import (
+    ArAssetStatus,
+    CarpetMaterial,
+    CarpetPattern,
+    ColorFamily,
+    RoomType,
+)
 
 
 class VariantOut(BaseModel):
@@ -45,6 +51,7 @@ class CarpetListItem(BaseModel):
     pattern: CarpetPattern
     material: CarpetMaterial
     colors: list[str]
+    color_families: list[ColorFamily]
     primary_image: str | None = None
     min_price: Decimal | None = None
     sizes_count: int = 0
@@ -60,6 +67,7 @@ class CarpetDetail(BaseModel):
     pattern: CarpetPattern
     material: CarpetMaterial
     colors: list[str]
+    color_families: list[ColorFamily]
     suitable_rooms: list[RoomType]
     origin: str | None
     variants: list[VariantOut]
@@ -93,7 +101,12 @@ class CatalogFilters(BaseModel):
     # no other way to ask for them. It composes with the rest like any other
     # filter — an id outside the set simply does not match.
     id: Annotated[list[int] | None, Query(description=_repeat)] = None
-    color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+    # A named family, not a hex. The hex version of this filter matched exact
+    # dominant colours, which are read off each photograph and so are all but
+    # unique — it could be satisfied only by pasting a value the shopper had no
+    # way to know. Families are the same colours bucketed into words, and the
+    # parameter repeats like the others: ?color=blue&color=cream.
+    color: Annotated[list[ColorFamily] | None, Query(description=_repeat)] = None
     min_width_cm: int | None = Field(default=None, ge=1)
     max_width_cm: int | None = Field(default=None, ge=1)
     min_length_cm: int | None = Field(default=None, ge=1)
@@ -116,6 +129,7 @@ class CatalogFacets(BaseModel):
     patterns: dict[str, int]
     materials: dict[str, int]
     rooms: dict[str, int]
+    colors: dict[str, int]
     min_price: Decimal | None
     max_price: Decimal | None
     price_histogram: list[int] = Field(
@@ -126,7 +140,13 @@ class CatalogFacets(BaseModel):
 
 class SimilarItem(BaseModel):
     carpet: CarpetListItem
-    similarity: float = Field(description="1 = عین هم؛ بر اساس فاصله‌ی کسینوسی")
+    similarity: float = Field(
+        description=(
+            "۱ = عین هم. ترکیب وزنی شباهت ساختار (امبدینگ) و شباهت رنگ "
+            "(هیستوگرام HSV)؛ وقتی تصویر پرس‌وجو یا کاندید هیستوگرام نداشته "
+            "باشد، فقط ساختار."
+        )
+    )
 
 
 class VisualSearchResponse(BaseModel):

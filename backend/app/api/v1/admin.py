@@ -334,6 +334,12 @@ async def upload_image(
     # first photo also fills in the carpet's colors unless the admin already set them
     if count == 0 and not carpet.colors:
         carpet.colors = image_set.dominant_colors
+    # Families follow the same rule but are tracked separately, because an admin
+    # who hand-picked the swatches has not thereby picked the filter buckets —
+    # the two fields are edited in different places and one being set says
+    # nothing about the other.
+    if count == 0 and not carpet.color_families:
+        carpet.color_families = image_set.color_families
 
     record = CarpetImage(
         carpet_id=carpet_id,
@@ -344,6 +350,7 @@ async def upload_image(
         position=count,
         is_primary=count == 0,
         embedding=embedder.embed_image(data),
+        color_histogram=image_set.color_histogram,
     )
     session.add(record)
     await session.commit()

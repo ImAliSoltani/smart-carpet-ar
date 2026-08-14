@@ -5,10 +5,20 @@ the wrong way still returns 200 and still renders — as a chip with no label an
 no count — so the failure only shows up as an interface that looks half-built.
 """
 
-from app.models.enums import CarpetMaterial, CarpetPattern, RoomType
+from io import BytesIO
+
+from PIL import Image
+
+from app.models.enums import CarpetMaterial, CarpetPattern, ColorFamily, RoomType
 
 
-def _create(admin_client, slug, *, pattern, material, rooms, prices):
+def _png(rgb: tuple[int, int, int]) -> bytes:
+    buffer = BytesIO()
+    Image.new("RGB", (400, 600), rgb).save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def _create(admin_client, slug, *, pattern, material, rooms, prices, photo=None):
     response = admin_client.post(
         "/api/v1/admin/carpets",
         json={
@@ -23,6 +33,14 @@ def _create(admin_client, slug, *, pattern, material, rooms, prices):
     )
     assert response.status_code == 201, response.text
     carpet = response.json()
+    if photo is not None:
+        # Colour families are derived from the photograph, never typed in, so a
+        # carpet only enters the colour facet by being photographed.
+        uploaded = admin_client.post(
+            f"/api/v1/admin/carpets/{carpet['id']}/images",
+            files={"file": (f"{slug}.png", _png(photo), "image/png")},
+        )
+        assert uploaded.status_code == 201, uploaded.text
     for i, price in enumerate(prices):
         created = admin_client.post(
             f"/api/v1/admin/carpets/{carpet['id']}/variants",
@@ -102,6 +120,65 @@ def test_facet_keys_are_the_values_the_api_speaks(client, admin_client) -> None:
         assert key == CarpetPattern(key).value
     for key in body["materials"]:
         assert key == CarpetMaterial(key).value
+    for key in body["colors"]:
+        assert key == ColorFamily(key).value
+
+
+def test_colour_is_a_facet_and_a_filter(client, admin_client) -> None:
+    """The pair that could not exist while colour was stored as exact hex.
+
+    Dominant colours are read off each photograph, so grouping the catalogue by
+    them gave one carpet per bucket and the filter matched a hex string a
+    shopper had no way to know. Both now work off named families, and both have
+    to keep working off the same vocabulary — a facet the filter cannot accept
+    renders as a chip that returns nothing.
+    """
+    _create(
+        admin_client,
+        "navy-one",
+        pattern="lachak_toranj",
+        material="silk",
+        rooms=["living_room"],
+        prices=[8_000_000],
+        photo=(40, 60, 150),
+    )
+    _create(
+        admin_client,
+        "navy-two",
+        pattern="afshan",
+        material="wool",
+        rooms=["bedroom"],
+        prices=[6_000_000],
+        photo=(35, 55, 140),
+    )
+    _create(
+        admin_client,
+        "crimson-one",
+        pattern="medallion",
+        material="wool",
+        rooms=["living_room"],
+        prices=[7_000_000],
+        photo=(180, 30, 40),
+    )
+
+    body = client.get("/api/v1/carpets/facets").json()
+    assert body["colors"]["blue"] == 2
+    assert body["colors"]["red"] == 1
+
+    # Every key the facet offers is a value the filter accepts.
+    for key, count in body["colors"].items():
+        narrowed = client.get("/api/v1/carpets", params={"color": [key]}).json()
+        assert narrowed["total"] == count, f"facet and filter disagree on {key}"
+
+    # Several colours in one group are alternatives, like every other facet.
+    either = client.get("/api/v1/carpets", params={"color": ["blue", "red"]}).json()
+    assert either["total"] == 3
+
+    # And colour narrows across groups rather than widening.
+    both = client.get(
+        "/api/v1/carpets", params={"color": ["blue", "red"], "material": ["wool"]}
+    ).json()
+    assert {item["slug"] for item in both["items"]} == {"navy-two", "crimson-one"}
 
 
 def test_facets_is_not_read_as_a_carpet_slug(client) -> None:

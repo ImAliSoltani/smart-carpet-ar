@@ -117,6 +117,7 @@ async def ingest(folder: Path, activate: bool) -> None:
                 pattern=CarpetPattern(row.get("pattern") or "medallion"),
                 material=CarpetMaterial(row.get("material") or "wool"),
                 colors=image_set.dominant_colors,
+                color_families=image_set.color_families,
                 suitable_rooms=parse_rooms(row.get("suitable_rooms") or ""),
                 origin=(row.get("origin") or None),
                 is_active=activate,
@@ -145,6 +146,7 @@ async def ingest(folder: Path, activate: bool) -> None:
                     position=0,
                     is_primary=True,
                     embedding=embedder.embed_image(data),
+                    color_histogram=image_set.color_histogram,
                 )
             )
             created += 1

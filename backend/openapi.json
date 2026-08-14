@@ -4,6 +4,13 @@
       "AdminCarpetDetail": {
         "description": "A carpet as the edit screen needs it: everything the shop sees, plus\nwhether the shop is allowed to see it.\n\n`is_active` is absent from the public shape for a good reason — the\nstorefront only ever receives active carpets, so the field would be a\nconstant `true` on every response and mean nothing. Here it is the state a\nwhole button exists to change.",
         "properties": {
+          "color_families": {
+            "items": {
+              "$ref": "#/components/schemas/ColorFamily"
+            },
+            "title": "Color Families",
+            "type": "array"
+          },
           "colors": {
             "items": {
               "type": "string"
@@ -85,6 +92,7 @@
           "pattern",
           "material",
           "colors",
+          "color_families",
           "suitable_rooms",
           "origin",
           "variants",
@@ -565,6 +573,13 @@
       },
       "CarpetDetail": {
         "properties": {
+          "color_families": {
+            "items": {
+              "$ref": "#/components/schemas/ColorFamily"
+            },
+            "title": "Color Families",
+            "type": "array"
+          },
           "colors": {
             "items": {
               "type": "string"
@@ -642,6 +657,7 @@
           "pattern",
           "material",
           "colors",
+          "color_families",
           "suitable_rooms",
           "origin",
           "variants",
@@ -652,6 +668,13 @@
       },
       "CarpetListItem": {
         "properties": {
+          "color_families": {
+            "items": {
+              "$ref": "#/components/schemas/ColorFamily"
+            },
+            "title": "Color Families",
+            "type": "array"
+          },
           "colors": {
             "items": {
               "type": "string"
@@ -712,7 +735,8 @@
           "name",
           "pattern",
           "material",
-          "colors"
+          "colors",
+          "color_families"
         ],
         "title": "CarpetListItem",
         "type": "object"
@@ -851,6 +875,13 @@
       "CatalogFacets": {
         "description": "Counts and ranges the filter panel needs before any filter is applied.\n\nKeys are the enum *values* the API speaks (`silk`, `lachak_toranj`), so the\nstorefront can look a count up by the same string it puts in the query.\nMembers with no stock are simply absent rather than present with a zero.",
         "properties": {
+          "colors": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Colors",
+            "type": "object"
+          },
           "materials": {
             "additionalProperties": {
               "type": "integer"
@@ -909,11 +940,32 @@
           "patterns",
           "materials",
           "rooms",
+          "colors",
           "min_price",
           "max_price"
         ],
         "title": "CatalogFacets",
         "type": "object"
+      },
+      "ColorFamily": {
+        "description": "The colours a shopper would name, as opposed to the ones a photo holds.\n\nDominant colours are stored as exact hex and are therefore nearly unique —\nuseless as a filter. These are the buckets those hexes fall into, assigned\nin `app.services.color`, and the vocabulary is chosen for carpets rather\nthan for colour theory: CREAM and TURQUOISE earn their place because Persian\ncarpets are full of both and neither survives being called \"pale yellow\" or\n\"cyan\", while colours no carpet ground is woven in are simply absent.",
+        "enum": [
+          "red",
+          "pink",
+          "orange",
+          "gold",
+          "cream",
+          "brown",
+          "green",
+          "turquoise",
+          "blue",
+          "purple",
+          "gray",
+          "black",
+          "white"
+        ],
+        "title": "ColorFamily",
+        "type": "string"
       },
       "CornerPoint": {
         "properties": {
@@ -1307,7 +1359,7 @@
             "$ref": "#/components/schemas/CarpetListItem"
           },
           "similarity": {
-            "description": "1 = عین هم؛ بر اساس فاصله‌ی کسینوسی",
+            "description": "۱ = عین هم. ترکیب وزنی شباهت ساختار (امبدینگ) و شباهت رنگ (هیستوگرام HSV)؛ وقتی تصویر پرس‌وجو یا کاندید هیستوگرام نداشته باشد، فقط ساختار.",
             "title": "Similarity",
             "type": "number"
           }
@@ -2833,19 +2885,23 @@
             }
           },
           {
+            "description": "چند مقدار، با تکرار همین پارامتر",
             "in": "query",
             "name": "color",
             "required": false,
             "schema": {
               "anyOf": [
                 {
-                  "pattern": "^#[0-9a-fA-F]{6}$",
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/components/schemas/ColorFamily"
+                  },
+                  "type": "array"
                 },
                 {
                   "type": "null"
                 }
               ],
+              "description": "چند مقدار، با تکرار همین پارامتر",
               "title": "Color"
             }
           },

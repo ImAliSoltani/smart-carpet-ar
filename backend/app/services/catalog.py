@@ -7,8 +7,26 @@ from sqlalchemy import Select, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Carpet, CarpetImage, CarpetVariant
-from app.models.enums import RoomType
+from app.models.enums import ColorFamily, RoomType
 from app.schemas.catalog import CarpetListItem, CatalogFacets, CatalogFilters
+from app.services import color as color_service
+
+# How the two signals are weighted when visual search ranks a candidate.
+# Structure leads because it is the reliable one and because it is what a
+# shopper photographing a carpet is usually pointing at; colour is heavy enough
+# to reorder a shelf of same-shaped rugs, which is exactly the failure it was
+# added to fix, and light enough that it cannot promote a carpet that merely
+# shares a palette. The split is a starting point to be measured rather than a
+# derived constant — the phase 5 evaluation notebook records Precision@k for it
+# against the structure-only ranking it replaced.
+STRUCTURE_WEIGHT = 0.7
+COLOR_WEIGHT = 0.3
+
+# How far past `limit` stage one reaches. Re-ranking can only reorder what it is
+# given, so a pool the size of the answer is not a second stage at all; eight
+# times leaves room for a carpet ranked thirtieth on structure to win on colour,
+# while staying small enough that the whole pool fits in one round trip.
+CANDIDATE_MULTIPLIER = 8
 
 
 class ListingRow(NamedTuple):
@@ -68,7 +86,12 @@ def _apply_filters(stmt: Select, filters: CatalogFilters) -> Select:
         # `overlap` is the array `&&`: suits any one of the rooms asked for.
         stmt = stmt.where(Carpet.suitable_rooms.overlap(filters.room))
     if filters.color:
-        stmt = stmt.where(Carpet.colors.any(filters.color.lower()))
+        # `overlap` again: a carpet is filed under up to three families, and one
+        # of them matching is what «فرش آبی» means. It is also what rescues the
+        # carpets whose largest colour is not their memorable one — a navy field
+        # under a wide cream border is filed cream first and blue second, and a
+        # shopper looking for blue should still find it.
+        stmt = stmt.where(Carpet.color_families.overlap(filters.color))
 
     variant_conditions = []
     if filters.min_width_cm:
@@ -163,12 +186,18 @@ async def facets(session: AsyncSession) -> CatalogFacets:
     )
     rooms = {RoomType[str(name)].value: n for name, n in room_rows.all()}
 
-    # No colour facet, deliberately. The dominant colours are exact hex values
-    # taken off each photograph, so they are very nearly unique: grouping the
-    # whole catalogue by colour returns twenty-four buckets holding one carpet
-    # each. A facet like that teaches nothing, and the `color` filter it would
-    # feed matches hex exactly, so it barely works either. Both need colours
-    # bucketed into families first — recorded as a debt of this phase.
+    # Colour counts the same way, and for the same reason: a carpet is filed
+    # under up to three families and belongs in each of their counts. This facet
+    # did not exist while colour was stored as exact hex — grouping the
+    # catalogue that way returned twenty-four buckets holding one carpet each,
+    # which teaches a shopper nothing. `color_families` is what made it possible.
+    color_col = func.unnest(Carpet.color_families).label("color")
+    color_rows = await session.execute(
+        select(color_col, func.count()).where(active).group_by(color_col)
+    )
+    # Same case correction as rooms above: unnest steps outside the Enum type
+    # and returns the stored name, while the rest of this payload speaks values.
+    colors = {ColorFamily[str(name)].value: n for name, n in color_rows.all()}
 
     price_stmt = (
         select(func.min(CarpetVariant.price), func.max(CarpetVariant.price))
@@ -200,6 +229,7 @@ async def facets(session: AsyncSession) -> CatalogFacets:
         patterns=patterns,
         materials=materials,
         rooms=rooms,
+        colors=colors,
         min_price=lo,
         max_price=hi,
         price_histogram=histogram,
@@ -224,37 +254,68 @@ async def search_by_embedding(
     session: AsyncSession,
     embedding: list[float],
     *,
+    color_histogram: list[float] | None = None,
     limit: int = 12,
     exclude_carpet_id: int | None = None,
 ) -> list[tuple[CarpetListItem, float]]:
-    """Nearest carpets to a query vector; one hit per carpet (its best image)."""
+    """Nearest carpets to a query vector; one hit per carpet (its best image).
+
+    Ranked in two stages, because no single vector answers the question. DINOv2
+    reads a carpet's *structure* — it tells لچک‌ترنج from افشان with almost no
+    mistakes — and is close to colour-blind, so on its own it answers a photo of
+    a green carpet with structurally identical red ones. That was measured on
+    this catalogue, not assumed.
+
+    So the embedding index proposes and the colour histogram disposes: stage one
+    is the HNSW nearest-neighbour search, over-fetched well past `limit` so that
+    stage two has something to reorder, and stage two scores each candidate on
+    both and sorts by the combination. Colour is the *second* stage rather than
+    a second index because structure is the stronger signal and the one worth
+    trusting to narrow the catalogue; colour decides among things already known
+    to be shaped alike.
+
+    A candidate with no histogram keeps its structure score alone rather than
+    being penalised. Missing is not "no colours in common": those rows predate
+    the histogram, and scoring them as maximally different would bury them.
+    """
     distance = CarpetImage.embedding.cosine_distance(embedding)
     stmt = (
-        select(CarpetImage.carpet_id, distance.label("dist"))
+        select(CarpetImage.carpet_id, distance.label("dist"), CarpetImage.color_histogram)
         .join(Carpet, Carpet.id == CarpetImage.carpet_id)
         .where(CarpetImage.embedding.is_not(None), Carpet.is_active.is_(True))
     )
     if exclude_carpet_id is not None:
         stmt = stmt.where(CarpetImage.carpet_id != exclude_carpet_id)
-    # over-fetch, then keep the best image per carpet
-    stmt = stmt.order_by(distance).limit(limit * 4)
+    stmt = stmt.order_by(distance).limit(limit * CANDIDATE_MULTIPLIER)
     rows = (await session.execute(stmt)).all()
 
-    best: dict[int, float] = {}
-    for carpet_id, dist in rows:
+    # Best image per carpet, by structure — the whole candidate pool, not the
+    # first `limit` of it. Cutting to `limit` here is what the single-stage
+    # version did, and it would leave the re-ranking below nothing to do but
+    # shuffle a list already chosen without reference to colour.
+    best: dict[int, tuple[float, list[float] | None]] = {}
+    for carpet_id, dist, histogram in rows:
         if carpet_id not in best:
-            best[carpet_id] = float(dist)
-        if len(best) >= limit:
-            break
+            best[carpet_id] = (float(dist), list(histogram) if histogram is not None else None)
 
     if not best:
         return []
 
+    scored: list[tuple[int, float]] = []
+    for carpet_id, (dist, histogram) in best.items():
+        structure = 1.0 - dist
+        if color_histogram is None or histogram is None:
+            scored.append((carpet_id, structure))
+            continue
+        colour = color_service.histogram_similarity(color_histogram, histogram)
+        scored.append(
+            (carpet_id, STRUCTURE_WEIGHT * structure + COLOR_WEIGHT * colour)
+        )
+    scored.sort(key=lambda pair: pair[1], reverse=True)
+    scored = scored[:limit]
+
     listing_rows = (
-        await session.execute(_listing_select().where(Carpet.id.in_(best.keys())))
+        await session.execute(_listing_select().where(Carpet.id.in_([c for c, _ in scored])))
     ).all()
     by_id = {row[0].id: row_to_list_item(ListingRow(*row)) for row in listing_rows}
-    return [
-        (by_id[cid], 1.0 - dist) for cid, dist in sorted(best.items(), key=lambda kv: kv[1])
-        if cid in by_id
-    ]
+    return [(by_id[cid], score) for cid, score in scored if cid in by_id]
