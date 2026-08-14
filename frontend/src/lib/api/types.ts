@@ -19,6 +19,8 @@ export type VariantOut = Schemas["VariantOut"];
 export type ImageOut = Schemas["ImageOut"];
 export type SimilarItem = Schemas["SimilarItem"];
 export type VisualSearchResponse = Schemas["VisualSearchResponse"];
+export type SizeGuideResponse = Schemas["SizeGuideResponse"];
+export type SizeSuggestion = Schemas["SizeSuggestion"];
 
 export type CarpetPattern = Schemas["CarpetPattern"];
 export type CarpetMaterial = Schemas["CarpetMaterial"];

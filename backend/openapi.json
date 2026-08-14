@@ -473,6 +473,20 @@
         "title": "ArVariantStatus",
         "type": "object"
       },
+      "Body_size_guide_api_v1_room_size_guide_post": {
+        "properties": {
+          "image": {
+            "contentMediaType": "application/octet-stream",
+            "title": "Image",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image"
+        ],
+        "title": "Body_size_guide_api_v1_room_size_guide_post",
+        "type": "object"
+      },
       "Body_upload_image_api_v1_admin_carpets__carpet_id__images_post": {
         "properties": {
           "file": {
@@ -1353,6 +1367,27 @@
         "title": "RoomType",
         "type": "string"
       },
+      "ScaleReferenceOut": {
+        "description": "What the A4 sheet in the photo said about its scale.",
+        "properties": {
+          "correction_percent": {
+            "description": "درصد اصلاحی که برگه‌ی A4 روی تخمین عمق اعمال کرد؛ منفی یعنی مدل اتاق را بزرگ‌تر دیده بود",
+            "title": "Correction Percent",
+            "type": "number"
+          },
+          "measured_long_cm": {
+            "description": "طول اندازه‌گیری‌شده‌ی برگه پیش از اصلاح",
+            "title": "Measured Long Cm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "correction_percent",
+          "measured_long_cm"
+        ],
+        "title": "ScaleReferenceOut",
+        "type": "object"
+      },
       "SimilarItem": {
         "properties": {
           "carpet": {
@@ -1369,6 +1404,87 @@
           "similarity"
         ],
         "title": "SimilarItem",
+        "type": "object"
+      },
+      "SizeGuideResponse": {
+        "description": "What one room photo says about the carpet it can take.",
+        "properties": {
+          "camera_height_m": {
+            "description": "ارتفاع بازیابی‌شده‌ی دوربین از کف",
+            "title": "Camera Height M",
+            "type": "number"
+          },
+          "confidence": {
+            "description": "۰ تا ۱؛ اطمینان تشخیص کف. زیر ۰٫۴ یعنی عدد‌ها را با احتیاط بخوانید",
+            "title": "Confidence",
+            "type": "number"
+          },
+          "free_area_sqm": {
+            "description": "مساحت کل کفِ در دسترس، نه فقط آن مستطیل",
+            "title": "Free Area Sqm",
+            "type": "number"
+          },
+          "free_length_cm": {
+            "description": "طول همان محدوده",
+            "title": "Free Length Cm",
+            "type": "integer"
+          },
+          "free_width_cm": {
+            "description": "عرض بزرگ‌ترین محدوده‌ی آزادِ فرش‌شکل",
+            "title": "Free Width Cm",
+            "type": "integer"
+          },
+          "recommended": {
+            "description": "بزرگ‌ترین اندازه‌های موجود که در این محدوده جا می‌شوند، حداکثر شش تا",
+            "items": {
+              "$ref": "#/components/schemas/SizeSuggestion"
+            },
+            "title": "Recommended",
+            "type": "array"
+          },
+          "scale_reference": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScaleReferenceOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "confidence",
+          "camera_height_m",
+          "free_width_cm",
+          "free_length_cm",
+          "free_area_sqm"
+        ],
+        "title": "SizeGuideResponse",
+        "type": "object"
+      },
+      "SizeSuggestion": {
+        "properties": {
+          "carpet_count": {
+            "description": "تعداد فرش‌های موجود در این اندازه",
+            "title": "Carpet Count",
+            "type": "integer"
+          },
+          "length_cm": {
+            "title": "Length Cm",
+            "type": "integer"
+          },
+          "width_cm": {
+            "title": "Width Cm",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width_cm",
+          "length_cm",
+          "carpet_count"
+        ],
+        "title": "SizeSuggestion",
         "type": "object"
       },
       "ValidationError": {
@@ -3280,6 +3396,48 @@
         "summary": "Track Order",
         "tags": [
           "orders"
+        ]
+      }
+    },
+    "/api/v1/room/size-guide": {
+      "post": {
+        "description": "عکس اتاق → اندازه‌های فرشی که در فضای آزاد جا می‌شوند.",
+        "operationId": "size_guide_api_v1_room_size_guide_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_size_guide_api_v1_room_size_guide_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SizeGuideResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Size Guide",
+        "tags": [
+          "room"
         ]
       }
     },

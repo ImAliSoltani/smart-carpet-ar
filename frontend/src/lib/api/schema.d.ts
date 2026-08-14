@@ -407,6 +407,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/room/size-guide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Size Guide
+         * @description عکس اتاق → اندازه‌های فرشی که در فضای آزاد جا می‌شوند.
+         */
+        post: operations["size_guide_api_v1_room_size_guide_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/search/visual": {
         parameters: {
             query?: never;
@@ -638,6 +658,11 @@ export interface components {
             variant_id: number;
             /** Width Cm */
             width_cm: number;
+        };
+        /** Body_size_guide_api_v1_room_size_guide_post */
+        Body_size_guide_api_v1_room_size_guide_post: {
+            /** Image */
+            image: string;
         };
         /** Body_upload_image_api_v1_admin_carpets__carpet_id__images_post */
         Body_upload_image_api_v1_admin_carpets__carpet_id__images_post: {
@@ -922,6 +947,22 @@ export interface components {
          * @enum {string}
          */
         RoomType: "living_room" | "bedroom" | "dining_room" | "kids_room" | "office" | "hallway";
+        /**
+         * ScaleReferenceOut
+         * @description What the A4 sheet in the photo said about its scale.
+         */
+        ScaleReferenceOut: {
+            /**
+             * Correction Percent
+             * @description درصد اصلاحی که برگه‌ی A4 روی تخمین عمق اعمال کرد؛ منفی یعنی مدل اتاق را بزرگ‌تر دیده بود
+             */
+            correction_percent: number;
+            /**
+             * Measured Long Cm
+             * @description طول اندازه‌گیری‌شده‌ی برگه پیش از اصلاح
+             */
+            measured_long_cm: number;
+        };
         /** SimilarItem */
         SimilarItem: {
             carpet: components["schemas"]["CarpetListItem"];
@@ -930,6 +971,55 @@ export interface components {
              * @description ۱ = عین هم. ترکیب وزنی شباهت ساختار (امبدینگ) و شباهت رنگ (هیستوگرام HSV)؛ وقتی تصویر پرس‌وجو یا کاندید هیستوگرام نداشته باشد، فقط ساختار.
              */
             similarity: number;
+        };
+        /**
+         * SizeGuideResponse
+         * @description What one room photo says about the carpet it can take.
+         */
+        SizeGuideResponse: {
+            /**
+             * Camera Height M
+             * @description ارتفاع بازیابی‌شده‌ی دوربین از کف
+             */
+            camera_height_m: number;
+            /**
+             * Confidence
+             * @description ۰ تا ۱؛ اطمینان تشخیص کف. زیر ۰٫۴ یعنی عدد‌ها را با احتیاط بخوانید
+             */
+            confidence: number;
+            /**
+             * Free Area Sqm
+             * @description مساحت کل کفِ در دسترس، نه فقط آن مستطیل
+             */
+            free_area_sqm: number;
+            /**
+             * Free Length Cm
+             * @description طول همان محدوده
+             */
+            free_length_cm: number;
+            /**
+             * Free Width Cm
+             * @description عرض بزرگ‌ترین محدوده‌ی آزادِ فرش‌شکل
+             */
+            free_width_cm: number;
+            /**
+             * Recommended
+             * @description بزرگ‌ترین اندازه‌های موجود که در این محدوده جا می‌شوند، حداکثر شش تا
+             */
+            recommended?: components["schemas"]["SizeSuggestion"][];
+            scale_reference?: components["schemas"]["ScaleReferenceOut"] | null;
+        };
+        /** SizeSuggestion */
+        SizeSuggestion: {
+            /**
+             * Carpet Count
+             * @description تعداد فرش‌های موجود در این اندازه
+             */
+            carpet_count: number;
+            /** Length Cm */
+            length_cm: number;
+            /** Width Cm */
+            width_cm: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -1844,6 +1934,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    size_guide_api_v1_room_size_guide_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_size_guide_api_v1_room_size_guide_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SizeGuideResponse"];
                 };
             };
             /** @description Validation Error */

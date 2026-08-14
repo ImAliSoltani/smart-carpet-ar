@@ -236,6 +236,27 @@ async def facets(session: AsyncSession) -> CatalogFacets:
     )
 
 
+async def stocked_sizes(session: AsyncSession) -> list[tuple[int, int, int]]:
+    """Every size the shop actually sells, with how many carpets come in it.
+
+    (width_cm, length_cm, carpet_count), largest first. The size guide needs the
+    real list rather than a table of standard sizes: recommending 250×350 to
+    somebody whose room takes it is only useful if the shop has one.
+    """
+    rows = await session.execute(
+        select(
+            CarpetVariant.width_cm,
+            CarpetVariant.length_cm,
+            func.count(func.distinct(CarpetVariant.carpet_id)),
+        )
+        .join(Carpet, Carpet.id == CarpetVariant.carpet_id)
+        .where(Carpet.is_active.is_(True), CarpetVariant.stock > 0)
+        .group_by(CarpetVariant.width_cm, CarpetVariant.length_cm)
+    )
+    sizes = [(int(w), int(length), int(n)) for w, length, n in rows.all()]
+    return sorted(sizes, key=lambda row: row[0] * row[1], reverse=True)
+
+
 async def get_carpet_by_slug(session: AsyncSession, slug: str) -> Carpet | None:
     result = await session.execute(
         select(Carpet).where(Carpet.slug == slug, Carpet.is_active.is_(True))

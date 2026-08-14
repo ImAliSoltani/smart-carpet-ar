@@ -1,9 +1,10 @@
 from fastapi import APIRouter
 
-from app.api.v1 import admin, catalog, orders, search
+from app.api.v1 import admin, catalog, orders, room, search
 
 router = APIRouter(prefix="/api/v1")
 router.include_router(catalog.router)
 router.include_router(search.router)
+router.include_router(room.router)
 router.include_router(orders.router)
 router.include_router(admin.router)

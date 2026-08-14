@@ -23,6 +23,29 @@ export function formatNumber(value: string | number | null | undefined): string 
   return parsed === null ? "—" : faDigits.format(parsed);
 }
 
+/**
+ * ۱٫۵ — Persian digits keeping one decimal place.
+ *
+ * `formatNumber` deliberately drops decimals, because every number it was
+ * written for is a count or a price and «۶۷٬۴۰۰٬۰۰۰٫۰۰ تومان» is not how anyone
+ * writes money. The size guide brought the first quantities that are genuinely
+ * fractional — a camera at 1.5 m, a floor of 22.8 square metres — and rounding
+ * those turned a measurement into «۲ متر», which reads as a shrug.
+ *
+ * Note the separator: Persian writes the decimal mark as «٫» (U+066B), not as
+ * the Latin full stop, and `Intl` handles that as long as it is asked for the
+ * decimals at all.
+ */
+const faDecimal = new Intl.NumberFormat("fa-IR", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 1,
+});
+
+export function formatDecimal(value: string | number | null | undefined): string {
+  const parsed = toNumber(value);
+  return parsed === null ? "—" : faDecimal.format(parsed);
+}
+
 /** ۶۷٬۴۰۰٬۰۰۰ تومان. Prices are stored in toman, so no conversion is involved. */
 export function formatToman(value: string | number | null | undefined): string {
   const parsed = toNumber(value);
