@@ -134,7 +134,13 @@ export function AskClient() {
         </div>
       )}
 
-      <AnimatePresence initial={false}>
+      {/* `mode="wait"` is not a taste decision here. Without it the outgoing
+          results stay mounted while the incoming ones arrive, and any carpet in
+          both answers is named twice at once — which is precisely the condition
+          the shared carpet transition cannot survive. It shows up as a console
+          error and a transition that silently stops working, never as a broken
+          page, so it is the kind of thing that ships. */}
+      <AnimatePresence mode="wait" initial={false}>
         {data && (
           <motion.section
             key={draft}
