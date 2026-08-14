@@ -14,11 +14,14 @@ Vectors are L2-normalized so pgvector cosine distance behaves.
 """
 
 import hashlib
+import logging
 import math
 from io import BytesIO
 from typing import Protocol
 
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 EMBEDDING_DIM = 768
 
@@ -110,15 +113,32 @@ _backend: EmbeddingBackend | None = None
 
 
 def get_embedding_backend() -> EmbeddingBackend:
-    """App-wide backend. Tests override this via dependency injection."""
+    """App-wide backend. Tests override this via dependency injection.
+
+    The fallback is deliberate and the noise around it is too. A missing torch
+    is normal — CI and the test suite run without it on purpose — but a torch
+    that is *present and broken* looks identical to this `except`, and the
+    consequence is not a crash: it is a visual search that answers, quickly,
+    with nonsense. The stored vectors are DINOv2's; a hash vector is orthogonal
+    to all of them, so every ranking becomes noise while every response stays
+    200. That happened here, from an interrupted install, and nothing said so.
+
+    So the fallback now announces itself, and says which of the two it is.
+    """
     global _backend
     if _backend is None:
         try:
             import torch  # noqa: F401
 
             _backend = DinoV2Backend()
-        except ImportError:
+        except ImportError as exc:
             _backend = HashEmbeddingBackend()
+            logger.warning(
+                "جست‌وجوی بصری روی بک‌اند قلابی اجرا می‌شود: %s. "
+                "امبدینگ‌های ذخیره‌شده از DINOv2 هستند، پس نتایج بی‌معنا خواهند بود. "
+                "برای اجرای واقعی: uv sync --group ml",
+                exc,
+            )
     return _backend
 
 

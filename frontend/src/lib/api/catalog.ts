@@ -50,6 +50,27 @@ export function getSimilarCarpets(
   });
 }
 
+/**
+ * A photograph in, the carpets nearest it out.
+ *
+ * `FormData` and no `Content-Type` header: the browser has to write that one
+ * itself, because a multipart body is only parseable with the boundary token it
+ * generates. Setting it by hand produces a request the backend rejects as
+ * malformed, and the mistake looks like a server bug rather than a client one.
+ */
+export function visualSearch(
+  image: File,
+  signal?: AbortSignal,
+): Promise<VisualSearchResponse> {
+  const body = new FormData();
+  body.append("image", image);
+  return request<VisualSearchResponse>("/api/v1/search/visual", {
+    method: "POST",
+    body,
+    signal,
+  });
+}
+
 /** Counts per filter and the price distribution — the filter panel's input. */
 export function getFacets(signal?: AbortSignal): Promise<CatalogFacets> {
   return request<CatalogFacets>("/api/v1/carpets/facets", { signal });
