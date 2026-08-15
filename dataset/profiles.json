@@ -1,0 +1,2008 @@
+[
+  {
+    "slug": "qom-silk-lachak-sormei",
+    "name": "فرش دستباف ابریشم قم — لچک‌ترنج زمینه سرمه‌ای",
+    "description": "تمام‌ابریشم قم با ۷۰ رج، بافته‌شده روی چله‌ی ابریشم. زمینه‌ی سرمه‌ای عمیق با ترنج مرکزی نخودی و لچک‌های قرینه، و حاشیه‌ی باریکی که نقش را قاب می‌گیرد. زیر نور، ابریشم رنگ را از دو جهت متفاوت نشان می‌دهد.",
+    "pattern": "lachak_toranj",
+    "material": "silk",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "قم",
+    "handmade": true,
+    "density": "۷۰ رج",
+    "intended_colors": [
+      "blue",
+      "cream",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "178600000",
+        "stock": 2
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "215300000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "382700000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "qom-silk-afshan-firoozei",
+    "name": "فرش دستباف ابریشم قم — افشان فیروزه‌ای",
+    "description": "نقش افشان روی زمینه‌ی فیروزه‌ای؛ گل و بند بدون ترنج مرکزی در تمام سطح فرش پخش شده و چشم را جایی متوقف نمی‌کند. تمام‌ابریشم قم، ۶۰ رج.",
+    "pattern": "afshan",
+    "material": "silk",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "قم",
+    "handmade": true,
+    "density": "۶۰ رج",
+    "intended_colors": [
+      "turquoise",
+      "cream",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "188400000",
+        "stock": 9
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "227100000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "403700000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "esfahan-kork-lachak-kerem",
+    "name": "فرش دستباف اصفهان — کرک و ابریشم، لچک‌ترنج نخودی",
+    "description": "کرک مرغوب با گل‌های ابریشم، زمینه‌ی نخودی روشن و ترنج لاکی. برجستگی ابریشم روی کرک، نقش را در نور کم هم خوانا نگه می‌دارد.",
+    "pattern": "lachak_toranj",
+    "material": "mixed",
+    "suitable_rooms": [
+      "living_room",
+      "dining_room"
+    ],
+    "origin": "اصفهان",
+    "handmade": true,
+    "density": "۵۵ رج",
+    "intended_colors": [
+      "cream",
+      "red",
+      "blue"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "44600000",
+        "stock": 2
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "100300000",
+        "stock": 4
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "178300000",
+        "stock": 9
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "260000000",
+        "stock": 1
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "naeen-9la-afshan-sormei",
+    "name": "فرش دستباف نایین ۹ لا — افشان سرمه‌ای",
+    "description": "نایین نُه‌لا با گل ابریشم؛ زمینه‌ی سرمه‌ای و نقش افشان با غلبه‌ی سفید و آبی. نایین را از همین ترکیب کم‌رنگِ آرام می‌شناسند.",
+    "pattern": "afshan",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room",
+      "office"
+    ],
+    "origin": "نایین",
+    "handmade": true,
+    "density": "۹ لا",
+    "intended_colors": [
+      "blue",
+      "white",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "52900000",
+        "stock": 8
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "119100000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "211600000",
+        "stock": 7
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "308600000",
+        "stock": 5
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "tabriz-50raj-toranji-laki",
+    "name": "فرش دستباف تبریز ۵۰ رج — ترنجی لاکی",
+    "description": "تبریز پنجاه رج با ترنج مرکزی درشت و زمینه‌ی لاکی. بافت محکم و پرزِ کوتاه، همان‌طور که تبریز را می‌شناسند.",
+    "pattern": "medallion",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "تبریز",
+    "handmade": true,
+    "density": "۵۰ رج",
+    "intended_colors": [
+      "red",
+      "blue",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "26400000",
+        "stock": 1
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "49300000",
+        "stock": 8
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "59400000",
+        "stock": 5
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "105600000",
+        "stock": 2
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "154000000",
+        "stock": 5
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "211100000",
+        "stock": 0
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-lachak-laki",
+    "name": "فرش دستباف کاشان — لچک‌ترنج لاکی",
+    "description": "کاشانِ کلاسیک: زمینه‌ی لاکی، ترنج سرمه‌ای و لچک‌های نخودی. همان فرشی که در ذهن بیشتر مردم تصویر «فرش ایرانی» است.",
+    "pattern": "lachak_toranj",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room",
+      "dining_room"
+    ],
+    "origin": "کاشان",
+    "handmade": true,
+    "density": "۴۰ رج",
+    "intended_colors": [
+      "red",
+      "blue",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "27400000",
+        "stock": 6
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "51200000",
+        "stock": 3
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "61700000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "109700000",
+        "stock": 1
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "160000000",
+        "stock": 3
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "219400000",
+        "stock": 3
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "mashhad-afshan-arghavani",
+    "name": "فرش دستباف مشهد — افشان ارغوانی",
+    "description": "مشهدِ ارغوانی با نقش افشان و گل‌های درشت. رنگ ارغوانی در فرش مشهد کهنه‌شدنی است و با گذر سال‌ها به گلبهی می‌نشیند.",
+    "pattern": "afshan",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room",
+      "bedroom"
+    ],
+    "origin": "مشهد",
+    "handmade": true,
+    "density": "۴۰ رج",
+    "intended_colors": [
+      "pink",
+      "red",
+      "purple"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "17700000",
+        "stock": 4
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "33000000",
+        "stock": 6
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "39700000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "70600000",
+        "stock": 1
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "103000000",
+        "stock": 1
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "141300000",
+        "stock": 6
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kerman-golfarang-kerem",
+    "name": "فرش دستباف کرمان — گل فرنگ زمینه نخودی",
+    "description": "نقش گل فرنگ کرمان روی زمینه‌ی نخودی؛ دسته‌گل‌های رز به سبک اروپایی که کرمان در دوره‌ی قاجار وارد نقشه‌ی فرش ایرانی کرد.",
+    "pattern": "floral",
+    "material": "wool",
+    "suitable_rooms": [
+      "bedroom",
+      "living_room"
+    ],
+    "origin": "کرمان",
+    "handmade": true,
+    "density": "۴۰ رج",
+    "intended_colors": [
+      "cream",
+      "pink",
+      "green"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "17800000",
+        "stock": 9
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "40100000",
+        "stock": 4
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "71400000",
+        "stock": 0
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "104100000",
+        "stock": 9
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "arak-sultanabad-golfarang",
+    "name": "فرش دستباف اراک — سلطان‌آباد گل‌دار",
+    "description": "سلطان‌آباد با نقش گل‌دار درشت و رنگ‌های گیاهی. بافت روستایی و پرزِ بلندتر، مناسب فضایی که زیر پا زیاد راه می‌روند.",
+    "pattern": "floral",
+    "material": "wool",
+    "suitable_rooms": [
+      "dining_room",
+      "living_room"
+    ],
+    "origin": "اراک",
+    "handmade": true,
+    "density": "۳۵ رج",
+    "intended_colors": [
+      "red",
+      "blue",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "69800000",
+        "stock": 1
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "101700000",
+        "stock": 5
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "139500000",
+        "stock": 0
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "birjand-toranji-sabz",
+    "name": "فرش دستباف بیرجند — ترنجی سبز",
+    "description": "بیرجند با زمینه‌ی سبز زیتونی و ترنج نخودی. سبز در فرش دستباف کم‌یاب است و همین آن را برای فضایی که می‌خواهد متفاوت باشد انتخاب می‌کند.",
+    "pattern": "medallion",
+    "material": "wool",
+    "suitable_rooms": [
+      "office",
+      "living_room"
+    ],
+    "origin": "بیرجند",
+    "handmade": true,
+    "density": "۴۰ رج",
+    "intended_colors": [
+      "green",
+      "cream",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "18400000",
+        "stock": 3
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "41300000",
+        "stock": 8
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "73500000",
+        "stock": 0
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "107200000",
+        "stock": 1
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "qashqai-ashayeri-ghermez",
+    "name": "گبه‌ی دستباف قشقایی — عشایری قرمز",
+    "description": "بافت عشایری قشقایی؛ نقشی که از حفظ بافته می‌شود نه از روی نقشه، پس هیچ دو نیمه‌اش دقیقاً قرینه نیست. همین بی‌قرینگی امضای آن است.",
+    "pattern": "tribal",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room",
+      "bedroom"
+    ],
+    "origin": "شیراز — قشقایی",
+    "handmade": true,
+    "density": "۳۰ رج",
+    "intended_colors": [
+      "red",
+      "orange",
+      "brown"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "26500000",
+        "stock": 0
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "32000000",
+        "stock": 1
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "56900000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "baluch-kenareh-ghahvei",
+    "name": "کناره‌ی دستباف بلوچ — عشایری قهوه‌ای",
+    "description": "کناره‌ی بلوچ با زمینه‌ی قهوه‌ای تیره و نقش هندسی ریز. باریک و بلند، برای راهرو یا کنار تخت.",
+    "pattern": "tribal",
+    "material": "wool",
+    "suitable_rooms": [
+      "hallway",
+      "bedroom"
+    ],
+    "origin": "سیستان — بلوچ",
+    "handmade": true,
+    "density": "۳۰ رج",
+    "intended_colors": [
+      "brown",
+      "black",
+      "red"
+    ],
+    "variants": [
+      {
+        "width_cm": 80,
+        "length_cm": 200,
+        "price": "14900000",
+        "stock": 5
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 300,
+        "price": "22300000",
+        "stock": 9
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 400,
+        "price": "29800000",
+        "stock": 5
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "hamedan-hendesi-ghermez",
+    "name": "فرش دستباف همدان — هندسی قرمز",
+    "description": "همدان با نقش هندسی و بافت تک‌پود؛ محکم، ساده و بی‌ادعا. فرشی که برای کار کردن بافته شده نه برای قاب گرفتن.",
+    "pattern": "geometric",
+    "material": "wool",
+    "suitable_rooms": [
+      "office",
+      "hallway"
+    ],
+    "origin": "همدان",
+    "handmade": true,
+    "density": "۳۰ رج",
+    "intended_colors": [
+      "red",
+      "gray",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "19800000",
+        "stock": 7
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "23900000",
+        "stock": 4
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "42500000",
+        "stock": 5
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "ardabil-hendesi-abi",
+    "name": "فرش دستباف اردبیل — هندسی آبی",
+    "description": "اردبیل با نقش هندسی آبی و سفید و بافت شمال‌غربی. خطوط شکسته و رنگ‌بندی سردی که در اتاق خواب آرام می‌نشیند.",
+    "pattern": "geometric",
+    "material": "wool",
+    "suitable_rooms": [
+      "bedroom",
+      "office"
+    ],
+    "origin": "اردبیل",
+    "handmade": true,
+    "density": "۳۵ رج",
+    "intended_colors": [
+      "blue",
+      "white",
+      "gray"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "21800000",
+        "stock": 9
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "26300000",
+        "stock": 9
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "46800000",
+        "stock": 3
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "tabriz-patineh-vintage-tousi",
+    "name": "فرش دستباف تبریز — پتینه‌ی طوسی",
+    "description": "فرش دستباف تبریز که رنگ‌برداری و پتینه شده؛ نقش زیر لایه‌ای از خاکستری محو می‌شود و فرش قدیمی‌تر از سنش به نظر می‌رسد.",
+    "pattern": "vintage",
+    "material": "wool",
+    "suitable_rooms": [
+      "living_room",
+      "office"
+    ],
+    "origin": "تبریز",
+    "handmade": true,
+    "density": "۴۰ رج",
+    "intended_colors": [
+      "gray",
+      "pink",
+      "purple"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "17100000",
+        "stock": 0
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "38500000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "68500000",
+        "stock": 3
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "99900000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "yazd-sadeh-nokhodi",
+    "name": "فرش دستباف یزد — ساده‌ی نخودی",
+    "description": "زمینه‌ی یک‌دستِ نخودی با حاشیه‌ی باریک و بافت پنبه‌ای. برای فضایی که خودش پُر است و فرش باید ساکت بماند.",
+    "pattern": "plain",
+    "material": "cotton",
+    "suitable_rooms": [
+      "bedroom",
+      "office"
+    ],
+    "origin": "یزد",
+    "handmade": true,
+    "density": "۳۰ رج",
+    "intended_colors": [
+      "cream",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "7500000",
+        "stock": 7
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "16800000",
+        "stock": 3
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "29800000",
+        "stock": 5
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "43500000",
+        "stock": 0
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-1200-lachak-sormei",
+    "name": "فرش ماشینی کاشان ۱۲۰۰ شانه — لچک‌ترنج سرمه‌ای",
+    "description": "۱۲۰۰ شانه با تراکم ۳۶۰۰، اکریلیک هیت‌ست. لچک‌ترنج کلاسیک روی زمینه‌ی سرمه‌ای؛ پرکاربردترین ترکیب فرش ماشینی ایرانی.",
+    "pattern": "lachak_toranj",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "living_room",
+      "dining_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "blue",
+      "cream",
+      "red"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "3200000",
+        "stock": 9
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "6000000",
+        "stock": 8
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "7300000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "12900000",
+        "stock": 5
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "18800000",
+        "stock": 2
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "25800000",
+        "stock": 8
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-1200-afshan-talaei",
+    "name": "فرش ماشینی کاشان ۱۲۰۰ شانه — افشان طلایی",
+    "description": "زمینه‌ی طلایی گرم با نقش افشان و بدون ترنج مرکزی. زیر نور مصنوعی طلایی‌تر و زیر نور روز به نخودی نزدیک می‌شود.",
+    "pattern": "afshan",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "gold",
+      "cream",
+      "brown"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "3100000",
+        "stock": 0
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "5700000",
+        "stock": 9
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "6900000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "12300000",
+        "stock": 9
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "17900000",
+        "stock": 7
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "24500000",
+        "stock": 8
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-1500-lachak-firoozei",
+    "name": "فرش ماشینی کاشان ۱۵۰۰ شانه — لچک‌ترنج فیروزه‌ای",
+    "description": "۱۵۰۰ شانه با تراکم ۴۵۰۰؛ خط نقش تیزتر از ۱۲۰۰ شانه است و از فاصله‌ی نزدیک هم پیکسلی به نظر نمی‌رسد. زمینه‌ی فیروزه‌ای.",
+    "pattern": "lachak_toranj",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۵۰۰ شانه",
+    "intended_colors": [
+      "turquoise",
+      "cream",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "18100000",
+        "stock": 3
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "26400000",
+        "stock": 5
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "36200000",
+        "stock": 2
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-1000-toranji-laki",
+    "name": "فرش ماشینی آران و بیدگل ۱۰۰۰ شانه — ترنجی لاکی",
+    "description": "هزار شانه با ترنج درشت و زمینه‌ی لاکی. انتخاب متعارف پذیرایی‌های بزرگ که فرش باید فضا را پر کند.",
+    "pattern": "medallion",
+    "material": "polyester",
+    "suitable_rooms": [
+      "living_room",
+      "dining_room"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "red",
+      "blue",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "1900000",
+        "stock": 2
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "3600000",
+        "stock": 0
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "4300000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "7700000",
+        "stock": 5
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "11300000",
+        "stock": 8
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "15400000",
+        "stock": 0
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-700-goldar-laki",
+    "name": "فرش ماشینی آران و بیدگل ۷۰۰ شانه — گل‌دار لاکی",
+    "description": "هفتصد شانه، اقتصادی و سبک. نقش گل‌دار درشت که از فاصله‌ی معمول اتاق خواب کاملاً خوانا است.",
+    "pattern": "floral",
+    "material": "polyester",
+    "suitable_rooms": [
+      "bedroom",
+      "kids_room"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۷۰۰ شانه",
+    "intended_colors": [
+      "red",
+      "cream",
+      "green"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "2500000",
+        "stock": 3
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "3000000",
+        "stock": 0
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "5300000",
+        "stock": 2
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-1200-goldar-surati",
+    "name": "فرش ماشینی کاشان ۱۲۰۰ شانه — گل‌دار صورتی",
+    "description": "زمینه‌ی صورتی کم‌رنگ با دسته‌گل‌های ریز. برای اتاق خوابی که می‌خواهد روشن و آرام بماند.",
+    "pattern": "floral",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "bedroom"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "pink",
+      "cream",
+      "green"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "5800000",
+        "stock": 2
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "7000000",
+        "stock": 1
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "12400000",
+        "stock": 6
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "mashhad-modern-tousi",
+    "name": "فرش ماشینی مشهد — مدرن طوسی",
+    "description": "طرح مدرن با خطوط محو و رنگ‌بندی طوسی و سفید. بدون حاشیه‌ی سنتی، برای فضایی که مبلمانش امروزی است.",
+    "pattern": "modern",
+    "material": "polyester",
+    "suitable_rooms": [
+      "living_room",
+      "office"
+    ],
+    "origin": "مشهد",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "gray",
+      "white",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "9700000",
+        "stock": 4
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "14100000",
+        "stock": 8
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "19400000",
+        "stock": 2
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-1500-modern-abi",
+    "name": "فرش ماشینی کاشان ۱۵۰۰ شانه — مدرن آبی‌خاکستری",
+    "description": "ویسکوز با درخشش ملایم و طرح مدرن آبی‌خاکستری. سطحی که با زاویه‌ی دید رنگش کمی عوض می‌شود.",
+    "pattern": "modern",
+    "material": "viscose",
+    "suitable_rooms": [
+      "office",
+      "living_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۵۰۰ شانه",
+    "intended_colors": [
+      "gray",
+      "blue",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "3700000",
+        "stock": 6
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "8300000",
+        "stock": 5
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "14700000",
+        "stock": 7
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "21400000",
+        "stock": 7
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-modern-meshki",
+    "name": "فرش ماشینی آران و بیدگل — مدرن مشکی",
+    "description": "زمینه‌ی مشکی با نقش هندسی ریز سفید. تیره‌ترین فرش کاتالوگ و مناسب اتاق کاری که دیوارهایش روشن است.",
+    "pattern": "modern",
+    "material": "polyester",
+    "suitable_rooms": [
+      "office"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "black",
+      "gray",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "3800000",
+        "stock": 6
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "4600000",
+        "stock": 6
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "8200000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-modern-sefid",
+    "name": "فرش ماشینی کاشان — مدرن سفید",
+    "description": "سفید شکسته با بافت برجسته‌ی هندسی. رنگ ندارد، سایه دارد — نقش فقط از اختلاف ارتفاع پرز دیده می‌شود.",
+    "pattern": "modern",
+    "material": "viscose",
+    "suitable_rooms": [
+      "bedroom",
+      "living_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "white",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "7500000",
+        "stock": 7
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "9000000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "16100000",
+        "stock": 8
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-sadeh-nokhodi",
+    "name": "فرش ماشینی کاشان — ساده‌ی نخودی",
+    "description": "تک‌رنگ نخودی بدون هیچ نقشی. ساده‌ترین گزینه‌ی کاتالوگ و بی‌خطرترین برای اتاقی که هنوز چیده نشده.",
+    "pattern": "plain",
+    "material": "viscose",
+    "suitable_rooms": [
+      "living_room",
+      "bedroom"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "cream",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "3800000",
+        "stock": 2
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "7200000",
+        "stock": 1
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "8600000",
+        "stock": 7
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "15300000",
+        "stock": 0
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "22400000",
+        "stock": 3
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "30700000",
+        "stock": 9
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-sadeh-tousi",
+    "name": "فرش ماشینی آران و بیدگل — ساده‌ی طوسی",
+    "description": "تک‌رنگ طوسی متوسط، بدون نقش و بدون حاشیه.",
+    "pattern": "plain",
+    "material": "polyester",
+    "suitable_rooms": [
+      "bedroom",
+      "office"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۷۰۰ شانه",
+    "intended_colors": [
+      "gray"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "1300000",
+        "stock": 3
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "2900000",
+        "stock": 3
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "5100000",
+        "stock": 3
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "7500000",
+        "stock": 7
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-sadeh-sabz",
+    "name": "فرش ماشینی کاشان — ساده‌ی سبز زیتونی",
+    "description": "تک‌رنگ سبز زیتونی. سبز در کاتالوگ کم است و این یکی برای فضایی است که عمداً دنبال رنگ می‌گردد.",
+    "pattern": "plain",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "living_room",
+      "office"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "green"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "5200000",
+        "stock": 2
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "6300000",
+        "stock": 5
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "11200000",
+        "stock": 6
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "mashhad-vintage-narenji",
+    "name": "فرش ماشینی مشهد — وینتیج نارنجی",
+    "description": "طرح وینتیج با رنگ‌های سوخته‌ی نارنجی و قهوه‌ای؛ نقش عمداً ساییده چاپ شده تا فرش قدیمی به نظر برسد.",
+    "pattern": "vintage",
+    "material": "polyester",
+    "suitable_rooms": [
+      "living_room"
+    ],
+    "origin": "مشهد",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "orange",
+      "brown",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "2000000",
+        "stock": 9
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "4500000",
+        "stock": 5
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "8000000",
+        "stock": 4
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "11700000",
+        "stock": 7
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-vintage-abi",
+    "name": "فرش ماشینی کاشان — وینتیج آبی",
+    "description": "وینتیج آبی محو با حاشیه‌ی رنگ‌رفته و نقش کهنه‌نما.",
+    "pattern": "vintage",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "living_room",
+      "bedroom"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "blue",
+      "cream",
+      "gray"
+    ],
+    "variants": [
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "2900000",
+        "stock": 1
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "6600000",
+        "stock": 2
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "11700000",
+        "stock": 9
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "17000000",
+        "stock": 0
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-hendesi-meshki-sefid",
+    "name": "فرش ماشینی آران و بیدگل — هندسی مشکی و سفید",
+    "description": "نقش هندسی پرکنتراست مشکی و سفید، بدون حاشیه‌ی سنتی.",
+    "pattern": "geometric",
+    "material": "polyester",
+    "suitable_rooms": [
+      "office",
+      "hallway"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "black",
+      "white",
+      "gray"
+    ],
+    "variants": [
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "3600000",
+        "stock": 1
+      },
+      {
+        "width_cm": 150,
+        "length_cm": 225,
+        "price": "4300000",
+        "stock": 6
+      },
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "7700000",
+        "stock": 2
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-hendesi-banafsh",
+    "name": "فرش ماشینی کاشان — هندسی بنفش",
+    "description": "هندسی بنفش و طوسی؛ تنها فرش بنفش کاتالوگ و انتخابی برای اتاق کودکی که نمی‌خواهد صورتی باشد.",
+    "pattern": "geometric",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "kids_room",
+      "bedroom"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "purple",
+      "gray",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 60,
+        "length_cm": 90,
+        "price": "1300000",
+        "stock": 3
+      },
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "3500000",
+        "stock": 7
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "6600000",
+        "stock": 3
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-kodak-firoozei",
+    "name": "فرش ماشینی کاشان — اتاق کودک فیروزه‌ای",
+    "description": "فیروزه‌ای روشن با نقش ساده‌ی هندسی و پرز نرم. برای اتاق کودک، با رنگی که سریع خسته‌کننده نمی‌شود.",
+    "pattern": "modern",
+    "material": "polyester",
+    "suitable_rooms": [
+      "kids_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "turquoise",
+      "white",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 60,
+        "length_cm": 90,
+        "price": "700000",
+        "stock": 7
+      },
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "2000000",
+        "stock": 9
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "3700000",
+        "stock": 8
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-kodak-surati",
+    "name": "فرش ماشینی آران و بیدگل — اتاق کودک صورتی",
+    "description": "صورتی روشن با نقش ابری نرم و پرز بلند، مخصوص اتاق کودک.",
+    "pattern": "modern",
+    "material": "polyester",
+    "suitable_rooms": [
+      "kids_room"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۷۰۰ شانه",
+    "intended_colors": [
+      "pink",
+      "white"
+    ],
+    "variants": [
+      {
+        "width_cm": 60,
+        "length_cm": 90,
+        "price": "400000",
+        "stock": 9
+      },
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "1200000",
+        "stock": 1
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "2200000",
+        "stock": 7
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-kenareh-afshan-sormei",
+    "name": "کناره‌ی ماشینی کاشان ۱۲۰۰ شانه — افشان سرمه‌ای",
+    "description": "کناره‌ی سرمه‌ای با نقش افشان، در سه طول. برای راهروی بلند که یک فرش معمولی در آن جا نمی‌شود.",
+    "pattern": "afshan",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "hallway"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "blue",
+      "red",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 80,
+        "length_cm": 200,
+        "price": "3000000",
+        "stock": 0
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 300,
+        "price": "4600000",
+        "stock": 3
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 400,
+        "price": "6100000",
+        "stock": 5
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "aran-kenareh-hendesi-ghahvei",
+    "name": "کناره‌ی ماشینی آران و بیدگل — هندسی قهوه‌ای",
+    "description": "کناره‌ی قهوه‌ای با نقش هندسی تکرارشونده و بافت متراکم.",
+    "pattern": "geometric",
+    "material": "polyester",
+    "suitable_rooms": [
+      "hallway",
+      "office"
+    ],
+    "origin": "آران و بیدگل",
+    "handmade": false,
+    "density": "۱۰۰۰ شانه",
+    "intended_colors": [
+      "brown",
+      "cream",
+      "gold"
+    ],
+    "variants": [
+      {
+        "width_cm": 80,
+        "length_cm": 200,
+        "price": "2500000",
+        "stock": 8
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 300,
+        "price": "3800000",
+        "stock": 8
+      },
+      {
+        "width_cm": 80,
+        "length_cm": 400,
+        "price": "5100000",
+        "stock": 1
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-naharkhori-lachak-ghermez",
+    "name": "فرش ماشینی کاشان — لچک‌ترنج قرمز ناهارخوری",
+    "description": "لچک‌ترنج قرمز و طلایی در اندازه‌های بزرگ. زیر میز ناهارخوری، نقش شلوغ لکه‌ها را کمتر نشان می‌دهد.",
+    "pattern": "lachak_toranj",
+    "material": "acrylic",
+    "suitable_rooms": [
+      "dining_room",
+      "living_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "red",
+      "gold",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "13800000",
+        "stock": 1
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "20100000",
+        "stock": 7
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "27600000",
+        "stock": 3
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "mashhad-naharkhori-modern-ghahvei",
+    "name": "فرش ماشینی مشهد — مدرن قهوه‌ای ناهارخوری",
+    "description": "طرح مدرن قهوه‌ای و طلایی با پرز کوتاه. پرز کوتاه زیر صندلی ناهارخوری کمتر گیر می‌کند.",
+    "pattern": "modern",
+    "material": "viscose",
+    "suitable_rooms": [
+      "dining_room"
+    ],
+    "origin": "مشهد",
+    "handmade": false,
+    "density": "۱۲۰۰ شانه",
+    "intended_colors": [
+      "brown",
+      "gold",
+      "cream"
+    ],
+    "variants": [
+      {
+        "width_cm": 200,
+        "length_cm": 300,
+        "price": "18300000",
+        "stock": 5
+      },
+      {
+        "width_cm": 250,
+        "length_cm": 350,
+        "price": "26700000",
+        "stock": 7
+      },
+      {
+        "width_cm": 300,
+        "length_cm": 400,
+        "price": "36600000",
+        "stock": 9
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  },
+  {
+    "slug": "kashan-padari-ashayeri-narenji",
+    "name": "پادری ماشینی کاشان — عشایری نارنجی",
+    "description": "پادری کوچک با نقش عشایری نارنجی و قرمز. جلوی در ورودی یا کنار آشپزخانه.",
+    "pattern": "tribal",
+    "material": "polyester",
+    "suitable_rooms": [
+      "hallway",
+      "kids_room"
+    ],
+    "origin": "کاشان",
+    "handmade": false,
+    "density": "۷۰۰ شانه",
+    "intended_colors": [
+      "orange",
+      "red",
+      "brown"
+    ],
+    "variants": [
+      {
+        "width_cm": 60,
+        "length_cm": 90,
+        "price": "500000",
+        "stock": 9
+      },
+      {
+        "width_cm": 100,
+        "length_cm": 150,
+        "price": "1400000",
+        "stock": 6
+      },
+      {
+        "width_cm": 140,
+        "length_cm": 200,
+        "price": "2600000",
+        "stock": 4
+      }
+    ],
+    "images": [
+      "flat",
+      "cover",
+      "macro",
+      "room",
+      "gallery"
+    ]
+  }
+]
