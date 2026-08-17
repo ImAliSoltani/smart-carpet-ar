@@ -18,11 +18,13 @@ a texture, and four things about it are load-bearing.
 - **Flat and square-on.** The AR pipeline rectifies perspective and bakes the
   result into the `.glb`; a three-quarter view gives it a trapezoid to unwarp
   and the weave stretches at one end.
-- **Pure white, seamless background.** `extract_dominant_colors` and the HSV
-  histogram read every opaque pixel, so a wooden floor under the rug becomes one
-  of the carpet's colours and the shop files it under «قهوه‌ای».
-- **The whole rug, edge to edge, nothing on it.** A cropped edge cannot be
-  rectified and a coffee table baked into the texture never comes off.
+- **No background at all — the rug fills the frame.** `extract_dominant_colors`
+  and the HSV histogram skip *transparent* pixels, and a generated JPEG has no
+  transparency, so anything that is not carpet is counted as carpet. This was
+  first written asking for a white backdrop, which is how a navy Qom came back
+  filed under «سفید»: a third of its pixels were the studio, not the rug. Edge to
+  edge also gives the AR rectifier its four corners for free.
+- **Nothing on it.** A coffee table baked into the texture never comes off.
 - **Even light.** A hotspot becomes a permanent bright patch on the 3D model,
   which reads as a stain from every angle in the room.
 
@@ -117,17 +119,17 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
             name="flat",
             needs_reference=False,
             prompt=(
-                f"A top-down flat product photograph of {subject}.{note} "
-                f"The entire rug fills the frame in {ratio}, photographed "
-                "perfectly square-on from directly above, with its edges parallel "
-                "to the frame and no perspective distortion whatsoever. "
-                "Isolated on a pure seamless white background (#FFFFFF). "
-                "Completely flat on the surface, no folds, no curled corners, no "
-                "objects on or near it, nothing casting a shadow onto it. "
-                "Even diffuse studio lighting across the whole surface with no "
-                "hotspots and no gradient. Sharp focus edge to edge so the weave "
-                "is legible. Catalogue texture reference photograph, not a styled "
-                "interior shot."
+                f"A top-down flat texture photograph of {subject}.{note} "
+                f"The rug completely fills the frame in {ratio}, edge to edge, "
+                "with NO background visible on any side — the four edges of the "
+                "rug are the four edges of the image. Photographed perfectly "
+                "square-on from directly above, edges parallel to the frame, no "
+                "perspective distortion whatsoever. "
+                "Completely flat, no folds, no curled corners, nothing on it and "
+                "nothing casting a shadow onto it. Even diffuse lighting across "
+                "the whole surface with no hotspots and no gradient. Sharp focus "
+                "edge to edge so the weave is legible. A texture reference, not a "
+                "styled product shot."
             ),
         ),
         Shot(

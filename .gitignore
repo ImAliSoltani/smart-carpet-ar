@@ -40,3 +40,7 @@ models/weights/
 # --- local tooling ---
 .DS_Store
 Thumbs.db
+
+# Generated catalogue images, dropped in by hand. Heavy and reproducible.
+dataset/f*/
+dataset/_check.png
