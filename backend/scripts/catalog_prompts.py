@@ -31,13 +31,22 @@ a texture, and four things about it are load-bearing.
 Prompts 2–5 are free to be beautiful, because nothing measures them. They feed
 the gallery, and one of them doubles as a test photograph for the room adviser.
 
-They were not beautiful at first. The cover and the gallery both put the rug
-alone on a bare floor, and both came back reading as a cut-out pasted onto a
-backdrop — the failure is emptiness, not lighting. What fixes it is a floor with
-grain and seams instead of a flat plane, a wall with light raking across it, and
-two or three small specific objects: a bench, a stoneware vase of dried
-branches, a brass strip at the skirting. Those are staged in `_ROOM_SHELL` and
-rotated per carpet, so forty rugs are not photographed in one room forty times.
+They were not beautiful at first, and the fix took two passes. The failure was
+never the lighting: the cover and the gallery both put the rug alone on a bare
+plane, and a rug alone on a bare plane reads as a cut-out pasted onto a
+backdrop. What repairs it is specificity — a **parquet** floor with a laying
+pattern and grain rather than a grey plane, a corner where two walls meet, the
+shadow of the window bars falling across the plaster, and objects that are
+simply not the exhibit: a bench, a vessel in an alcove, a framed miniature.
+
+The second pass added the things a photograph has that a description does not.
+The rug runs out of the bottom of the frame, so the camera feels close rather
+than surveying; the grade is named (medium-format film, warm, muted, gentle
+contrast) rather than left to «editorial»; and the gallery stopped being a white
+box with one object in it, which is not reverence, only emptiness.
+
+Floors and props rotate per carpet, picked from the slug, so forty rugs are not
+photographed in one room forty times.
 """
 
 from __future__ import annotations
@@ -72,17 +81,30 @@ _MATERIAL_LOOK: dict[CarpetMaterial, str] = {
 }
 
 
-#: The setting shots 2 and 5 are staged in, written once because both of them
-#: were failing the same way: a rug alone on an empty floor reads as a cut-out
-#: pasted onto a backdrop, and no amount of good lighting rescues it. What sells
-#: «this is a real room» is a handful of small specific objects with the light
-#: falling across them — and the floor itself having grain, seams and character
-#: rather than being the flat grey plane the first version asked for.
+#: The floor under every staged shot, and it is always parquet. After the rug
+#: it is the largest surface in the frame, so a flat plane there flattens
+#: everything above it — grain, seams and a laying pattern are most of what
+#: makes a room read as a room rather than as a backdrop. Rotated, because five
+#: different parquets across forty carpets is a shop and one parquet is a set.
+_FLOORS: tuple[str, ...] = (
+    "a wide-plank whitewashed oak parquet floor, heavy visible grain, open "
+    "knots and clear seams between the boards",
+    "a herringbone parquet floor in pale honey oak, the chevrons catching the "
+    "light at different angles",
+    "a warm mid-brown walnut parquet in long planks, satin finish, the grain "
+    "running away from the camera",
+    "a chevron parquet floor in weathered ash, grey-beige, with fine dark "
+    "joints between the pieces",
+    "a classic Iranian wood-look parquet in warm caramel tones, narrow boards, "
+    "slightly worn where the light falls",
+)
+
 _ROOM_SHELL = (
-    "a wide-plank pale oak floor with visible grain and plank seams, a warm "
-    "lime-washed plaster wall behind, a slim brass strip where the wall meets "
-    "the floor, and soft raking daylight from a tall window just out of frame "
-    "throwing a long angled shadow across the wall"
+    "a warm lime-washed plaster wall with visible hand-troweled texture, the "
+    "corner of the room showing where two walls meet, a slim brass strip along "
+    "the skirting, and low golden daylight from a tall window just out of frame "
+    "on the left throwing the soft-edged shadow of the window bars across the "
+    "wall and the floor"
 )
 
 #: Small props, rotated so forty carpets are not photographed in one room forty
@@ -103,16 +125,26 @@ _COVER_PROPS: tuple[str, ...] = (
     "one rung",
 )
 
-#: The gallery is deliberately a different world from the cover: architecture
-#: rather than furniture, and Persian rather than generic — an arch, stone, a
-#: high ceiling. It answers the site's «گالری موزه‌ای» direction, which is what
-#: it is there for.
+#: The gallery is a different world from the cover: architecture rather than
+#: furniture, and Persian rather than generic. The first version was a bare
+#: white box with one object in it, which is not «reverent», only empty — a real
+#: gallery is full of things that are simply not the exhibit. So each of these
+#: furnishes the room properly: an alcove with a vessel standing in it, a framed
+#: miniature on the wall, light through coloured glass.
 _GALLERY_PROPS: tuple[str, ...] = (
-    "a tall plain brick arch in the far wall with daylight falling through it",
-    "a low travertine plinth standing empty in the corner",
-    "a long dark-wood visitors' bench set against the far wall",
-    "a deep empty niche cut into the plaster wall, lit from above",
-    "a single tall window with a stone sill and no curtain",
+    "a tall brick arch in the far wall, a deep plaster alcove beside it holding "
+    "a single large turquoise-glazed ceramic vessel, and two small framed "
+    "Persian miniatures hung on the wall",
+    "an orosi window — the traditional Persian lattice of coloured stained "
+    "glass — throwing red, blue and amber "
+    "patches of light across the floor, a low travertine plinth below it with a "
+    "bronze ewer standing on it",
+    "a long dark-wood visitors' bench with a folded kilim cushion on it, a tall "
+    "brass floor lamp beside it, and a large framed calligraphy panel on the wall",
+    "carved wooden ceiling beams overhead, a deep niche in the plaster holding "
+    "three antique ceramic bowls, and a potted fig tree in a glazed pot",
+    "a colonnade of plain brick columns running down one side, a stone bench "
+    "between two of them, and a big framed textile fragment lit on the far wall",
 )
 
 
@@ -196,17 +228,20 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
             needs_reference=True,
             prompt=(
                 "Using the attached rug exactly as it is — the same pattern, the "
-                "same colours, the same weave — photograph it lying in a quiet, "
-                "beautiful corner of a real home. "
-                f"The setting: {_ROOM_SHELL}. In the corner there is "
+                "same colours, the same weave — photograph it lying in the quiet "
+                "corner of a beautiful, expensive, minimal home. "
+                f"The floor is {_pick(_FLOORS, profile.slug, 'floor')}. "
+                f"Behind it: {_ROOM_SHELL}. In the corner stands "
                 f"{_pick(_COVER_PROPS, profile.slug, 'cover')}. "
-                "The rug lies flat on the floor at a three-quarter angle, its "
-                "fringe toward the camera, seen from standing height looking down "
-                "at roughly fifty degrees, filling most of the lower two thirds of "
-                "a vertical frame. Warm natural light, soft long shadows, calm and "
-                "unstyled — a home somebody actually lives in, not a showroom. "
-                "Editorial interior photography. Do not change the rug's design, "
-                "its colours, or its proportions."
+                "The rug lies flat and slightly turned, its fringed end nearest "
+                "the camera and **running out of the bottom edge of the frame**, "
+                "so the photograph feels close rather than surveyed. Camera at "
+                "standing height, tilted down about forty degrees. Vertical frame. "
+                "Shot on medium-format film: warm golden light, gentle contrast, "
+                "slightly muted and faded colours, soft natural shadows, shallow "
+                "depth of field so the far wall falls a little out of focus. "
+                "Serene, unstyled, luxurious. No people. "
+                "Do not change the rug's design, its colours, or its proportions."
             ),
         ),
         Shot(
@@ -226,11 +261,15 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
             needs_reference=True,
             prompt=(
                 "Place the attached rug — unchanged in pattern and colour — on the "
-                f"floor of a real, lived-in {_ROOM_EN[profile.rooms[0].value]}. "
-                "Natural window light, real furniture partly standing on the rug, "
-                "a Persian-Iranian apartment interior. Photographed from standing "
-                "eye level, wide enough to see the walls and the furniture as well "
-                "as the floor. Believable everyday photograph, not a render."
+                f"floor of a real, lived-in {_ROOM_EN[profile.rooms[0].value]} in "
+                "a Persian-Iranian apartment. "
+                f"The floor around the rug is {_pick(_FLOORS, profile.slug, 'room')} "
+                "— parquet, never tile, stone or carpet. "
+                "Natural window light, real furniture with some of it standing on "
+                "the rug, the ordinary things of a home visible around the edges. "
+                "Photographed from standing eye level, wide enough to see the "
+                "walls and the furniture as well as the floor. Warm and believable "
+                "everyday photograph, not a render and not a showroom."
             ),
         ),
         Shot(
@@ -238,16 +277,19 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
             needs_reference=True,
             prompt=(
                 "Place the attached rug — unchanged in pattern, colour and "
-                "proportion — alone on the floor of a quiet Persian museum "
-                "gallery. A tall room with warm lime-washed walls and a polished "
-                "stone floor, high ceiling, and "
+                "proportion — on the floor of a beautiful Persian museum gallery "
+                "housed in a restored historic house. A tall room with warm "
+                "lime-washed plaster walls, a polished stone floor, and a high "
+                "ceiling. In the room: "
                 f"{_pick(_GALLERY_PROPS, profile.slug, 'gallery')}. "
-                "One shaft of daylight falls across the rug and up the far wall, "
-                "leaving the corners of the room in soft shadow. The rug is the "
-                "only object on the floor, laid at a slight angle, seen from "
-                "standing height with enough of the architecture around it to feel "
-                "the height of the room. Reverent, architectural photography, warm "
-                "and still. Vertical frame."
+                "A shaft of daylight falls across the rug and up the far wall, "
+                "leaving the corners in soft shadow. The rug is the only thing on "
+                "the floor and it is unmistakably the exhibit, but the room around "
+                "it is furnished and lived-in rather than empty. Seen from "
+                "standing height at a slight angle, with enough architecture "
+                "around it to feel the height of the room. Vertical frame. Warm, "
+                "still, reverent — shot on medium-format film, rich but muted "
+                "colour, gentle contrast. No people."
             ),
         ),
     ]
