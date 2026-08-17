@@ -5,7 +5,9 @@
 `dataset/profiles.json` is the machine-readable catalogue — what the ingest
 script will read once the images exist. `dataset/prompts.md` is the same thing
 written for a person, so the two hundred prompts can be read and argued with
-before any of them is spent.
+before any of them is spent. `dataset/chat-guide.md` is the third form: the
+document to actually work from when the images are made by hand in a chat app,
+with the prompts in paste order and a checklist that survives an interruption.
 
 Both are derived, never edited: `catalog_profiles.py` is the source. They live
 under `dataset/` at the repository root rather than under `data/`, which is
@@ -16,6 +18,7 @@ import json
 import sys
 from pathlib import Path
 
+from catalog_chat_guide import build_guide
 from catalog_profiles import PROFILES, RATE_PER_SQM
 from catalog_prompts import build_shots
 
@@ -119,6 +122,7 @@ def main() -> int:
         lines.append("")
 
     (OUT / "prompts.md").write_text("\n".join(lines), encoding="utf-8")
+    (OUT / "chat-guide.md").write_text(build_guide(), encoding="utf-8")
 
     tiers = sorted({p.tier for p in PROFILES})
     print(f"{len(catalogue)} carpets, {sum(len(p['variants']) for p in catalogue)} sizes")
@@ -126,6 +130,7 @@ def main() -> int:
     print(f"rates defined:    {len(RATE_PER_SQM)}")
     print(f"wrote {OUT / 'profiles.json'}")
     print(f"wrote {OUT / 'prompts.md'}")
+    print(f"wrote {OUT / 'chat-guide.md'}")
     return 0
 
 
