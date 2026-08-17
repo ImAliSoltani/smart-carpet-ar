@@ -108,7 +108,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Qom, de
 ### پیام ۲ → `qom-silk-lachak-sormei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `qom-silk-lachak-sormei__macro.png`
@@ -126,7 +126,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `qom-silk-lachak-sormei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -147,7 +147,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Qom, tu
 ### پیام ۲ → `qom-silk-afshan-firoozei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `qom-silk-afshan-firoozei__macro.png`
@@ -165,7 +165,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `qom-silk-afshan-firoozei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -186,7 +186,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Isfahan
 ### پیام ۲ → `esfahan-kork-lachak-kerem__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `esfahan-kork-lachak-kerem__macro.png`
@@ -204,7 +204,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `esfahan-kork-lachak-kerem__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -225,7 +225,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Nain, n
 ### پیام ۲ → `naeen-9la-afshan-sormei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `naeen-9la-afshan-sormei__macro.png`
@@ -243,7 +243,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `naeen-9la-afshan-sormei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -264,7 +264,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Tabriz,
 ### پیام ۲ → `tabriz-50raj-toranji-laki__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a potted olive tree in an unglazed terracotta pot, and a pair of leather slippers left at the edge of the rug. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `tabriz-50raj-toranji-laki__macro.png`
@@ -282,7 +282,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `tabriz-50raj-toranji-laki__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -303,7 +303,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Kashan,
 ### پیام ۲ → `kashan-lachak-laki__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-lachak-laki__macro.png`
@@ -321,7 +321,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-lachak-laki__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -342,7 +342,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Mashhad
 ### پیام ۲ → `mashhad-afshan-arghavani__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `mashhad-afshan-arghavani__macro.png`
@@ -360,7 +360,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `mashhad-afshan-arghavani__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a deep empty niche cut into the plaster wall, lit from above. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -381,7 +381,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Kerman,
 ### پیام ۲ → `kerman-golfarang-kerem__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a potted olive tree in an unglazed terracotta pot, and a pair of leather slippers left at the edge of the rug. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kerman-golfarang-kerem__macro.png`
@@ -399,7 +399,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kerman-golfarang-kerem__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -420,7 +420,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Arak (S
 ### پیام ۲ → `arak-sultanabad-golfarang__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a tall paper floor lamp casting a warm pool of light, and two hardback books stacked on the floor. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `arak-sultanabad-golfarang__macro.png`
@@ -438,7 +438,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `arak-sultanabad-golfarang__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -459,7 +459,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Birjand
 ### پیام ۲ → `birjand-toranji-sabz__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a potted olive tree in an unglazed terracotta pot, and a pair of leather slippers left at the edge of the rug. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `birjand-toranji-sabz__macro.png`
@@ -477,7 +477,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `birjand-toranji-sabz__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -498,7 +498,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Shiraz,
 ### پیام ۲ → `qashqai-ashayeri-ghermez__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a simple wooden ladder leaning against the wall with a folded blanket over one rung. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `qashqai-ashayeri-ghermez__macro.png`
@@ -516,7 +516,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `qashqai-ashayeri-ghermez__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -537,7 +537,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Sistan,
 ### پیام ۲ → `baluch-kenareh-ghahvei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `baluch-kenareh-ghahvei__macro.png`
@@ -555,7 +555,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `baluch-kenareh-ghahvei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -576,7 +576,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Hamedan
 ### پیام ۲ → `hamedan-hendesi-ghermez__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a tall paper floor lamp casting a warm pool of light, and two hardback books stacked on the floor. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `hamedan-hendesi-ghermez__macro.png`
@@ -594,7 +594,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `hamedan-hendesi-ghermez__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -615,7 +615,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Ardabil
 ### پیام ۲ → `ardabil-hendesi-abi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `ardabil-hendesi-abi__macro.png`
@@ -633,7 +633,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `ardabil-hendesi-abi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -654,7 +654,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Tabriz,
 ### پیام ۲ → `tabriz-patineh-vintage-tousi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `tabriz-patineh-vintage-tousi__macro.png`
@@ -672,7 +672,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `tabriz-patineh-vintage-tousi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -693,7 +693,7 @@ A top-down flat texture photograph of a hand-knotted Persian carpet from Yazd, u
 ### پیام ۲ → `yazd-sadeh-nokhodi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `yazd-sadeh-nokhodi__macro.png`
@@ -711,7 +711,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `yazd-sadeh-nokhodi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -732,7 +732,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-1200-lachak-sormei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-1200-lachak-sormei__macro.png`
@@ -750,7 +750,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-1200-lachak-sormei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -771,7 +771,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-1200-afshan-talaei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-1200-afshan-talaei__macro.png`
@@ -789,7 +789,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-1200-afshan-talaei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -810,7 +810,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-1500-lachak-firoozei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a potted olive tree in an unglazed terracotta pot, and a pair of leather slippers left at the edge of the rug. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-1500-lachak-firoozei__macro.png`
@@ -828,7 +828,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-1500-lachak-firoozei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -849,7 +849,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-1000-toranji-laki__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-1000-toranji-laki__macro.png`
@@ -867,7 +867,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-1000-toranji-laki__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a deep empty niche cut into the plaster wall, lit from above. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -888,7 +888,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-700-goldar-laki__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a tall paper floor lamp casting a warm pool of light, and two hardback books stacked on the floor. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-700-goldar-laki__macro.png`
@@ -906,7 +906,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-700-goldar-laki__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -927,7 +927,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-1200-goldar-surati__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-1200-goldar-surati__macro.png`
@@ -945,7 +945,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-1200-goldar-surati__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -966,7 +966,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Mashh
 ### پیام ۲ → `mashhad-modern-tousi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `mashhad-modern-tousi__macro.png`
@@ -984,7 +984,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `mashhad-modern-tousi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1005,7 +1005,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-1500-modern-abi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-1500-modern-abi__macro.png`
@@ -1023,7 +1023,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-1500-modern-abi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1044,7 +1044,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-modern-meshki__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a tall paper floor lamp casting a warm pool of light, and two hardback books stacked on the floor. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-modern-meshki__macro.png`
@@ -1062,7 +1062,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-modern-meshki__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1083,7 +1083,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-modern-sefid__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-modern-sefid__macro.png`
@@ -1101,7 +1101,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-modern-sefid__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a deep empty niche cut into the plaster wall, lit from above. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1122,7 +1122,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-sadeh-nokhodi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a potted olive tree in an unglazed terracotta pot, and a pair of leather slippers left at the edge of the rug. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-sadeh-nokhodi__macro.png`
@@ -1140,7 +1140,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-sadeh-nokhodi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1161,7 +1161,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-sadeh-tousi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-sadeh-tousi__macro.png`
@@ -1179,7 +1179,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-sadeh-tousi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1200,7 +1200,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-sadeh-sabz__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a tall paper floor lamp casting a warm pool of light, and two hardback books stacked on the floor. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-sadeh-sabz__macro.png`
@@ -1218,7 +1218,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-sadeh-sabz__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1239,7 +1239,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Mashh
 ### پیام ۲ → `mashhad-vintage-narenji__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `mashhad-vintage-narenji__macro.png`
@@ -1257,7 +1257,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `mashhad-vintage-narenji__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1278,7 +1278,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-vintage-abi__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-vintage-abi__macro.png`
@@ -1296,7 +1296,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-vintage-abi__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1317,7 +1317,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-hendesi-meshki-sefid__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-hendesi-meshki-sefid__macro.png`
@@ -1335,7 +1335,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-hendesi-meshki-sefid__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1356,7 +1356,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-hendesi-banafsh__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-hendesi-banafsh__macro.png`
@@ -1374,7 +1374,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-hendesi-banafsh__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1395,7 +1395,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-kodak-firoozei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-kodak-firoozei__macro.png`
@@ -1413,7 +1413,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-kodak-firoozei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a low travertine plinth standing empty in the corner. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1434,7 +1434,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-kodak-surati__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-kodak-surati__macro.png`
@@ -1452,7 +1452,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-kodak-surati__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1473,7 +1473,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-kenareh-afshan-sormei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-kenareh-afshan-sormei__macro.png`
@@ -1491,7 +1491,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-kenareh-afshan-sormei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a deep empty niche cut into the plaster wall, lit from above. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1512,7 +1512,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Aran-
 ### پیام ۲ → `aran-kenareh-hendesi-ghahvei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low ceramic bowl of pomegranates on the floor and a linen curtain half drawn at the window edge. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `aran-kenareh-hendesi-ghahvei__macro.png`
@@ -1530,7 +1530,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `aran-kenareh-hendesi-ghahvei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a tall plain brick arch in the far wall with daylight falling through it. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1551,7 +1551,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-naharkhori-lachak-ghermez__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a low dark-wood bench against the wall with a rustic stoneware vase of dried branches standing beside it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-naharkhori-lachak-ghermez__macro.png`
@@ -1569,7 +1569,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-naharkhori-lachak-ghermez__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1590,7 +1590,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Mashh
 ### پیام ۲ → `mashhad-naharkhori-modern-ghahvei__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a slim walnut stool holding a folded wool throw, and a small brass tray on the floor next to it. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `mashhad-naharkhori-modern-ghahvei__macro.png`
@@ -1608,7 +1608,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `mashhad-naharkhori-modern-ghahvei__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a single tall window with a stone sill and no curtain. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
@@ -1629,7 +1629,7 @@ A top-down flat texture photograph of an Iranian machine-woven carpet from Kasha
 ### پیام ۲ → `kashan-padari-ashayeri-narenji__cover.png`
 
 ```text
-Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — create a premium e-commerce cover photograph of it. Show the rug at a slight three-quarter angle on a pale warm concrete floor, one corner turned up just enough to show the pile depth, soft directional daylight from one side and a long gentle shadow. Warm neutral background, generous empty space around the rug. Editorial catalogue photography, shallow depth of field at the far edge. Do not change the rug's design.
+Using the attached rug exactly as it is — the same pattern, the same colours, the same weave — photograph it lying in a quiet, beautiful corner of a real home. The setting: a wide-plank pale oak floor with visible grain and plank seams, a warm lime-washed plaster wall behind, a slim brass strip where the wall meets the floor, and soft raking daylight from a tall window just out of frame throwing a long angled shadow across the wall. In the corner there is a simple wooden ladder leaning against the wall with a folded blanket over one rung. The rug lies flat on the floor at a three-quarter angle, its fringe toward the camera, seen from standing height looking down at roughly fifty degrees, filling most of the lower two thirds of a vertical frame. Warm natural light, soft long shadows, calm and unstyled — a home somebody actually lives in, not a showroom. Editorial interior photography. Do not change the rug's design, its colours, or its proportions.
 ```
 
 ### پیام ۳ → `kashan-padari-ashayeri-narenji__macro.png`
@@ -1647,7 +1647,7 @@ Place the attached rug — unchanged in pattern and colour — on the floor of a
 ### پیام ۵ → `kashan-padari-ashayeri-narenji__gallery.png`
 
 ```text
-Place the attached rug — unchanged — alone in a quiet museum gallery: a large warm off-white room, polished pale floor, one wall visible, a single soft overhead light pooling on the rug, deep empty space around it. Nothing else in the frame. Calm, reverent, architectural photography with the rug as the only object. Shot straight on from a low standing height.
+Place the attached rug — unchanged in pattern, colour and proportion — alone on the floor of a quiet Persian museum gallery. A tall room with warm lime-washed walls and a polished stone floor, high ceiling, and a long dark-wood visitors' bench set against the far wall. One shaft of daylight falls across the rug and up the far wall, leaving the corners of the room in soft shadow. The rug is the only object on the floor, laid at a slight angle, seen from standing height with enough of the architecture around it to feel the height of the room. Reverent, architectural photography, warm and still. Vertical frame.
 ```
 
 ---
