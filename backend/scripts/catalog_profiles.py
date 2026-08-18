@@ -129,6 +129,20 @@ class CarpetProfile:
     prompt_note: str = ""
     variants: tuple[tuple[int, int, Decimal, int], ...] = field(default_factory=tuple)
 
+    @property
+    def has_fringe(self) -> bool:
+        """Whether this carpet ends in ریشه, the fringe at its two short ends.
+
+        Derived rather than authored, because it follows from what the carpet
+        already is. On a hand-knotted rug the fringe is not a trim: it is the
+        warp itself, tied off where the weaving stops, so every one of them has
+        it. A machine-woven carpet is cut from a roll and finished at the ends,
+        and the mill adds a fringe only when the design is a traditional one —
+        a modern or plain machine rug gets a bound edge instead, and a fringe on
+        it would look like fancy dress.
+        """
+        return self.handmade or self.pattern not in {P.MODERN, P.PLAIN}
+
 
 def _priced(profile: CarpetProfile) -> CarpetProfile:
     """Fill in the size ladder, priced from the tier and the area."""

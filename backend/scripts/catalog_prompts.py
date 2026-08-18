@@ -205,6 +205,18 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
     width, length = _representative_size(profile)
     ratio = f"{width}:{length} aspect ratio (a {width}×{length} cm rug)"
 
+    # The fringe has to be asked for by name or it is simply left off, and then
+    # the rug placed in somebody's room in AR is a rug with its ends cut away.
+    # It belongs *inside* the frame rather than beyond it: the fringe is part of
+    # the carpet, so the rug still reaches the edges — it just reaches them as
+    # fringe at the two short ends.
+    fringe = (
+        " The carpet's two short ends finish in their natural knotted warp "
+        "fringe, and both fringed ends are fully visible inside the frame."
+        if profile.has_fringe
+        else " The edges are cleanly bound with no fringe."
+    )
+
     return [
         Shot(
             name="flat",
@@ -215,7 +227,7 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
                 "with NO background visible on any side — the four edges of the "
                 "rug are the four edges of the image. Photographed perfectly "
                 "square-on from directly above, edges parallel to the frame, no "
-                "perspective distortion whatsoever. "
+                f"perspective distortion whatsoever.{fringe} "
                 "Completely flat, no folds, no curled corners, nothing on it and "
                 "nothing casting a shadow onto it. Even diffuse lighting across "
                 "the whole surface with no hotspots and no gradient. Sharp focus "
@@ -266,10 +278,14 @@ def build_shots(profile: CarpetProfile) -> list[Shot]:
                 f"The floor around the rug is {_pick(_FLOORS, profile.slug, 'room')} "
                 "— parquet, never tile, stone or carpet. "
                 "Natural window light, real furniture with some of it standing on "
-                "the rug, the ordinary things of a home visible around the edges. "
-                "Photographed from standing eye level, wide enough to see the "
-                "walls and the furniture as well as the floor. Warm and believable "
-                "everyday photograph, not a render and not a showroom."
+                "the rug. Photographed from standing eye level, wide enough to see "
+                "the walls and the furniture as well as the floor. "
+                "The room is **tidy and cared-for**: lived in, but kept. "
+                "Absolutely no clutter on the floor — no charger cables, no phone "
+                "charging by the skirting, no power strips, no laundry, no "
+                "scattered toys, no plastic bags, nothing left lying about. "
+                "Warm and believable, an ordinary home on a good day — not a "
+                "render, not a showroom, and not a mess."
             ),
         ),
         Shot(
