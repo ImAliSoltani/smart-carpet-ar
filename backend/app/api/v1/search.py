@@ -1,7 +1,13 @@
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, Request, UploadFile
 
 from app.api.deps import DbSession, EmbeddingDep
 from app.core.config import get_settings
+from app.core.security import (
+    client_key,
+    conversational_limiter,
+    read_upload,
+    visual_search_limiter,
+)
 from app.nlq import get_planner
 from app.schemas.catalog import (
     CarpetListItem,
@@ -13,7 +19,6 @@ from app.schemas.catalog import (
     VisualSearchResponse,
 )
 from app.services import catalog as catalog_service
-from app.services import color as color_service
 from app.services.images import InvalidImageError, load_image
 
 router = APIRouter(tags=["search"])
@@ -21,28 +26,18 @@ router = APIRouter(tags=["search"])
 
 @router.post("/search/visual", response_model=VisualSearchResponse)
 async def visual_search(
-    session: DbSession, embedder: EmbeddingDep, image: UploadFile
+    request: Request, session: DbSession, embedder: EmbeddingDep, image: UploadFile
 ) -> VisualSearchResponse:
     """عکس فرش (یا اتاق) → شبیه‌ترین فرش‌های کاتالوگ."""
-    data = await image.read()
-    max_bytes = get_settings().max_upload_mb * 1024 * 1024
-    if len(data) > max_bytes:
-        raise HTTPException(413, detail="حجم تصویر بیش از حد مجاز است")
+    visual_search_limiter.check(client_key(request))
+    data = await read_upload(image, max_bytes=get_settings().max_upload_mb * 1024 * 1024)
     try:
         query_image = load_image(data)  # validate early: real image, supported format
     except InvalidImageError as exc:
         raise HTTPException(422, detail=str(exc)) from exc
 
-    vector = embedder.embed_image(data)
-    # The uploaded photo is read for colour exactly as a catalogue photo was at
-    # ingest, so the two histograms are comparable bin for bin. A shopper's
-    # phone snap is lit differently from a studio shot and this does nothing to
-    # correct for that; what saves the comparison is that hue survives a change
-    # of light far better than the RGB triple does, which is why the descriptor
-    # is built on hue in the first place.
-    profile = color_service.analyse(query_image)
-    matches = await catalog_service.search_by_embedding(
-        session, vector, color_histogram=profile.histogram, limit=12
+    matches = await catalog_service.search_by_photograph(
+        session, query_image, embedder=embedder, limit=12
     )
     return VisualSearchResponse(
         results=[SimilarItem(carpet=item, similarity=score) for item, score in matches]
@@ -51,7 +46,7 @@ async def visual_search(
 
 @router.post("/search/conversational", response_model=ConversationalSearchResponse)
 async def conversational_search(
-    session: DbSession, body: ConversationalQuery
+    request: Request, session: DbSession, body: ConversationalQuery
 ) -> ConversationalSearchResponse:
     """جمله‌ی فارسی → فیلتر ساخت‌یافته → همان نتایجی که کاتالوگ می‌دهد.
 
@@ -60,6 +55,7 @@ async def conversational_search(
     listing page calls — so this endpoint cannot return a carpet the catalogue
     would not, at a price it does not charge, however the translation went.
     """
+    conversational_limiter.check(client_key(request))
     facets = await catalog_service.facets(session)
     plan = await get_planner().plan(
         body.q, price_floor=facets.min_price, price_ceiling=facets.max_price

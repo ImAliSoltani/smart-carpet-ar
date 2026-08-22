@@ -24,6 +24,17 @@ function lanAddresses(): string[] {
 
 const nextConfig: NextConfig = {
   /**
+   * Trace the modules the server actually imports and emit a self-contained
+   * tree under `.next/standalone`.
+   *
+   * This is what the deployment image copies (frontend/Dockerfile), and it is
+   * the reason the runtime stage carries no `node_modules`. It changes nothing
+   * about `next dev` or `next start` locally — the standalone tree is an extra
+   * output beside the normal one, not a replacement for it.
+   */
+  output: "standalone",
+
+  /**
    * React's `<ViewTransition>`, which is what carries the photograph across a
    * navigation instead of redrawing it on the other side.
    *

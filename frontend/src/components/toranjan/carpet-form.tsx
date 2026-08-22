@@ -99,9 +99,12 @@ function Field({
   hint?: string;
   children: React.ReactNode;
 }) {
+  // A `<label>` around the whole field, not a sibling one — see the same note
+  // in checkout-form.tsx. A caption that is not bound to its control is a
+  // caption a screen reader never reads out.
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-[13.5px] text-ink-2">{label}</label>
+    <label className="flex flex-col gap-2">
+      <span className="text-[13.5px] text-ink-2">{label}</span>
       {children}
       {error ? (
         <p role="alert" className="text-[12.5px] leading-loose text-destructive">
@@ -110,7 +113,7 @@ function Field({
       ) : hint ? (
         <p className="text-[12.5px] leading-loose text-muted">{hint}</p>
       ) : null}
-    </div>
+    </label>
   );
 }
 

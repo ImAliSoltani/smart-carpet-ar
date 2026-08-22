@@ -1,0 +1,77 @@
+# One host, three things behind it: the storefront, the API, and the files.
+#
+# Same-origin is the point. The browser talks only to https://{$SITE_DOMAIN},
+# so there is no CORS preflight on the shopping path, the admin session cookie
+# is a first-party cookie (which is what keeps it working as browsers keep
+# tightening third-party rules), and `NEXT_PUBLIC_API_BASE_URL` is the path
+# `/api` rather than a hostname the build has to know.
+#
+# TLS is not configured here beyond the address and an e-mail: Caddy obtains and
+# renews the certificate on its own, which is the entire reason it is in front
+# rather than nginx.
+
+{
+	email {$ACME_EMAIL}
+	# Caddy's own admin API. It is unauthenticated by design and is bound to
+	# localhost inside the container, but nothing here needs it at all.
+	admin off
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# --- the API ---------------------------------------------------------
+	# Passed through with the path intact, because the backend mounts its
+	# routes under /api/v1 itself. Rewriting here would mean the OpenAPI
+	# document, the generated TypeScript client and this file each carry a
+	# different idea of where a route lives.
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# --- stored files ----------------------------------------------------
+	# Photographs, WebP derivatives, and the .glb/.usdz for every size.
+	handle /files/* {
+		# Content-addressed paths (see app/services/storage.py): the digest is
+		# in the filename, so a changed file is a changed URL and this can be
+		# cached for as long as a browser is willing to.
+		header Cache-Control "public, max-age=31536000, immutable"
+		# The one header that must not be guessed. Quick Look picks its viewer
+		# from the content type and refuses a model that arrives as raw bytes,
+		# which is how the AR button spent two phases silently doing nothing on
+		# iPhone. Caddy's own table does not know these three.
+		@usdz path *.usdz
+		header @usdz Content-Type "model/vnd.usdz+zip"
+		@glb path *.glb
+		header @glb Content-Type "model/gltf-binary"
+		@webp path *.webp
+		header @webp Content-Type "image/webp"
+		reverse_proxy api:8000
+	}
+
+	# --- the storefront --------------------------------------------------
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		# The AR page asks for the camera and must not be framed — an invisible
+		# frame over a camera permission prompt is the whole clickjacking
+		# family, and this is the only page in the product that would care.
+		X-Frame-Options "DENY"
+		# `self` and not `*`: the shop needs the camera, nothing embedded in it
+		# does. `interest-cohort=()` opts out of topic-based ad targeting.
+		Permissions-Policy "camera=(self), microphone=(), geolocation=(), interest-cohort=()"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 20MiB
+			roll_keep 5
+		}
+	}
+}

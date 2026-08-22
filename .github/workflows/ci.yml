@@ -62,5 +62,70 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      # The generated API types are only worth generating if something checks
+      # them. `next build` does not: it type-checks pages, and a mis-typed call
+      # inside a hook it happens not to reach compiles fine.
+      - name: Types
+        run: npm run typecheck
       - name: Build
         run: npm run build
+
+  # The seam the other two jobs cannot see: a real browser against a real API.
+  # Everything below the browser is already covered, so this stays deliberately
+  # small — the buying journey and the admin sign-in, which is what ROADMAP §8
+  # فاز ۵ asks for by name.
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: farsh
+          POSTGRES_PASSWORD: farsh
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U farsh"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      # `scripts/e2e-api.mjs` creates `farsh_e2e` itself and refuses any URL
+      # without "e2e" in it, because its next act is a TRUNCATE.
+      E2E_DATABASE_URL: postgresql+asyncpg://farsh:farsh@localhost:5432/farsh_e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      # Without `--group ml`, so visual search runs on the hash backend here.
+      # That is correct for this job: it proves the endpoint answers and the
+      # page renders what it answers, and says nothing about ranking quality —
+      # which is measured in `scripts/eval_retrieval.py`, on a machine with the
+      # real model and the real catalogue.
+      - name: Install backend
+        run: uv sync
+        working-directory: backend
+      - name: Install frontend
+        run: npm ci
+        working-directory: frontend
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: End-to-end
+        run: npx playwright test --project=chromium
+        working-directory: frontend
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7

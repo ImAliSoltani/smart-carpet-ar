@@ -107,11 +107,27 @@ export function AddToCart({
   /** Holds the confirmed state open. Only the design-review page uses it —
       the state is otherwise too brief to compare three of them side by side. */
   holdConfirmed = false,
+  /**
+   * Nothing to add — an unselected size, or a size with no stock.
+   *
+   * It is a prop rather than something the caller works around, because the
+   * workaround was tried and is worse than doing nothing: the product page used
+   * to leave the button live and return early inside `onAdd`. Pressing it on a
+   * sold-out size played the spinner, drew the tick, and said «به سبد اضافه
+   * شد» over an empty cart. A button that confirms a sale that did not happen
+   * is a worse failure than one that refuses, and it survived every backend
+   * test, because the backend was never asked.
+   */
+  disabled = false,
+  /** What the refusal says. «ناموجود» when a size is sold out. */
+  disabledLabel = "ناموجود",
 }: {
   confirmStyle?: ConfirmStyle;
   onAdd?: () => void;
   className?: string;
   holdConfirmed?: boolean;
+  disabled?: boolean;
+  disabledLabel?: string;
 }) {
   const [phase, setPhase] = useState<Phase>(holdConfirmed ? "done" : "idle");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -124,7 +140,7 @@ export function AddToCart({
   }, []);
 
   const start = () => {
-    if (holdConfirmed || phase !== "idle") return;
+    if (disabled || holdConfirmed || phase !== "idle") return;
     setPhase("adding");
     timers.current.push(
       setTimeout(() => {
@@ -142,7 +158,7 @@ export function AddToCart({
     <button
       type="button"
       onClick={start}
-      disabled={phase !== "idle"}
+      disabled={disabled || phase !== "idle"}
       // A colour change and a tick say nothing to a screen reader, so the
       // outcome is announced in words.
       aria-live="polite"
@@ -151,7 +167,11 @@ export function AddToCart({
         "rounded-full border px-6 py-3.5 text-[15px] font-medium",
         "transition-[color,border-color] duration-[var(--dur-feedback)] ease-[var(--ease-io)]",
         "active:scale-[.985] disabled:cursor-default",
-        done ? CONFIRM_TEXT[confirmStyle] : "border-cta text-on-cta",
+        disabled
+          ? "border-line-2 text-muted"
+          : done
+            ? CONFIRM_TEXT[confirmStyle]
+            : "border-cta text-on-cta",
         className,
       )}
       style={
@@ -165,7 +185,11 @@ export function AddToCart({
       <span
         aria-hidden
         className={cn(
-          "absolute inset-0 -z-20 bg-cta transition-colors duration-[var(--dur-feedback)]",
+          "absolute inset-0 -z-20 transition-colors duration-[var(--dur-feedback)]",
+          // Refused reads as an outline, not as a filled call to action. The
+          // near-black fill is the loudest thing on the column and cannot be
+          // what says «you cannot have this».
+          disabled ? "bg-transparent" : "bg-cta",
           working && "bg-cta-hover",
         )}
       />
@@ -196,17 +220,21 @@ export function AddToCart({
       {/* Both labels are stacked in one grid cell so the button never changes
           width as the words change. */}
       <span className="grid place-items-center">
-        <SwapLabel show={!done && !working}>
+        <SwapLabel show={disabled}>
+          <span className={ACTION_LABEL}>{disabledLabel}</span>
+        </SwapLabel>
+
+        <SwapLabel show={!disabled && !done && !working}>
           <ShoppingBag className="size-[18px]" />
           <span className={ACTION_LABEL}>افزودن به سبد خرید</span>
         </SwapLabel>
 
-        <SwapLabel show={working}>
+        <SwapLabel show={!disabled && working}>
           <Loader2 className="size-[18px] animate-spin" />
           <span className={ACTION_LABEL}>در حال افزودن…</span>
         </SwapLabel>
 
-        <SwapLabel show={done}>
+        <SwapLabel show={!disabled && done}>
           <DrawnCheck play={done && !holdConfirmed} />
           <span className={ACTION_LABEL}>به سبد اضافه شد</span>
         </SwapLabel>

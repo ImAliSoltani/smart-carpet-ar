@@ -1,0 +1,115 @@
+# The deployed shop: Caddy in front, everything else on a private network.
+#
+#   docker compose -f infra/compose.prod.yml --env-file infra/.env up -d --build
+#
+# Copy `infra/.env.example` to `infra/.env` first and fill it in; the API
+# refuses to start with development defaults (`Settings.assert_production_ready`),
+# which is deliberate — the alternative is a shop that serves every page
+# correctly while anyone who has read this repository can forge an admin cookie.
+#
+# **Only Caddy publishes ports.** The API, the storefront and Postgres are
+# reachable on the internal network and nowhere else, so the admin API cannot be
+# hit around the proxy and Postgres is not exposed to the internet at all — the
+# single most common way a small deployment is lost.
+
+name: farsh
+
+networks:
+  edge:
+    driver: bridge
+    ipam:
+      config:
+        # Fixed so Caddy can hold a known address: the API believes
+        # `X-Forwarded-For` from that address and from nothing else. Without a
+        # fixed subnet the address moves between restarts and either the
+        # rate limiter charges every visitor to one key, or it trusts a header
+        # anyone can write.
+        - subnet: 172.28.0.0/24
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in infra/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-farsh}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [edge]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-farsh}
+      DEBUG: "false"
+      # Same host for the site and the API, so the browser never makes a
+      # cross-origin request and this list exists only to refuse everyone else.
+      CORS_ORIGINS: https://${SITE_DOMAIN:?set SITE_DOMAIN in infra/.env}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in infra/.env}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:?generate with scripts/hash_password.py}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      # Read by uvicorn itself. One address: Caddy's. See the network comment.
+      FORWARDED_ALLOW_IPS: 172.28.0.2
+    volumes:
+      # The photographs, the derivatives and every `.glb`/`.usdz`. This volume
+      # *is* the shop's media; `scripts/backup.sh` copies it beside the dump,
+      # and a database restored without it is a catalogue of broken images.
+      - storage:/app/data/storage
+    networks: [edge]
+
+  web:
+    build:
+      context: ../frontend
+      args:
+        # A path, not an origin — Caddy serves the site and the API from one
+        # host, so the browser calls itself.
+        NEXT_PUBLIC_API_BASE_URL: /api
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      # Server-side rendering talks to the API directly over the private
+      # network, skipping Caddy and TLS for a call that never leaves the host.
+      API_INTERNAL_URL: http://api:8000
+    networks: [edge]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [web, api]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      # Let's Encrypt sends expiry warnings here and needs it for the account.
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in infra/.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates and the ACME account key. Losing this volume means
+      # re-issuing on every restart, which runs into Let's Encrypt's rate limit
+      # and takes the site down until it clears.
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      edge:
+        ipv4_address: 172.28.0.2
+
+volumes:
+  pgdata:
+  storage:
+  caddy_data:
+  caddy_config:

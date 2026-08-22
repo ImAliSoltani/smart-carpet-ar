@@ -94,9 +94,16 @@ function Field({
   error?: string;
   children: React.ReactNode;
 }) {
+  // The whole field is the `<label>`, so the caption is bound to the control by
+  // containment. It was a sibling `<label>` with no `htmlFor`, which renders
+  // identically and is not a label at all: a screen reader arriving at the
+  // input announced «متن» and nothing else, and tapping the caption on a phone
+  // did not focus the field. Containment rather than an id because these
+  // captions are written at the call site and an id would have to be threaded
+  // through every one of them to be got right once.
   return (
-    <div className="space-y-2">
-      <label className="block text-sm text-ink-2">{label}</label>
+    <label className="block space-y-2">
+      <span className="block text-sm text-ink-2">{label}</span>
       {children}
       {/* Beside the field, not gathered at the top: §8 asks for the error where
           the correction is made. `role="alert"` so it is also heard there. */}
@@ -107,7 +114,7 @@ function Field({
       ) : hint ? (
         <p className="text-[12.5px] leading-loose text-muted">{hint}</p>
       ) : null}
-    </div>
+    </label>
   );
 }
 
@@ -402,8 +409,30 @@ export function CheckoutForm() {
             بازگشت
           </Button>
 
+          {/* The two `key`s are load-bearing, not tidiness.
+              
+              Without them React sees a `Button` at the same position in both
+              branches, keeps the same `<button>` element, and only swaps its
+              `type` and `onClick`. So the click that advances to the last step
+              turns the very node being clicked into a submit button — and the
+              browser evaluates a click's default action *after* the listener,
+              against whatever `type` the node has by then. One press of «ادامه»
+              both moved to the review step and placed the order, so the review
+              step was never seen and «ثبت سفارش» was never pressed.
+              
+              It was found end to end and could only be found there: the order
+              endpoint received a valid order and answered 201, every unit test
+              passed, and the shopper's own screen went straight to a tracking
+              code for a purchase they had not confirmed. Distinct keys make the
+              submit button a new node, which the already-dispatched click
+              cannot activate. */}
           {last ? (
-            <Button type="submit" disabled={form.formState.isSubmitting} className="h-12 gap-2 rounded-full px-7">
+            <Button
+              key="submit"
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="h-12 gap-2 rounded-full px-7"
+            >
               {form.formState.isSubmitting ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
@@ -417,7 +446,12 @@ export function CheckoutForm() {
               )}
             </Button>
           ) : (
-            <Button type="button" onClick={goNext} className="h-12 gap-1 rounded-full px-7">
+            <Button
+              key="next"
+              type="button"
+              onClick={goNext}
+              className="h-12 gap-1 rounded-full px-7"
+            >
               ادامه
               <ChevronLeft className="size-4" />
             </Button>

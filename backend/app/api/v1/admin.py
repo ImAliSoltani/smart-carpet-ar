@@ -16,6 +16,7 @@ from app.api.deps import DbSession, EmbeddingDep, StorageDep
 from app.ar import pipeline as ar_pipeline
 from app.ar.rectify import detect_corners
 from app.core.config import get_settings
+from app.core.security import client_key, read_upload
 from app.models import Carpet, CarpetImage, CarpetVariant, Order
 from app.models.enums import ArAssetStatus, OrderStatus
 from app.schemas.admin import (
@@ -55,10 +56,10 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.post("/login")
 async def login(request: Request, response: Response, payload: LoginRequest) -> dict[str, str]:
-    client_key = request.client.host if request.client else "unknown"
-    check_rate_limit(client_key)
+    caller = client_key(request)
+    check_rate_limit(caller)
     if not verify_credentials(payload.username, payload.password):
-        record_failed_attempt(client_key)
+        record_failed_attempt(caller)
         raise HTTPException(401, detail="نام کاربری یا رمز عبور نادرست است")
 
     settings = get_settings()
@@ -317,9 +318,7 @@ async def upload_image(
     if carpet is None:
         raise HTTPException(404, detail="فرش پیدا نشد")
 
-    data = await file.read()
-    if len(data) > get_settings().max_upload_mb * 1024 * 1024:
-        raise HTTPException(413, detail="حجم فایل بیش از حد مجاز است")
+    data = await read_upload(file, max_bytes=get_settings().max_upload_mb * 1024 * 1024)
     try:
         image_set = process_upload(data, storage)
     except InvalidImageError as exc:

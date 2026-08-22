@@ -59,7 +59,7 @@ def order_corners(points: np.ndarray) -> Corners:
     return tuple(tuple(float(v) for v in point) for point in ordered)  # type: ignore[return-value]
 
 
-def _quad_regularity(corners: Corners) -> float:
+def quad_regularity(corners: Corners) -> float:
     """How rectangle-like the quad is (1.0 = perfect), used as a sanity score.
 
     A real carpet photographed from any angle still projects to a convex quad
@@ -135,7 +135,7 @@ def detect_corners(image: Image.Image) -> tuple[Corners, float]:
             continue
 
         corners = order_corners(approx / scale)
-        regularity = _quad_regularity(corners)
+        regularity = quad_regularity(corners)
         coverage = min(area / frame_area, 1.0)
         # Both matter: a big blob that is not rectangle-like is not a carpet,
         # and a perfect little rectangle is probably a motif.

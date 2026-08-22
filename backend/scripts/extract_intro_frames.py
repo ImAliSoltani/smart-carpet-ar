@@ -191,7 +191,8 @@ def prune(out_root: Path, count: int) -> None:
         f"\npruned {freed / 1_048_576:.1f} MB the page never requests "
         f"({kept} resting frames kept per AVIF set, webp-1920 dropped)"
     )
-    print(f"shipping {remaining / 1_048_576:.1f} MB across {len(list(out_root.rglob('f-*')))} files")
+    shipped = len(list(out_root.rglob("f-*")))
+    print(f"shipping {remaining / 1_048_576:.1f} MB across {shipped} files")
 
 
 if __name__ == "__main__":

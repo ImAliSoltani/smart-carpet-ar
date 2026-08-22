@@ -1,10 +1,11 @@
 """Room-photo features. Today: which carpet size the floor will take."""
 
 import anyio
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, HTTPException, Request, UploadFile
 
 from app.api.deps import DbSession
 from app.core.config import get_settings
+from app.core.security import client_key, read_upload, room_limiter
 from app.room.adviser import advise
 from app.room.compose import RoomAnalysisError, analyze_room
 from app.room.palette import read_palette
@@ -44,13 +45,12 @@ MAX_ADVICE = 8
 
 
 @router.post("/room/size-guide", response_model=SizeGuideResponse)
-async def size_guide(session: DbSession, image: UploadFile) -> SizeGuideResponse:
+async def size_guide(request: Request, session: DbSession, image: UploadFile) -> SizeGuideResponse:
     """عکس اتاق → اندازه‌های فرشی که در فضای آزاد جا می‌شوند."""
     import numpy as np
 
-    data = await image.read()
-    if len(data) > get_settings().max_upload_mb * 1024 * 1024:
-        raise HTTPException(413, detail="حجم تصویر بیش از حد مجاز است")
+    room_limiter.check(client_key(request))
+    data = await read_upload(image, max_bytes=get_settings().max_upload_mb * 1024 * 1024)
     try:
         photo = load_image(data).convert("RGB")
     except InvalidImageError as exc:
@@ -109,7 +109,9 @@ async def size_guide(session: DbSession, image: UploadFile) -> SizeGuideResponse
 
 
 @router.post("/room/adviser", response_model=RoomAdviserResponse)
-async def room_adviser(session: DbSession, image: UploadFile) -> RoomAdviserResponse:
+async def room_adviser(
+    request: Request, session: DbSession, image: UploadFile
+) -> RoomAdviserResponse:
     """عکس اتاق → فرش‌هایی که به آن می‌آیند، با دلیل هر کدام.
 
     Shares its first half with the size guide — the same depth, the same floor
@@ -119,9 +121,8 @@ async def room_adviser(session: DbSession, image: UploadFile) -> RoomAdviserResp
     a shopper who wants a size does not want to wait for a ranking, and the two
     answers belong on different pages.
     """
-    data = await image.read()
-    if len(data) > get_settings().max_upload_mb * 1024 * 1024:
-        raise HTTPException(413, detail="حجم تصویر بیش از حد مجاز است")
+    room_limiter.check(client_key(request))
+    data = await read_upload(image, max_bytes=get_settings().max_upload_mb * 1024 * 1024)
     try:
         photo = load_image(data).convert("RGB")
     except InvalidImageError as exc:

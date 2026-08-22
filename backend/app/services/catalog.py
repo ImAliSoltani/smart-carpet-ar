@@ -3,6 +3,8 @@
 from decimal import Decimal
 from typing import NamedTuple
 
+import anyio
+from PIL import Image
 from sqlalchemy import Select, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +12,8 @@ from app.models import Carpet, CarpetImage, CarpetVariant
 from app.models.enums import ColorFamily, RoomType
 from app.schemas.catalog import CarpetListItem, CatalogFacets, CatalogFilters
 from app.services import color as color_service
+from app.services import query_windows
+from app.services.embeddings import EmbeddingBackend
 
 # How the two signals are weighted when visual search ranks a candidate.
 # Structure leads because it is the reliable one and because it is what a
@@ -361,3 +365,64 @@ async def search_by_embedding(
     ).all()
     by_id = {row[0].id: row_to_list_item(ListingRow(*row)) for row in listing_rows}
     return [(by_id[cid], score) for cid, score in scored if cid in by_id]
+
+
+async def search_by_photograph(
+    session: AsyncSession,
+    photo: Image.Image,
+    *,
+    embedder: EmbeddingBackend,
+    limit: int = 12,
+    grid: tuple[query_windows.Window, ...] = query_windows.DEFAULT_GRID,
+) -> list[tuple[CarpetListItem, float]]:
+    """A shopper's photograph → the carpets in it, read through several windows.
+
+    The catalogue is indexed on photographs of rugs filling the frame. A query
+    photograph is usually not one: it is a rug in a room, a fifth of the pixels
+    surrounded by wall and parquet. Embedding it whole asks the model about a
+    room, and the model answers about a room. So the frame is cut into windows,
+    each is searched, and every carpet keeps the best score any window gave it —
+    which lets whichever window happens to frame the rug speak for the query
+    without anything having to decide in advance which one that is. The reasoning
+    and the measured effect are in `app.services.query_windows`.
+
+    The whole frame is one of the windows, so this cannot rank worse than the
+    single-vector search it replaced except by a tie.
+    """
+    views = [view for _window, view in query_windows.cut(photo, grid)]
+    if not views:
+        return []
+
+    def describe() -> list[tuple[list[float], list[float]]]:
+        """The CPU half: one batched forward pass, then a histogram per window.
+
+        On a worker thread because it is hundreds of milliseconds with the GIL
+        held, and the event loop is also serving the catalogue to everyone else.
+        The histogram is computed per window for the same reason the vector is —
+        a histogram of the whole frame is a histogram of the floorboards, and
+        would undo in the re-ranking exactly what the windowing just fixed.
+        """
+        vectors = embedder.embed_batch(views)
+        return [
+            (vector, color_service.analyse(view).histogram)
+            for view, vector in zip(views, vectors, strict=True)
+        ]
+
+    described = await anyio.to_thread.run_sync(describe)
+
+    best: dict[int, float] = {}
+    for vector, histogram in described:
+        for item, score in await search_by_embedding(
+            session, vector, color_histogram=histogram, limit=limit * 2
+        ):
+            if score > best.get(item.id, -1.0):
+                best[item.id] = score
+
+    if not best:
+        return []
+    ranked = sorted(best.items(), key=lambda pair: pair[1], reverse=True)[:limit]
+    listing_rows = (
+        await session.execute(_listing_select().where(Carpet.id.in_([c for c, _ in ranked])))
+    ).all()
+    by_id = {row[0].id: row_to_list_item(ListingRow(*row)) for row in listing_rows}
+    return [(by_id[cid], score) for cid, score in ranked if cid in by_id]

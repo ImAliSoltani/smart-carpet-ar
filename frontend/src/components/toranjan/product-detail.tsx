@@ -591,7 +591,11 @@ export function ProductDetail({
               <AddToCart
                 // Out of stock is the one case where the button must not
                 // pretend: the order endpoint would refuse the line anyway.
+                // It used to be enforced only by the early return below, which
+                // meant the button still played its confirmation over a cart
+                // nothing had been added to — see the note on `disabled`.
                 key={selected?.id}
+                disabled={!selected || selected.stock <= 0}
                 onAdd={() => {
                   if (!selected || selected.stock <= 0) return;
                   addToCart({

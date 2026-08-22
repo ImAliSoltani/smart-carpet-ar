@@ -6,20 +6,20 @@ in-process. No user table — the attack surface of this product is one shop
 owner, and simplicity here is a security feature.
 """
 
-import time
+import secrets
 
 import bcrypt
 from fastapi import Cookie, HTTPException, status
 from itsdangerous import BadSignature, SignatureExpired, TimestampSigner
 
 from app.core.config import get_settings
+from app.core.security import SlidingWindowLimiter
 
 SESSION_COOKIE = "farsh_admin_session"
 
-# sliding window: max attempts per window per client key
-_MAX_ATTEMPTS = 5
-_WINDOW_SECONDS = 300
-_attempts: dict[str, list[float]] = {}
+#: Failed logins only — see `SlidingWindowLimiter.check(record=False)`. Five in
+#: five minutes is generous for a person and hopeless for a dictionary.
+login_limiter = SlidingWindowLimiter(limit=5, window_seconds=300, name="admin-login")
 
 
 def _signer() -> TimestampSigner:
@@ -31,27 +31,33 @@ def hash_password(plain: str) -> str:
 
 
 def check_rate_limit(client_key: str) -> None:
-    now = time.monotonic()
-    window = [t for t in _attempts.get(client_key, []) if now - t < _WINDOW_SECONDS]
-    _attempts[client_key] = window
-    if len(window) >= _MAX_ATTEMPTS:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="تلاش بیش از حد؛ چند دقیقه بعد دوباره امتحان کنید",
-        )
+    login_limiter.check(client_key, record=False)
 
 
 def record_failed_attempt(client_key: str) -> None:
-    _attempts.setdefault(client_key, []).append(time.monotonic())
+    login_limiter.record(client_key)
+
+
+#: Compared against when no admin password is configured, purely so that the
+#: "no admin exists" path costs the same bcrypt round as a wrong password.
+_DUMMY_HASH = b"$2b$12$eImiTXuWVxfM37uY4JANjQ.cD1YbLBn9K7pF0k5HBtwqA0LOX/rGm"
 
 
 def verify_credentials(username: str, password: str) -> bool:
+    """Constant-work credential check.
+
+    Both halves are always evaluated and the hash is always computed, even when
+    the username is wrong or no admin is configured at all. The short-circuit
+    that was here before answered a wrong *username* in microseconds and a wrong
+    *password* in the ~200 ms bcrypt takes — so the response time said which of
+    the two was wrong, which is precisely what the login error message goes out
+    of its way not to say.
+    """
     settings = get_settings()
-    if not settings.admin_password_hash:
-        return False
-    username_ok = username == settings.admin_username
-    password_ok = bcrypt.checkpw(password.encode(), settings.admin_password_hash.encode())
-    return username_ok and password_ok
+    stored = settings.admin_password_hash.encode() if settings.admin_password_hash else _DUMMY_HASH
+    password_ok = bcrypt.checkpw(password.encode(), stored)
+    username_ok = secrets.compare_digest(username, settings.admin_username)
+    return bool(settings.admin_password_hash) and username_ok and password_ok
 
 
 def issue_session() -> str:

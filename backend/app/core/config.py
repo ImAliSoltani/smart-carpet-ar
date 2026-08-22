@@ -70,6 +70,32 @@ class Settings(BaseSettings):
             return self.session_cookie_secure
         return not self.debug
 
+    def assert_production_ready(self) -> None:
+        """Refuse to start with development defaults outside development.
+
+        Both of these are one forgotten line in a `.env` away, and neither one
+        announces itself: a server signing sessions with `dev-only-change-me`
+        serves every page correctly while anyone who has read this repository
+        can mint an admin cookie, and a server with no admin hash simply has an
+        admin panel nobody can reach. A refusal at startup is loud; both of the
+        alternatives are silent.
+
+        `testing` is exempt because the suite deliberately runs the production
+        branch of `debug=False` code — cookie flags, docs being hidden — without
+        wanting a real secret in a fixture.
+        """
+        if self.debug or self.testing:
+            return
+        problems = []
+        if self.session_secret == Settings.model_fields["session_secret"].default:
+            problems.append("SESSION_SECRET هنوز مقدار پیش‌فرض توسعه است")
+        if not self.admin_password_hash:
+            problems.append("ADMIN_PASSWORD_HASH تنظیم نشده؛ پنل ادمین در دسترس نخواهد بود")
+        if problems:
+            raise RuntimeError(
+                "پیکربندی برای اجرای غیرتوسعه‌ای آماده نیست:\n  - " + "\n  - ".join(problems)
+            )
+
 
 @lru_cache
 def get_settings() -> Settings:
