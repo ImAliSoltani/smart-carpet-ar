@@ -98,14 +98,40 @@ export function ProductDetail({
   // `full_url` is null on rows ingested before the derivative columns existed,
   // and there the card file stands in — soft is worse than sharp and far better
   // than a 404.
-  const gallery = carpet.images
-    .map((image) => ({
-      src: mediaUrl(image.full_url ?? image.url),
-      zoomSrc: mediaUrl(image.full_url ?? image.url),
-    }))
-    .filter((entry): entry is { src: string; zoomSrc: string } => Boolean(entry.src));
+  // The styled photograph leads and the flat one follows it, which is the order
+  // the grid already promised: a card rests on the room shot, so opening it has
+  // to arrive at the room shot or the shared transition dissolves one
+  // photograph into a different one. Everything after the pair keeps the order
+  // the ingest gave it.
+  //
+  // Read off `is_primary` rather than off position, because that flag is the
+  // one thing guaranteed to mean «the flat» — it is what the AR pipeline
+  // rectifies and what visual search embeds, and it is set that way whether the
+  // carpet came from `ingest_catalog.py` or from an upload in the admin panel.
+  const gallery = React.useMemo(() => {
+    const images = carpet.images;
+    const flat = images.findIndex((image) => image.is_primary);
+    const cover = images.findIndex((image) => !image.is_primary);
+    const ordered =
+      flat < 0 || cover < 0
+        ? images
+        : [
+            images[cover],
+            images[flat],
+            ...images.filter((_, i) => i !== cover && i !== flat),
+          ];
+    return ordered
+      .map((image) => ({
+        src: mediaUrl(image.full_url ?? image.url),
+        zoomSrc: mediaUrl(image.full_url ?? image.url),
+      }))
+      .filter((entry): entry is { src: string; zoomSrc: string } => Boolean(entry.src));
+  }, [carpet.images]);
 
   const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+  // −1 or +1: which way the reader is turning, so the photograph arrives from
+  // the side they are turning from instead of materialising in place.
+  const [direction, setDirection] = React.useState(0);
 
   /* ---- moving between photographs -------------------------------------
      The row of dots was the only way through the gallery, and it is the
@@ -122,10 +148,16 @@ export function ProductDetail({
   const goToImage = React.useCallback(
     (index: number) => {
       if (imageCount === 0) return;
+      // Direction comes from the index as asked for, *before* it is wrapped —
+      // which is what makes the wrap look right. Stepping past the last
+      // photograph asks for index `imageCount`, still greater than the current
+      // one, so it reads as going forward even though it lands on zero. Compare
+      // the wrapped values instead and the last step of a loop plays backwards.
+      setDirection(index > currentImageIndex ? 1 : index < currentImageIndex ? -1 : 0);
       // wraps both ways, so the last photograph leads back to the first
       setCurrentImageIndex(((index % imageCount) + imageCount) % imageCount);
     },
-    [imageCount],
+    [imageCount, currentImageIndex],
   );
 
   /* Which way is «next». The page is RTL, so the gallery runs right to left:
@@ -264,79 +296,111 @@ export function ProductDetail({
               `AnimatePresence` for the frame either way, since it renders its
               child with no element of its own. */}
           <ViewTransition name={carpetPhotoName(carpet.slug)} default={CARPET_PHOTO_CLASS}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentImageIndex}
-                // `false`, never a branch on `useReducedMotion`. That hook answers
-                // differently on the server than in the browser, so branching on it
-                // rendered `opacity: 0` into the HTML and `opacity: 1` after
-                // hydration — a real mismatch React refuses to patch up.
-                //
-                // It is also the better behaviour: this photograph is the largest
-                // thing painted on the page, and the first one should be there
-                // rather than arrive. The cross-fade is for changing image, which
-                // only ever happens after a click.
-                initial={false}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduced ? { opacity: 0 } : { opacity: 0, y: -20 }}
-                transition={{ duration: reduced ? 0 : 0.3 }}
-                // Horizontal drag only, and framer-motion answers it with
-                // `touch-action: pan-y`, so the page still scrolls under the
-                // finger. A carousel that eats the vertical scroll is the
-                // gesture conflict this would otherwise introduce.
-                drag={imageCount > 1 ? "x" : false}
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.18}
-                dragMomentum={false}
-                onPointerDownCapture={(event) => {
-                  pointerStartX.current = event.clientX;
-                  swallowNextClick.current = false;
-                }}
-                onPointerUpCapture={(event) => {
-                  if (
-                    pointerStartX.current !== null &&
-                    Math.abs(event.clientX - pointerStartX.current) > 8
-                  ) {
-                    swallowNextClick.current = true;
-                  }
-                }}
-                onClickCapture={(event) => {
-                  if (!swallowNextClick.current) return;
-                  // The lightbox listens on the photograph itself, below this
-                  // handler, so the native event has to be stopped too.
-                  event.preventDefault();
-                  event.stopPropagation();
-                  event.nativeEvent.stopImmediatePropagation();
-                }}
-                onDragEnd={(_, info) => {
-                  if (imageCount < 2) return;
-                  const travelled =
-                    Math.abs(info.offset.x) > SWIPE_DISTANCE ||
-                    Math.abs(info.velocity.x) > SWIPE_VELOCITY;
-                  if (!travelled) return;
-                  const forward = Math.sign(info.offset.x) === NEXT_DRAG_SIGN;
-                  goToImage(currentImageIndex + (forward ? 1 : -1));
-                }}
-                className={cn(
-                  "toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg",
-                  imageCount > 1 && "touch-pan-y",
-                )}
-              >
-                {gallery[currentImageIndex] && (
-                  <ZoomableImage
-                    src={gallery[currentImageIndex].src}
-                    zoomSrc={gallery[currentImageIndex].zoomSrc}
-                    alt={`${carpet.name} — تصویر ${formatNumber(currentImageIndex + 1)}`}
-                    fill
-                    sizes="(min-width: 1024px) 45vw, 100vw"
-                    priority
-                    // `contain`, not `cover`: these photographs are cut to the
-                    // weave and cropping one takes the border off the pattern.
-                    className="object-contain p-6"
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
+            {/* The frame holds still and the photographs travel through it.
+                They used to be the same element, which is why changing image
+                read as one picture dissolving in mid-air: the thing that moved
+                was the whole frame, so the only change it could express was
+                opacity. Now the border, the rounding and the box stay put —
+                they are what the shared transition grows into — and the layer
+                inside slides. */}
+            <div
+              className={cn(
+                "toranjan-zoom-frame relative aspect-4/5 w-full overflow-hidden rounded-xl border border-line bg-bg",
+                imageCount > 1 && "touch-pan-y",
+              )}
+            >
+              {/* `initial={false}`, and it has to live here rather than on the
+                  child. `useReducedMotion` answers differently on the server
+                  than in the browser, and a branch on it once rendered
+                  `opacity: 0` into the HTML and `opacity: 1` after hydration —
+                  a real mismatch React refuses to patch up. Told here, the
+                  first photograph mounts already at rest and the enter
+                  animation only ever runs on a photograph the reader asked
+                  for. No `mode`: both layers have to move at once, or the
+                  outgoing one leaves an empty frame behind before the next
+                  arrives. */}
+              <AnimatePresence initial={false} custom={direction}>
+                <motion.div
+                  key={currentImageIndex}
+                  custom={direction}
+                  // Right-to-left, so photograph two sits to the *left* of
+                  // photograph one and turning forward walks the strip
+                  // rightwards: the new one comes in from the left edge while
+                  // the old one leaves by the right. Turning back mirrors it.
+                  // Same sign convention as the drag below, and the reason the
+                  // arrows and the arrow keys are flipped from an LTR carousel.
+                  variants={{
+                    enter: (dir: number) => ({ x: dir >= 0 ? "-100%" : "100%", opacity: 0 }),
+                    center: { x: 0, opacity: 1 },
+                    exit: (dir: number) => ({ x: dir >= 0 ? "100%" : "-100%", opacity: 0 }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  // Duration carries reduced motion rather than a different set
+                  // of values, so the styles React renders never depend on a
+                  // hook that disagrees with itself across hydration. At zero
+                  // the slide is a swap, which is what «less motion» means.
+                  transition={{
+                    duration: reduced ? 0 : 0.42,
+                    ease: [0.16, 1, 0.3, 1],
+                    opacity: { duration: reduced ? 0 : 0.28 },
+                  }}
+                  // Horizontal drag only, and framer-motion answers it with
+                  // `touch-action: pan-y`, so the page still scrolls under the
+                  // finger. A carousel that eats the vertical scroll is the
+                  // gesture conflict this would otherwise introduce.
+                  drag={imageCount > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.18}
+                  dragMomentum={false}
+                  onPointerDownCapture={(event) => {
+                    pointerStartX.current = event.clientX;
+                    swallowNextClick.current = false;
+                  }}
+                  onPointerUpCapture={(event) => {
+                    if (
+                      pointerStartX.current !== null &&
+                      Math.abs(event.clientX - pointerStartX.current) > 8
+                    ) {
+                      swallowNextClick.current = true;
+                    }
+                  }}
+                  onClickCapture={(event) => {
+                    if (!swallowNextClick.current) return;
+                    // The lightbox listens on the photograph itself, below this
+                    // handler, so the native event has to be stopped too.
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.nativeEvent.stopImmediatePropagation();
+                  }}
+                  onDragEnd={(_, info) => {
+                    if (imageCount < 2) return;
+                    const travelled =
+                      Math.abs(info.offset.x) > SWIPE_DISTANCE ||
+                      Math.abs(info.velocity.x) > SWIPE_VELOCITY;
+                    if (!travelled) return;
+                    const forward = Math.sign(info.offset.x) === NEXT_DRAG_SIGN;
+                    goToImage(currentImageIndex + (forward ? 1 : -1));
+                  }}
+                  className="absolute inset-0"
+                >
+                  {gallery[currentImageIndex] && (
+                    <ZoomableImage
+                      src={gallery[currentImageIndex].src}
+                      zoomSrc={gallery[currentImageIndex].zoomSrc}
+                      alt={`${carpet.name} — تصویر ${formatNumber(currentImageIndex + 1)}`}
+                      fill
+                      sizes="(min-width: 1024px) 45vw, 100vw"
+                      priority
+                      // `contain`, not `cover`: these photographs are cut to the
+                      // weave and cropping one takes the border off the pattern.
+                      className="object-contain p-6"
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </ViewTransition>
 
           {/* Pointer devices have no swipe. Hidden below `sm`, where the
