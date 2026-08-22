@@ -32,6 +32,7 @@ CANDIDATE_MULTIPLIER = 8
 class ListingRow(NamedTuple):
     carpet: Carpet
     primary_image: str | None
+    cover_image: str | None
     min_price: Decimal | None
     sizes_count: int
 
@@ -41,6 +42,24 @@ def _listing_select() -> Select:
         select(CarpetImage.url)
         .where(CarpetImage.carpet_id == Carpet.id)
         .order_by(CarpetImage.is_primary.desc(), CarpetImage.position)
+        .limit(1)
+        .correlate(Carpet)
+        .scalar_subquery()
+    )
+    # The styled photograph beside the flat one, for the grid to lead with. The
+    # primary image is the rug seen square-on — it is the honest view and the
+    # one AR needs, but forty of them side by side is forty rectangles of pure
+    # pattern, and a کناره shown that way is a narrow strip adrift in a card.
+    #
+    # Identified as "the first image that is not the primary", which is exactly
+    # what it is rather than a new convention: `ingest_catalog.py` writes the
+    # flat at position 0 and the styled shots after it, and the admin panel
+    # makes the first upload primary and appends the rest. Null when a carpet
+    # has only the one photograph, and then the card simply keeps showing it.
+    cover_image = (
+        select(CarpetImage.url)
+        .where(CarpetImage.carpet_id == Carpet.id, CarpetImage.is_primary.is_(False))
+        .order_by(CarpetImage.position)
         .limit(1)
         .correlate(Carpet)
         .scalar_subquery()
@@ -60,6 +79,7 @@ def _listing_select() -> Select:
     return select(
         Carpet,
         primary_image.label("primary_image"),
+        cover_image.label("cover_image"),
         min_price.label("min_price"),
         sizes_count.label("sizes_count"),
     ).where(Carpet.is_active.is_(True))
@@ -126,6 +146,7 @@ def _apply_sort(stmt: Select, filters: CatalogFilters) -> Select:
 def row_to_list_item(row: ListingRow) -> CarpetListItem:
     item = CarpetListItem.model_validate(row.carpet)
     item.primary_image = row.primary_image
+    item.cover_image = row.cover_image
     item.min_price = row.min_price
     item.sizes_count = row.sizes_count
     return item

@@ -244,7 +244,12 @@ _RAW: list[CarpetProfile] = [
             "سفید و آبی. نایین را از همین ترکیب کم‌رنگِ آرام می‌شناسند."
         ),
         pattern=P.AFSHAN,
-        material=M.WOOL,
+        # کرک و ابریشم, like the Isfahan above it: the description says «با گل
+        # ابریشم» and the price tier says `kork_silk`, so WOOL here was the odd
+        # one out of three. It also left MIXED with a single carpet in it, and a
+        # filter chip that returns one product is the thing §4.5 set out to
+        # avoid.
+        material=M.MIXED,
         rooms=(R.LIVING_ROOM, R.OFFICE),
         origin="نایین",
         handmade=True,

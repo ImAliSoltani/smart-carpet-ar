@@ -748,6 +748,17 @@
             "title": "Colors",
             "type": "array"
           },
+          "cover_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover Image"
+          },
           "id": {
             "title": "Id",
             "type": "integer"

@@ -798,6 +798,8 @@ export interface components {
             color_families: components["schemas"]["ColorFamily"][];
             /** Colors */
             colors: string[];
+            /** Cover Image */
+            cover_image?: string | null;
             /** Id */
             id: number;
             material: components["schemas"]["CarpetMaterial"];

@@ -23,6 +23,14 @@ npm-debug.log*
 # --- heavy data: stays OUT of git (object storage instead) ---
 data/
 assets/
+# The catalogue photographs as they came out of the image model, one folder per
+# carpet. `dataset/` is the *reviewable* half of the catalogue — profiles.json,
+# prompts.md and chat-guide.md, all of them text somebody can argue with — and
+# these forty folders are 339 MB of pixels that would drown it. They are not a
+# separate asset either: `ingest_catalog.py` copies them into `data/catalog-gen`
+# and from there into storage, which is the same road every other product's
+# photographs travel. Keep a copy off the machine; git is not that copy.
+dataset/[0-9][0-9]_*/
 docs/prototypes/**/frames/
 # The intro's frame sets — hundreds of files and tens of megabytes, rebuilt
 # from the film in `assets/` by `backend/scripts/extract_intro_frames.py`.

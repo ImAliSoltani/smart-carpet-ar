@@ -74,9 +74,27 @@ export function CarpetCard({
   onCompareToggle,
   compareFull = false,
 }: CarpetCardProps) {
-  const gallery = (images?.length ? images : [carpet.primary_image])
+  // The card rests on the styled photograph and shows the flat one while the
+  // pointer is on it. Both come from the listing endpoint; `cover_image` is
+  // null for a carpet with a single photograph, and then the flat is all there
+  // is and there is nothing to swap to.
+  //
+  // Resting on the styled shot rather than the flat one is a shop decision, not
+  // a technical one: the flat is the honest view of the goods, but a grid of
+  // twenty-four of them is twenty-four rectangles of pattern with no air in
+  // them, and a کناره — 0.26 wide against a 0.75 frame — is a narrow strip
+  // stranded in the middle of a card. The room shot gives every card the same
+  // shape and the same light. The rug itself is one hover away, and one tap
+  // away on the product page.
+  const gallery = (images?.length ? images : [carpet.cover_image ?? carpet.primary_image])
     .map((u) => mediaUrl(u))
     .filter((u): u is string => Boolean(u));
+
+  // The flat, revealed on hover — but only when it is not already what the card
+  // is resting on, and never when a caller supplied its own gallery to page
+  // through, because then the reveal and the carousel would fight.
+  const revealed =
+    !images?.length && carpet.cover_image ? mediaUrl(carpet.primary_image) : undefined;
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const href = `/carpets/${carpet.slug}`;
@@ -134,9 +152,42 @@ export function CarpetCard({
                 // largest thing painted; lazy-loading it means measuring our own
                 // LCP against a placeholder. Four covers the widest grid.
                 priority={index < 4}
-                // `contain`, not `cover`: these photographs are cut out to the
-                // weave, and cropping one would cut the border off the pattern.
-                className="object-contain p-4 transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]"
+                className={cn(
+                  "transition-transform duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03]",
+                  // `contain` with air around it when this is the rug itself:
+                  // the photograph is cut out to the weave, and cropping one
+                  // would cut the border off the pattern. `cover` when it is a
+                  // room, because a photograph of a room is not a cut-out and
+                  // letterboxing one inside a card reads as a mistake.
+                  revealed ? "object-cover" : "object-contain p-4",
+                )}
+              />
+            )}
+
+            {/* The rug itself, on top, faded in while the pointer is on the
+                card.
+
+                `hidden` under `(hover: none)` is what keeps this off phones,
+                and it has to be written out: Tailwind v4 wraps *some* hover
+                utilities in `@media (hover: hover)` but emits
+                `group-hover:opacity-100` ungated, and a tap on a touch screen
+                raises `:hover`. `display: none` outranks the opacity either
+                way, and it also means the file is never fetched — a lazy image
+                in a `display: none` box is never in the viewport to load. So a
+                phone pays nothing for a layer it will not use.
+
+                It carries its own background: `object-contain` leaves the
+                padding transparent, and without one the room shot underneath
+                would show around the rug's edges for the length of the fade. */}
+            {revealed && (
+              <Image
+                src={revealed}
+                alt=""
+                aria-hidden
+                fill
+                loading="lazy"
+                sizes="(min-width: 1280px) 22vw, (min-width: 768px) 33vw, 50vw"
+                className="bg-bg object-contain p-4 opacity-0 transition-[opacity,transform] duration-500 ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.03] group-hover:opacity-100 [@media(hover:none)]:hidden"
               />
             )}
 

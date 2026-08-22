@@ -138,14 +138,14 @@ Place the attached rug — unchanged in pattern, colour and proportion — on th
 
 ## 4. فرش دستباف نایین ۹ لا — افشان سرمه‌ای
 
-`naeen-9la-afshan-sormei` · دستباف · ۹ لا · نایین · afshan · wool
+`naeen-9la-afshan-sormei` · دستباف · ۹ لا · نایین · afshan · mixed
 
 رنگ‌های خواسته‌شده: blue + white, cream
 
 **`naeen-9la-afshan-sormei__flat.png`** — **بدون مرجع — اول این**
 
 ```text
-A top-down flat texture photograph of a hand-knotted Persian carpet from Nain, navy field with an all-over afshan of white and pale blue vine work, silk-highlighted outlines, restrained palette, hand-knotted wool pile, matte, dense, slightly uneven hand-spun yarn. The rug completely fills the frame in 200:300 aspect ratio (a 200×300 cm rug), edge to edge, with NO background visible on any side — the four edges of the rug are the four edges of the image. Photographed perfectly square-on from directly above, edges parallel to the frame, no perspective distortion whatsoever. The carpet's two short ends finish in their natural knotted warp fringe, and both fringed ends are fully visible inside the frame. Completely flat, no folds, no curled corners, nothing on it and nothing casting a shadow onto it. Even diffuse lighting across the whole surface with no hotspots and no gradient. Sharp focus edge to edge so the weave is legible. A texture reference, not a styled product shot.
+A top-down flat texture photograph of a hand-knotted Persian carpet from Nain, navy field with an all-over afshan of white and pale blue vine work, silk-highlighted outlines, restrained palette, wool pile with silk-highlighted motifs, the silk catching light against matte wool. The rug completely fills the frame in 200:300 aspect ratio (a 200×300 cm rug), edge to edge, with NO background visible on any side — the four edges of the rug are the four edges of the image. Photographed perfectly square-on from directly above, edges parallel to the frame, no perspective distortion whatsoever. The carpet's two short ends finish in their natural knotted warp fringe, and both fringed ends are fully visible inside the frame. Completely flat, no folds, no curled corners, nothing on it and nothing casting a shadow onto it. Even diffuse lighting across the whole surface with no hotspots and no gradient. Sharp focus edge to edge so the weave is legible. A texture reference, not a styled product shot.
 ```
 
 **`naeen-9la-afshan-sormei__cover.png`** — با ضمیمه‌ی `flat`

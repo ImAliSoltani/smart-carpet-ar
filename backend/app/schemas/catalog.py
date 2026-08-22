@@ -53,6 +53,9 @@ class CarpetListItem(BaseModel):
     colors: list[str]
     color_families: list[ColorFamily]
     primary_image: str | None = None
+    # The styled shot the grid leads with; `primary_image` stays the flat one
+    # underneath it. Null for a carpet with a single photograph.
+    cover_image: str | None = None
     min_price: Decimal | None = None
     sizes_count: int = 0
 

@@ -50,6 +50,17 @@ MIN_SATURATION = 0.12
 # a hue, and it is not the carpet's.
 BLACK_CEILING = 0.08
 
+# The other end of the same argument. The rule above is right that darkness
+# alone proves nothing — but darkness *together with* near-neutrality does: a
+# charcoal ground rendered with a faint blue cast is black to every eye that
+# sees it, and a modern مشکی carpet came back filed under «آبی» because two of
+# its four dominant colours sat at s≈0.17, v≈0.16. What keeps this from eating
+# the navy grounds the comment above defends is that it demands *both*: a real
+# سرمه‌ای clears 0.35 saturation comfortably (the Naeen reads s≈0.88 at v≈0.19)
+# while a black-with-a-cast never does.
+DARK_CEILING = 0.28
+DARK_MIN_SATURATION = 0.35
+
 # Only pixels this opaque are counted. Catalogue photographs are cut out from
 # their backdrop, so the transparent margin is not part of the carpet; counting
 # it would report the *discarded* backdrop as one of the carpet's colours. Same
@@ -108,28 +119,61 @@ def classify_pixel(hue_deg: float, saturation: float, value: float) -> ColorFami
         if value < 0.25:
             return ColorFamily.BLACK
         return ColorFamily.GRAY if value < 0.72 else ColorFamily.WHITE
+    if value < DARK_CEILING and saturation < DARK_MIN_SATURATION:
+        return ColorFamily.BLACK
     if 18.0 <= hue_deg < 70.0 and saturation < 0.45 and value > 0.55:
         return ColorFamily.CREAM
+    # Pale red is pink, and no hue boundary can say so: a baby-pink nursery rug
+    # and a crimson Kashan sit within five degrees of each other, separated only
+    # by how washed-out one is. Checked before RED because it is carved out of
+    # it, and reaching a little past the red wedge to 18° because the dusty rose
+    # grounds land just short of where CREAM begins.
+    if (hue_deg >= 345.0 or hue_deg < 18.0) and saturation < 0.30 and value > 0.80:
+        return ColorFamily.PINK
 
-    if hue_deg >= 335.0 or hue_deg < 15.0:
+    if hue_deg >= 345.0 or hue_deg < 15.0:
+        # Crimson and maroon are red to any eye, and they measure h≈354. The
+        # boundary sits at 345 rather than 335 because the ten degrees below it
+        # are not red at all: an ارغوانی Mashhad grounds at h≈338 and is
+        # mulberry, which the wedge at the bottom of this function now names.
         return ColorFamily.RED
-    if hue_deg < 45.0:
+    if hue_deg < 34.0:
         # Brown is not a hue, it is a dark orange — the axis that separates a
         # walnut ground from a terracotta one is value, not hue.
         return ColorFamily.BROWN if value < 0.55 else ColorFamily.ORANGE
     if hue_deg < 70.0:
-        return ColorFamily.GOLD
+        # And by the same argument at the other end of the band: dark yellow is
+        # olive, and olive is a green. A plain موس‌سبز Kashan reads h≈60 s≈0.46
+        # v≈0.42 and was filed under «طلایی», which is the one word nobody would
+        # use for it. Bright at the same hue really is gold, so value decides —
+        # the same axis, and the same threshold, that splits brown from orange.
+        return ColorFamily.GOLD if value >= 0.55 else ColorFamily.GREEN
     if hue_deg < 160.0:
         return ColorFamily.GREEN
     if hue_deg < 200.0:
         return ColorFamily.TURQUOISE
-    if hue_deg < 255.0:
+    if hue_deg < 270.0:
+        # Indigo is a blue. The band reaches past the textbook 255 because the
+        # silk سرمه‌ای grounds do: a Qom ground measures h≈260 against h≈215 for
+        # a Naeen, violet enough to fall out of the blue filter and into the
+        # purple one, which is wrong twice over.
         return ColorFamily.BLUE
     if hue_deg < 300.0:
         return ColorFamily.PURPLE
-    # Crimson and maroon sit just below the red boundary and are red to any eye;
-    # PINK is the genuinely magenta wedge, not everything left over.
-    return ColorFamily.PINK
+    # What is left is the magenta wedge, 300°–345°, and three families share it.
+    # Crimson comes out first: a carmine Kashan ground measures h≈340, and what
+    # marks it is how *pure* the dye is, not how dark it is — an ارغوانی Mashhad
+    # sits two degrees away at h≈338 and is unmistakably mulberry, but it reads
+    # s≈0.55 against crimson's s≈0.80.
+    if hue_deg >= 335.0 and saturation >= 0.70:
+        return ColorFamily.RED
+    # The rest splits on value, the third time in this function that value and
+    # not hue carries a family: brown is a dark orange, olive is a dark yellow,
+    # and plum is a dark magenta — rose is the same hue with the light left on.
+    # This is why the purple band above stops at 300 instead of running to 345:
+    # a بنفش checkerboard reads h≈315 v≈0.40 and is violet, while a hot pink
+    # reads the same hue at v≈0.70, and no line drawn across hue separates them.
+    return ColorFamily.PURPLE if value < 0.55 else ColorFamily.PINK
 
 
 def _hsv_pixels(image: Image.Image) -> list[tuple[float, float, float]]:
