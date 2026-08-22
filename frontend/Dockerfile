@@ -24,6 +24,10 @@ COPY . .
 ARG NEXT_PUBLIC_API_BASE_URL=/api
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
+# Turns on `output: "standalone"` in next.config.ts. Set here rather than there
+# so that `next start` — which the E2E suite and scripts/share.ps1 both use —
+# is not permanently warning about a mode only this build wants.
+ENV NEXT_OUTPUT_STANDALONE=1
 
 RUN npm run build
 

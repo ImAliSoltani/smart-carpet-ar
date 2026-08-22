@@ -25,14 +25,19 @@ function lanAddresses(): string[] {
 const nextConfig: NextConfig = {
   /**
    * Trace the modules the server actually imports and emit a self-contained
-   * tree under `.next/standalone`.
+   * tree under `.next/standalone`. That tree is what the deployment image
+   * copies (frontend/Dockerfile), and the reason its runtime stage carries no
+   * `node_modules`.
    *
-   * This is what the deployment image copies (frontend/Dockerfile), and it is
-   * the reason the runtime stage carries no `node_modules`. It changes nothing
-   * about `next dev` or `next start` locally — the standalone tree is an extra
-   * output beside the normal one, not a replacement for it.
+   * **Opt-in, because it is not free elsewhere.** Set unconditionally, it makes
+   * `next start` print «"next start" does not work with "output: standalone"»
+   * on every local run — which is a warning nobody can act on when the only
+   * consumer is a Docker build, and which sends you looking in the wrong place
+   * the first time a locally-served page misbehaves. The Dockerfile sets this;
+   * `npm run dev`, `npm run e2e` and scripts/share.ps1 do not, and get the
+   * ordinary build they actually run.
    */
-  output: "standalone",
+  output: process.env.NEXT_OUTPUT_STANDALONE ? "standalone" : undefined,
 
   /**
    * React's `<ViewTransition>`, which is what carries the photograph across a
