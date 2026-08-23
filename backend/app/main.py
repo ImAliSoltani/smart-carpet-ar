@@ -75,6 +75,20 @@ async def _warm_embeddings() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Startup, and the checks that belong to starting rather than to importing.
+
+    `assert_production_ready` lives here and not in `create_app`, which is where
+    it was first written and where it was wrong. Importing this module is not
+    starting a server: `scripts/export_openapi.py` imports `app` only to read
+    its schema, and CI runs that on a machine with no `.env` at all — so the
+    guard refused, the contract check died, and the failure said nothing about
+    OpenAPI. Refusing to *serve* with a development secret is right; refusing to
+    be *read* is a different rule nobody asked for.
+
+    Raised from lifespan it still stops the server dead, which is the whole
+    point, and uvicorn prints it.
+    """
+    get_settings().assert_production_ready()
     async with anyio.create_task_group() as tasks:
         tasks.start_soon(_warm_embeddings)
         yield
@@ -84,7 +98,6 @@ def create_app() -> FastAPI:
     _register_media_types()
 
     settings = get_settings()
-    settings.assert_production_ready()
     app = FastAPI(
         title=settings.app_name,
         debug=settings.debug,

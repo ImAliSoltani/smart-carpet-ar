@@ -202,3 +202,30 @@ def test_production_refuses_a_missing_admin_hash() -> None:
 
 def test_development_is_left_alone() -> None:
     Settings(_env_file=None, debug=True).assert_production_ready()
+
+
+def test_the_guard_runs_when_the_server_starts_not_when_it_is_imported(monkeypatch) -> None:
+    """Startup enforces it; importing the module does not.
+
+    Both halves matter and they pulled in opposite directions. The check began
+    life in `create_app`, which runs at import — and `scripts/export_openapi.py`
+    imports `app` only to read its schema, so CI (which has no `.env`) died on
+    the contract check with a message about session secrets. Moving it to
+    lifespan fixed that and could easily have made it dead code instead, which
+    nothing would have noticed until a server was serving forgeable sessions.
+    """
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    # Importing and building the app is not starting it.
+    app = create_app()
+
+    broken = Settings(
+        _env_file=None, debug=False, testing=False,
+        session_secret="dev-only-change-me", admin_password_hash="",
+    )
+    monkeypatch.setattr("app.main.get_settings", lambda: broken)
+    with pytest.raises(RuntimeError, match="SESSION_SECRET"):
+        with TestClient(app):  # entering the context is what runs lifespan
+            pass
