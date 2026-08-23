@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/toranjan/site-header";
 import { SiteFooter } from "@/components/toranjan/site-footer";
 import { CompareTray } from "@/components/toranjan/compare-tray";
+import { BottomNav } from "@/components/toranjan/bottom-nav";
 import { IntroCurtain } from "@/components/toranjan/intro/intro-curtain";
 
 /**
@@ -26,10 +27,25 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
       <SiteHeader />
       {children}
       <SiteFooter />
+      {/* The bottom bar is `fixed`, so unlike the compare tray it does hover
+          over the end of the page. Padding the footer is safe here for the
+          reason it was not safe there: this bar's height is a constant — a
+          44px row in 8px of padding — and does not move with the words inside
+          it. Below `lg` only, which is exactly where the bar is drawn.
+
+          `env()` is repeated rather than shared, because a spacer that ignores
+          the gesture bar leaves the footer's last line under it on precisely
+          the phones the bar was added for. */}
+      <div
+        aria-hidden
+        className="lg:hidden"
+        style={{ height: "calc(5.25rem + env(safe-area-inset-bottom, 0px))" }}
+      />
       {/* Outside the page, because a shortlist survives navigation — it is
           filled on one page and read on another. It draws nothing until
           something is in it. */}
       <CompareTray />
+      <BottomNav />
     </IntroCurtain>
   );
 }
