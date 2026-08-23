@@ -200,20 +200,50 @@ export function CornerEditor({
     [corners, clamp, onChange],
   );
 
-  const moveToPointer = React.useCallback(
-    (index: number, clientX: number, clientY: number) => {
+  const pointerToSource = React.useCallback(
+    (clientX: number, clientY: number): CornerPoint | null => {
       const frame = frameRef.current;
-      if (!frame) return;
+      if (!frame) return null;
       const rect = frame.getBoundingClientRect();
       // A frame with no size means the image has not laid out yet; dividing by
       // it would write `Infinity` into a corner.
-      if (rect.width === 0 || rect.height === 0) return;
-      replace(index, {
+      if (rect.width === 0 || rect.height === 0) return null;
+      return {
         x: ((clientX - rect.left) / rect.width) * imageWidth,
         y: ((clientY - rect.top) / rect.height) * imageHeight,
+      };
+    },
+    [imageWidth, imageHeight],
+  );
+
+  /**
+   * Where the corner sat relative to the finger when it was grabbed.
+   *
+   * **The drag is relative, and that is the whole fix for «it jumps».** It used
+   * to be absolute: `pointerdown` moved the corner to wherever the press
+   * landed. A mouse is clicked dead centre on the mark so the jump is zero,
+   * which is why nothing caught it — but the touch target is 44px around an
+   * 18px mark, and a fingertip lands anywhere inside it. Every grab therefore
+   * threw the corner up to twenty screen pixels before the drag had begun, and
+   * a screen pixel here is two and a half pixels of photograph.
+   *
+   * Holding the offset means the corner does not move until the finger does,
+   * and then moves exactly as far. It also lets the finger sit *beside* the
+   * point it is placing instead of on top of it — which is what the loupe was
+   * always for.
+   */
+  const grabOffset = React.useRef<CornerPoint>({ x: 0, y: 0 });
+
+  const dragToPointer = React.useCallback(
+    (index: number, clientX: number, clientY: number) => {
+      const point = pointerToSource(clientX, clientY);
+      if (!point) return;
+      replace(index, {
+        x: point.x + grabOffset.current.x,
+        y: point.y + grabOffset.current.y,
       });
     },
-    [replace, imageWidth, imageHeight],
+    [pointerToSource, replace],
   );
 
   // A step in *source* pixels, sized from the photograph rather than fixed. One
@@ -378,7 +408,12 @@ export function CornerEditor({
                 // So focus is asked for explicitly.
                 event.currentTarget.focus();
                 setDragging(index);
-                moveToPointer(index, event.clientX, event.clientY);
+                // Remember where the corner is relative to the finger, and
+                // leave it exactly where it is. Nothing moves on a press.
+                const at = pointerToSource(event.clientX, event.clientY);
+                grabOffset.current = at
+                  ? { x: corners[index].x - at.x, y: corners[index].y - at.y }
+                  : { x: 0, y: 0 };
               }}
               onPointerMove={(event) => {
                 // The DOM's own answer to «is this handle being dragged», not
@@ -391,7 +426,7 @@ export function CornerEditor({
                 // A guard is still needed: without one, moving the mouse across
                 // a handle with no button held would drag the corner.
                 if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
-                moveToPointer(index, event.clientX, event.clientY);
+                dragToPointer(index, event.clientX, event.clientY);
               }}
               onPointerUp={(event) => {
                 if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
