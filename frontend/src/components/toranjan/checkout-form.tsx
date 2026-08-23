@@ -183,6 +183,21 @@ export function CheckoutForm() {
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
+    // The order is placed from the review step or it is not placed. Every
+    // other guard here sits on a button, and a button is not the only thing
+    // that submits a form: the browser's own implicit submission answers to
+    // Enter in a single-line field and to nothing else, and a click the
+    // browser synthesises after the DOM has changed answers to whatever now
+    // occupies the coordinates. Neither can be reasoned about from a `type`
+    // attribute.
+    //
+    // Checked against the step this render was built from, which is what makes
+    // it work for the dangerous case: a submit arriving in the same tick as
+    // the advance reads the *old* step and is refused. The invoice is on
+    // screen at `last` and nowhere else, so this is the same sentence as «no
+    // order is placed that the buyer has not read».
+    if (step !== STEPS.length - 1) return;
+
     setSubmitError(null);
     const parsed = schema.parse(values);
     try {

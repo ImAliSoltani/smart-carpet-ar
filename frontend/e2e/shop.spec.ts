@@ -121,3 +121,110 @@ test("a search that matches nothing says so instead of showing everything", asyn
   await expect(page.getByRole("link", { name: CARPET.name, exact: true })).toHaveCount(0);
   await expect(page.getByText(/پیدا نشد|چیزی یافت نشد|نتیجه‌ای/)).toBeVisible();
 });
+
+test("one tap on «ادامه» reaches the review step without placing the order", async ({
+  page,
+  isMobile,
+}) => {
+  // The journey test above walks the same three steps and passes, so this one
+  // exists for a single difference: it **taps**. A mouse click is one event; a
+  // tap is a touch sequence from which the browser then synthesises a click,
+  // and it aims that synthetic click at whatever now sits under the finger. So
+  // a footer button that changes identity between the two is a different bug on
+  // a phone than it is on a desktop, and only the phone can show it.
+  //
+  // Reported from real use: the review step was reached only when the order was
+  // rejected for stock — i.e. it was being submitted through, and the shopper
+  // saw their invoice only on the path where the submission failed.
+  test.skip(!isMobile, "the synthetic click only exists where there is a touchscreen");
+
+  await page.goto(`/carpets/${CARPET.slug}`);
+  await page.getByRole("button", { name: /افزودن به سبد/ }).click();
+  await page.waitForFunction(() => {
+    const raw = window.localStorage.getItem("toranjan.cart");
+    return Array.isArray(JSON.parse(raw ?? "{}")?.state?.lines) && JSON.parse(raw!).state.lines.length === 1;
+  });
+
+  await page.goto("/checkout");
+  await page.getByLabel("نام و نام خانوادگی").fill("علی سلطانی تهرانی");
+  await page.getByLabel("شماره‌ی موبایل").fill("۰۹۱۲۳۴۵۶۷۸۹");
+  await page.getByRole("button", { name: "ادامه" }).tap();
+
+  await page.getByLabel("نشانی تحویل").fill("تهران، خیابان ولیعصر، کوچه‌ی نهم، پلاک ۱۲، واحد ۳");
+
+  // The tap that turns «ادامه» into «ثبت سفارش». After it the buyer must be
+  // *looking at* the invoice, with the order not yet made.
+  await page.getByRole("button", { name: "ادامه" }).tap();
+
+  await expect(page.getByRole("button", { name: /ثبت سفارش/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /سفارش ثبت شد/ })).toHaveCount(0);
+  // Asserted on the total rather than on the step dot: the point of this step
+  // is that the shopper can read what they are about to pay.
+  await expect(page.getByText("جمع")).toBeVisible();
+});
+
+test("Enter in a text field cannot place the order from an earlier step", async ({ page }) => {
+  // A single-line input inside a `<form>` submits it on Enter — the browser's
+  // implicit submission, which no button controls and which every phone
+  // keyboard offers as «رفتن». The footer button being `type="button"` does
+  // nothing about it.
+  //
+  // So the guard cannot live on a button. Whatever the shopper presses, the
+  // form must refuse to place an order from any step but the review step,
+  // because that is the step where the invoice is on screen.
+  await page.goto(`/carpets/${CARPET.slug}`);
+  await page.getByRole("button", { name: /افزودن به سبد/ }).click();
+  await page.waitForFunction(() => {
+    const raw = window.localStorage.getItem("toranjan.cart");
+    return Array.isArray(JSON.parse(raw ?? "{}")?.state?.lines) && JSON.parse(raw!).state.lines.length === 1;
+  });
+
+  await page.goto("/checkout");
+  await page.getByLabel("نام و نام خانوادگی").fill("علی سلطانی تهرانی");
+  await page.getByLabel("شماره‌ی موبایل").fill("۰۹۱۲۳۴۵۶۷۸۹");
+  await page.getByRole("button", { name: "ادامه" }).click();
+
+  // Every field is now filled, which is the state that makes this dangerous:
+  // the schema validates, so nothing else stands between a stray Enter and a
+  // placed order.
+  await page.getByLabel("نشانی تحویل").fill("تهران، خیابان ولیعصر، کوچه‌ی نهم، پلاک ۱۲، واحد ۳");
+  await page.getByRole("button", { name: "بازگشت" }).click();
+
+  await expect(page.getByLabel("شماره‌ی موبایل")).toBeVisible();
+  await page.getByLabel("شماره‌ی موبایل").press("Enter");
+
+  // Still on the contact step, with no order behind it.
+  await expect(page.getByRole("heading", { name: /سفارش ثبت شد/ })).toHaveCount(0);
+  await expect(page.getByLabel("شماره‌ی موبایل")).toBeVisible();
+
+  // Today the assertion above passes for a reason that is not the guard: the
+  // contact step has two single-line inputs, and the HTML spec suppresses
+  // implicit submission on a form with more than one such field and no submit
+  // button. That is luck, and it turns into a bug the day this step has one
+  // field. So the submit is also raised directly — the same event the browser
+  // would have sent — and must still be refused.
+  //
+  // Asserted on the **request**, not on the screen. Watching the screen was the
+  // first attempt and it was worthless: `requestSubmit()` returns immediately,
+  // the POST is still in flight, and «سفارش ثبت شد» is legitimately absent for
+  // a few hundred milliseconds whether or not an order is being created. The
+  // assertion passed with the guard removed, which is the definition of a test
+  // that proves nothing.
+  const orderPosts: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST" && /\/orders\b/.test(request.url())) {
+      orderPosts.push(request.url());
+    }
+  });
+
+  await page.evaluate(() => {
+    const form = document.querySelector("form");
+    if (!form) throw new Error("the checkout form is not on the page");
+    form.requestSubmit();
+  });
+  await page.waitForTimeout(1500);
+
+  expect(orderPosts).toEqual([]);
+  await expect(page.getByRole("heading", { name: /سفارش ثبت شد/ })).toHaveCount(0);
+  await expect(page.getByLabel("شماره‌ی موبایل")).toBeVisible();
+});
