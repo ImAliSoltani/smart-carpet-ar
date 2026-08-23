@@ -920,6 +920,40 @@ body {
    ease. These give it the shop's beat.
    ============================================================ */
 
+/* 🔑 Without this one declaration, nothing else in this section is ever seen.
+ *
+ * React's experimental `<ViewTransition>` suppresses the browser's default root
+ * cross-fade — which is what we want, since the point is that the photograph
+ * moves while the page does not dissolve. It does it with two Web Animations
+ * applied at run time, and the second is the problem:
+ *
+ *   ::view-transition-group(root)  →  { opacity: 0; pointer-events: none }
+ *   ::view-transition              →  { width: 0px; height: 0px }
+ *
+ * `::view-transition` is the snapshot containing block — the box every group
+ * lives inside. Collapsed to nothing it takes the named groups down with it, so
+ * the morph runs to completion with correct geometry and paints no pixels. That
+ * is precisely the symptom that cost this feature two phases: `startViewTransition`
+ * fires, `ready` resolves, `getAnimations()` reports real animations carrying our
+ * own durations, and the screen still cuts straight to the new page.
+ *
+ * They are script animations, so no ordinary rule reaches them — but the cascade
+ * places `!important` author declarations *above* animations, which is the whole
+ * trick. `100%` rather than `100vw`: the pseudo is `position: fixed`, so a
+ * percentage resolves against the viewport and never counts the scrollbar.
+ *
+ * How it was found, so nobody re-derives it: the same DOM, frozen mid-flight,
+ * measured twice. Through a navigation `::view-transition` is 0×0; through a
+ * hand-written transition on that same page it is the viewport. Everything else
+ * — names, geometry, opacities, blend modes — was identical and correct.
+ *
+ * `group(root)` is deliberately left alone: hiding the root fade is the
+ * behaviour we want, and only the collapsed container was ever the bug. */
+::view-transition {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 ::view-transition-group(.carpet-photo) {
   animation-duration: var(--dur-morph);
   animation-timing-function: var(--ease-morph);
