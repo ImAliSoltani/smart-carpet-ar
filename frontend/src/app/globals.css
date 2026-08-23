@@ -784,6 +784,46 @@ body {
   animation-delay: calc(var(--stagger, 0) * 1ms);
 }
 
+/* The page entrance that staircase was named after.
+ *
+ * CSS rather than framer-motion, and that is the whole point: these blocks are
+ * server-rendered, they are on screen at first paint, and this file already
+ * records why JavaScript is the wrong tool for them — framer writes inline
+ * styles so the `prefers-reduced-motion` block below never reaches it, and
+ * branching on `useReducedMotion()` to pick an `initial` makes the server and
+ * the browser disagree, which is a hydration mismatch. A keyframe has neither
+ * problem and costs no bundle.
+ *
+ * `both` fill is load-bearing: without it a block is fully visible during its
+ * own delay and then jumps back to start its entrance.
+ *
+ * 700ms, the slow end of §3-5's 400–900ms band. `admin-motion.tsx` deliberately
+ * takes the fast end for the panel — someone works in that all day — and the
+ * shop takes this one. The value is `--dur-entrance` and was chosen long before
+ * anything used it. */
+@keyframes toranjan-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.toranjan-rise {
+  animation: toranjan-rise-in var(--dur-entrance) var(--ease) both;
+  animation-delay: calc(var(--stagger, 0) * 1ms);
+}
+
+/* The blanket reduced-motion rule collapses the duration but says nothing
+   about the delay, so a staggered block would still wait its turn to appear
+   instantly. Scoped rather than added to the blanket rule, which would reach
+   animations that use a delay for something other than a staircase. */
+@media (prefers-reduced-motion: reduce) {
+  .toranjan-rise,
+  .toranjan-row {
+    animation-delay: 0ms !important;
+  }
+}
+
 @keyframes toranjan-fade-in {
   from {
     opacity: 0;

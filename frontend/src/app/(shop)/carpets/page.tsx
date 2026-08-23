@@ -121,14 +121,24 @@ export default async function CarpetsPage({
 
   return (
     <main className="mx-auto w-full max-w-[1400px] px-5 pb-28 sm:px-8">
+      {/* Read order is arrival order: the label, then the title, then the
+          sentence under it. 70ms apart — inside §3-5's 20–40ms guidance once
+          you count that these are three blocks rather than a list of twenty,
+          and far enough apart to be a sequence rather than a flicker. */}
       <header className="max-w-[760px] py-14 sm:py-20">
-        <p className="ltr-isolate mb-5 font-label text-[10.5px] font-medium uppercase tracking-[0.42em] text-muted">
+        <p className="toranjan-rise ltr-isolate mb-5 font-label text-[10.5px] font-medium uppercase tracking-[0.42em] text-muted">
           Collection
         </p>
-        <h1 className="text-[clamp(2rem,5vw,3.5rem)] font-light leading-[1.25] tracking-[-0.03em]">
+        <h1
+          className="toranjan-rise text-[clamp(2rem,5vw,3.5rem)] font-light leading-[1.25] tracking-[-0.03em]"
+          style={{ "--stagger": 70 } as React.CSSProperties}
+        >
           {title}
         </h1>
-        <p className="mt-5 max-w-[46ch] text-[15px] leading-[2.1] text-muted sm:text-[17px]">
+        <p
+          className="toranjan-rise mt-5 max-w-[46ch] text-[15px] leading-[2.1] text-muted sm:text-[17px]"
+          style={{ "--stagger": 140 } as React.CSSProperties}
+        >
           {lede}
         </p>
       </header>

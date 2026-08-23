@@ -63,6 +63,11 @@ export default function HomePage() {
         filters={{ sort: "newest" }}
       />
 
+      {/* Deliberately not `toranjan-rise`. That class animates on load, and
+          everything on this page below the fold is behind the cinematic intro
+          while it plays — the entrance would run, finish, and be over before
+          the visitor ever saw this section. Below the fold wants a scroll
+          trigger, which is what the carpet card already uses. */}
       <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
         <h2 className="mb-8 border-t border-line pt-8 text-xl font-bold tracking-tight sm:text-2xl">
           برای کدام اتاق؟
