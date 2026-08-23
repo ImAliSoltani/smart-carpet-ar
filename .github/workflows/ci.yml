@@ -1,8 +1,13 @@
 name: CI
 
 on:
+  # Every branch, not just `main`. §11 asks for a green CI on every commit, and
+  # a trigger that only fires on `main` cannot deliver that: the work happens on
+  # a branch, and by the time it reaches `main` the run is an audit rather than
+  # a safety net. This was not academic — a hundred and thirty commits' worth of
+  # phases 3 to 5 were written, tested locally on Windows, and never once run on
+  # Linux, because nothing was listening for them.
   push:
-    branches: [main]
   pull_request:
 
 jobs:
