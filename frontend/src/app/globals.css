@@ -107,6 +107,32 @@
      too slow for something the eye is already following, which reads as the
      page waiting rather than the carpet moving. */
   --dur-morph: 520ms;
+  /* The rest of the page swapping underneath the photograph. Shorter than the
+     morph on purpose — see the rule that uses it. A token rather than a literal
+     so that the slow-motion switch below can scale the whole gesture together;
+     scaling one and not the other changes the choreography instead of slowing
+     it. */
+  --dur-page-fade: 380ms;
+}
+
+/* Inspecting the morph.
+   ------------------------------------------------------------
+   A 520ms gesture between two pages cannot be judged by watching it: by the
+   time you know it started, it is over. This makes the whole thing six times
+   longer so it can be looked at, criticised and tuned.
+
+       document.documentElement.dataset.motion = "slow"   // on
+       delete document.documentElement.dataset.motion     // off
+
+   It is a debugging affordance and nothing reads it in production. It lives
+   here rather than in a scratch snippet because the numbers it scales are the
+   ones being judged, and a snippet that drifts from them measures nothing. */
+/* Scoped to `:root` deliberately: `data-motion` is already an attribute the
+   navigation panels carry (`from-start`, `to-end`), and an unqualified
+   selector here would be one typo away from meaning something to them. */
+:root[data-motion="slow"] {
+  --dur-morph: 3120ms;
+  --dur-page-fade: 2280ms;
 }
 
 /* ============================================================
@@ -918,7 +944,7 @@ body {
    than appearing after it. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 380ms;
+  animation-duration: var(--dur-page-fade);
   animation-timing-function: var(--ease-io);
 }
 
