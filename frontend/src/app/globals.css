@@ -91,6 +91,15 @@
      to feel immediate, entrances and transitions are allowed to breathe. */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  /* For distance. `--ease` is an aggressive settle, which is right for the few
+     pixels a hover or a menu moves and wrong for anything that travels: sampled
+     in the browser, it is **49% complete at 10% of its duration** and 97% at
+     half. On the photograph that crosses from the grid to the product page —
+     264px of width — that put the entire visible journey inside the first 52ms
+     of a 520ms animation, so the morph was measurably running and perceptually
+     not there at all. This curve is 4% at a tenth and 79% at half: it starts,
+     it travels, it lands. */
+  --ease-morph: cubic-bezier(0.33, 0, 0.2, 1);
   --dur-feedback: 220ms;
   --dur-entrance: 700ms;
   /* A photograph travelling from a grid to a page it fills. Its own beat inside
@@ -887,7 +896,7 @@ body {
 
 ::view-transition-group(.carpet-photo) {
   animation-duration: var(--dur-morph);
-  animation-timing-function: var(--ease);
+  animation-timing-function: var(--ease-morph);
 }
 
 ::view-transition-old(.carpet-photo),
@@ -900,7 +909,7 @@ body {
   inline-size: 100%;
   object-fit: contain;
   animation-duration: var(--dur-morph);
-  animation-timing-function: var(--ease);
+  animation-timing-function: var(--ease-morph);
 }
 
 /* Everything not lifted into a named group is the `root` snapshot, and it
