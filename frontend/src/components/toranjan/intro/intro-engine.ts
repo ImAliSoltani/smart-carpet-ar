@@ -51,6 +51,29 @@ const KEEP_RADIUS = 22;
 /** If the opening chapter cannot be assembled in this long, there is no film. */
 const READY_BUDGET_MS = 5000;
 
+/**
+ * The hard deadline on the entrance getting out of the visitor's way.
+ *
+ * `READY_BUDGET_MS` above bounds one step of the boot. This one bounds the
+ * whole of it, and that difference is a bug that reached a real phone: the
+ * entrance holds `<html>` at `data-intro="play"`, which locks `overflow` on
+ * the body and puts a fixed modal over the shop, and it lets go only once the
+ * engine arms. Three awaits on the way there had no deadline at all — the AVIF
+ * probe, which resolves from an `onload` the browser is free to defer while
+ * the page is hidden; the first frame's `fetch`, which does not reject when a
+ * sleeping radio simply stops answering; and that fetch's `createImageBitmap`.
+ *
+ * So locking the phone on the home page could leave a page that scrolls
+ * nowhere and answers no touch, recoverable only by closing the tab — which is
+ * exactly what was reported. A timer is enough to fix it without asking which
+ * of the three stalled: a throttled or frozen timer still fires when the page
+ * comes back, and coming back is when the visitor needs it to.
+ *
+ * Twelve seconds because it is only reached when something is already wrong;
+ * the healthy path arms in well under `READY_BUDGET_MS`.
+ */
+const ARM_DEADLINE_MS = 12000;
+
 const AVIF_PROBE =
   "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADrbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAETAAAAIAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAABqaXBycAAAAEtpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGl4aQAAAAADCAgIAAAADGF2MUOBAAwAAAAAE2NvbHJuY2x4AAEADQAGgAAAABdpcG1hAAAAAAAAAAEAAQQBAoMEAAAAKG1kYXQSAAoIGAAGiAhoNCAyEh/3h4UV3///4s/AAJA1jjx+3A==";
 
@@ -89,6 +112,7 @@ export class IntroEngine {
   private rate = 1;
   private raf = 0;
   private destroyed = false;
+  private armTimer = 0;
 
   constructor(canvas: HTMLCanvasElement, callbacks: IntroCallbacks) {
     this.canvas = canvas;
@@ -342,7 +366,21 @@ export class IntroEngine {
       return;
     }
     if (!this.armed) {
-      this.pendingGesture = dir; // held, not dropped
+      // The first gesture is held rather than dropped: it usually arrives a
+      // moment before the opening chapter is loadable, and replaying it on
+      // `arm` is what makes the entrance feel answerable.
+      //
+      // The second one means the first was not answered, and at that point the
+      // visitor is telling us something the engine cannot know — that whatever
+      // it is waiting for is not coming. They are trying to get into a shop.
+      // Holding a *second* gesture is how a loading state becomes a locked
+      // door, so this one leaves.
+      if (this.pendingGesture) {
+        this.pendingGesture = 0;
+        this.finish();
+        return;
+      }
+      this.pendingGesture = dir;
       return;
     }
     if (!this.playing) {
@@ -355,6 +393,7 @@ export class IntroEngine {
   }
 
   private arm() {
+    window.clearTimeout(this.armTimer);
     this.armed = true;
     this.cb.onCue("ادامه بده");
     if (this.pendingGesture) {
@@ -371,6 +410,7 @@ export class IntroEngine {
    */
   private goStatic() {
     if (this.staticMode) return;
+    window.clearTimeout(this.armTimer);
     this.staticMode = true;
     this.armed = true;
     this.cb.onCue("برای ورود به فروشگاه ادامه بده");
@@ -398,6 +438,13 @@ export class IntroEngine {
   }
 
   async boot(force?: "play" | "static" | null) {
+    // Started before the first await, because the first await is one of the
+    // ones that can hang. Cleared by `arm`, `goStatic` and `destroy`.
+    this.armTimer = window.setTimeout(() => {
+      if (this.destroyed || this.armed) return;
+      this.goStatic();
+    }, ARM_DEADLINE_MS);
+
     await this.chooseSet();
     if (this.destroyed) return;
 
@@ -438,6 +485,7 @@ export class IntroEngine {
 
   destroy() {
     this.destroyed = true;
+    window.clearTimeout(this.armTimer);
     cancelAnimationFrame(this.raf);
     for (let i = 0; i < FRAMES; i += 1) {
       this.images[i]?.close?.();
