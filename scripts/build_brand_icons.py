@@ -28,12 +28,22 @@ Outputs, all overwritten:
     frontend/public/brand/icon-maskable-512.png   manifest, maskable
     frontend/src/app/icon.png                     tab icon (Next convention)
     frontend/src/app/apple-icon.png               iOS home screen
+
+    frontend/public/brand/admin-icon-192.png            panel manifest, any
+    frontend/public/brand/admin-icon-512.png            panel manifest, any
+    frontend/public/brand/admin-icon-maskable-512.png   panel manifest, maskable
+
+The panel installs as its own app (`/admin/manifest.webmanifest`) and therefore
+needs its own tile. It is the same mark in the panel's own palette — one logo,
+two themes — so that a launcher holding both shows a pale tile for the shop and
+a dark one for the panel, and the shopkeeper never opens the wrong one.
 """
 
 from __future__ import annotations
 
 import math
 from pathlib import Path
+from typing import NamedTuple
 
 from PIL import Image, ImageDraw
 
@@ -48,6 +58,40 @@ APP = ROOT / "frontend" / "src" / "app"
 BG = (250, 250, 250, 255)  # --bg   #FAFAFA
 INK = (24, 24, 27, 255)  # --ink  #18181B
 ACCENT = (161, 98, 7, 255)  # --accent #A16207
+
+# The panel wears the same mark on its own ground.
+#
+# It is the *same logo* — the client asked for one icon that differs by theme,
+# not a second identity — so nothing about the drawing changes. What changes is
+# which palette it is drawn in, and these are not invented here either: they are
+# the `[data-surface="admin"]` tokens in `globals.css`, the same three the
+# panel's own surface already uses. An icon mixed by hand would drift the first
+# time that block was edited.
+#
+# On a launcher this is what tells the two apart at a glance, which is the whole
+# point of installing them separately: a pale tile is the shop, a dark one is
+# the panel.
+ADMIN_BG = (20, 19, 26, 255)  # --bg   #14131A
+ADMIN_INK = (245, 244, 247, 255)  # --ink  #F5F4F7
+ADMIN_ACCENT = (217, 168, 66, 255)  # --accent #D9A842
+
+
+class Palette(NamedTuple):
+    """Which three colours the mark is drawn in, and where its art comes from."""
+
+    ground: tuple[int, int, int, int]
+    ink: tuple[int, int, int, int]
+    accent: tuple[int, int, int, int]
+    source: Path
+
+
+SHOP = Palette(BG, INK, ACCENT, MARK_SOURCE)
+# `mark-dark.png` is optional and only matters once a real logo exists. A
+# finished logo is usually dark art on transparency, and dark art on a #14131A
+# ground is a black square — so the day one arrives, a light version goes here
+# and this line starts using it. Until then both variants come from the same
+# parametric drawing, which simply takes the palette it is given.
+ADMIN = Palette(ADMIN_BG, ADMIN_INK, ADMIN_ACCENT, ROOT / "assets" / "brand" / "mark-dark.png")
 
 # Drawn at 4x and reduced. Pillow's polygon fill has no anti-aliasing of its
 # own, and a toranj is nothing but diagonals — jagged at 192px, and at 24px the
@@ -93,7 +137,7 @@ def _toranj(
     return right + left[::-1]
 
 
-def _draw_placeholder(size: int) -> Image.Image:
+def _draw_placeholder(size: int, palette: Palette) -> Image.Image:
     """The stand-in mark: a lobed medallion with a pendant at each point.
 
     The pendants are what make it read as a toranj rather than as a generic
@@ -101,7 +145,7 @@ def _draw_placeholder(size: int) -> Image.Image:
     two dots on a vertical axis, which is still a composition.
     """
     canvas = size * SUPERSAMPLE
-    image = Image.new("RGBA", (canvas, canvas), BG)
+    image = Image.new("RGBA", (canvas, canvas), palette.ground)
     draw = ImageDraw.Draw(image)
 
     cx = cy = canvas / 2
@@ -116,7 +160,7 @@ def _draw_placeholder(size: int) -> Image.Image:
     body_half_h = total_half_h - 2 * pendant_half_h
     body_half_w = body_half_h / 1.25
 
-    draw.polygon(_toranj(cx, cy, body_half_w, body_half_h), fill=INK)
+    draw.polygon(_toranj(cx, cy, body_half_w, body_half_h), fill=palette.ink)
 
     # سرترنج, above and below, touching the tips rather than floating clear of
     # them. Detached they read as two specks at small sizes; touching, the three
@@ -125,18 +169,18 @@ def _draw_placeholder(size: int) -> Image.Image:
         pendant_cy = cy + direction * (body_half_h + pendant_half_h)
         draw.polygon(
             _toranj(cx, pendant_cy, pendant_half_h / 1.15, pendant_half_h, point=1.5, lobes=3, depth=0.14),
-            fill=INK,
+            fill=palette.ink,
         )
 
     # The warm centre. Gold is a detail here, not a field — which is both the
     # palette's rule and the only way it stays legible: a gold medallion on
     # #FAFAFA is 4.7:1, while ink is 15:1.
-    draw.polygon(_toranj(cx, cy, body_half_w * 0.44, body_half_h * 0.44), fill=ACCENT)
+    draw.polygon(_toranj(cx, cy, body_half_w * 0.44, body_half_h * 0.44), fill=palette.accent)
 
     return image.resize((size, size), Image.LANCZOS)
 
 
-def _mark(size: int, *, scale: float = 1.0) -> Image.Image:
+def _mark(size: int, palette: Palette, *, scale: float = 1.0) -> Image.Image:
     """The mark at `size`, from the real logo if there is one yet.
 
     `scale` below 1 shrinks the drawing inside its background — what a maskable
@@ -144,43 +188,45 @@ def _mark(size: int, *, scale: float = 1.0) -> Image.Image:
     of 80% diameter.
     """
     if scale != 1.0:
-        inner = _mark(round(size * scale))
-        canvas = Image.new("RGBA", (size, size), BG)
+        inner = _mark(round(size * scale), palette)
+        canvas = Image.new("RGBA", (size, size), palette.ground)
         offset = (size - inner.width) // 2
         canvas.paste(inner, (offset, offset), inner)
         return canvas
 
-    if MARK_SOURCE.exists():
-        art = Image.open(MARK_SOURCE).convert("RGBA")
+    if palette.source.exists():
+        art = Image.open(palette.source).convert("RGBA")
         if art.width != art.height:
-            raise SystemExit(f"{MARK_SOURCE} must be square; it is {art.width}×{art.height}.")
-        flat = Image.new("RGBA", art.size, BG)
+            raise SystemExit(f"{palette.source} must be square; it is {art.width}×{art.height}.")
+        flat = Image.new("RGBA", art.size, palette.ground)
         flat.paste(art, (0, 0), art)
         return flat.resize((size, size), Image.LANCZOS)
 
-    return _draw_placeholder(size)
+    return _draw_placeholder(size, palette)
 
 
 def main() -> None:
     PUBLIC_BRAND.mkdir(parents=True, exist_ok=True)
 
-    source = "assets/brand/mark.png" if MARK_SOURCE.exists() else "the drawn placeholder"
-    print(f"mark: {source}")
-
     outputs = [
-        (PUBLIC_BRAND / "icon-192.png", 192, 1.0),
-        (PUBLIC_BRAND / "icon-512.png", 512, 1.0),
+        (SHOP, PUBLIC_BRAND / "icon-192.png", 192, 1.0),
+        (SHOP, PUBLIC_BRAND / "icon-512.png", 512, 1.0),
         # Android crops a maskable icon to whatever shape the launcher likes and
         # only promises the middle 80% survives. 0.72 keeps the pendants inside
         # a circle mask with room to spare.
-        (PUBLIC_BRAND / "icon-maskable-512.png", 512, 0.72),
-        (APP / "icon.png", 256, 1.0),
-        (APP / "apple-icon.png", 180, 1.0),
+        (SHOP, PUBLIC_BRAND / "icon-maskable-512.png", 512, 0.72),
+        (SHOP, APP / "icon.png", 256, 1.0),
+        (SHOP, APP / "apple-icon.png", 180, 1.0),
+        (ADMIN, PUBLIC_BRAND / "admin-icon-192.png", 192, 1.0),
+        (ADMIN, PUBLIC_BRAND / "admin-icon-512.png", 512, 1.0),
+        (ADMIN, PUBLIC_BRAND / "admin-icon-maskable-512.png", 512, 0.72),
     ]
 
-    for path, size, scale in outputs:
-        _mark(size, scale=scale).save(path, "PNG", optimize=True)
-        print(f"  {path.relative_to(ROOT).as_posix()}  {size}×{size}")
+    for palette, path, size, scale in outputs:
+        which = "shop " if palette is SHOP else "panel"
+        source = palette.source.relative_to(ROOT).as_posix() if palette.source.exists() else "drawn"
+        _mark(size, palette, scale=scale).save(path, "PNG", optimize=True)
+        print(f"  {which}  {path.relative_to(ROOT).as_posix()}  {size}×{size}  ({source})")
 
 
 if __name__ == "__main__":

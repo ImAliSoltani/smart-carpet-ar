@@ -17,6 +17,17 @@ export const metadata: Metadata = {
   // `absolute` steps out of it. `template` still applies to the pages below.
   title: { absolute: "پنل مدیریت ترنجان", template: "%s — مدیریت ترنجان" },
   robots: { index: false, follow: false },
+  // The panel installs as its own app, so everything under `/admin` points at
+  // its own manifest instead of the shop's. Without this the shopkeeper who
+  // installs from this screen gets the storefront: the shop's name, the shop's
+  // pale icon, and a `start_url` of «/» — an app that opens on the catalogue
+  // they were trying to get away from.
+  //
+  // Declared on the layout rather than on each page: `/admin/login` is outside
+  // the `(panel)` group and is the screen an install prompt is most likely to
+  // appear on.
+  manifest: "/admin/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "مدیریت ترنجان", statusBarStyle: "black-translucent" },
 };
 
 /**

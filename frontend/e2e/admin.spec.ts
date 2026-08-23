@@ -72,3 +72,41 @@ test("the login page refuses to bounce to another origin", async ({ page }) => {
 
   await expect(page).not.toHaveURL(/evil\.example/);
 });
+
+test("the panel installs as its own app, not as the shop", async ({ page }) => {
+  // Installed from this screen, the shopkeeper must get the panel: its own
+  // name, its own dark tile, and a `start_url` inside `/admin`. Pointing at the
+  // root manifest would hand them the storefront — an app that opens on the
+  // catalogue they were trying to get away from.
+  await page.goto("/admin/login");
+  const href = await page.locator('link[rel="manifest"]').getAttribute("href");
+  expect(href).toBe("/admin/manifest.webmanifest");
+
+  const response = await page.request.get(href!);
+  expect(response.headers()["content-type"]).toContain("application/manifest+json");
+  const manifest = await response.json();
+
+  expect(manifest.start_url).toBe("/admin");
+  // `scope` is what keeps a link out to the storefront from opening inside the
+  // panel's window wearing the panel's theme colour.
+  expect(manifest.scope).toBe("/admin");
+  // Told apart from the shop's manifest by `id`; without one the browser falls
+  // back to `start_url` and a later change to it installs a second copy.
+  expect(manifest.id).toBe("/admin");
+  expect(manifest.icons.map((i: { src: string }) => i.src)).toContain(
+    "/brand/admin-icon-512.png",
+  );
+
+  // Every icon it promises has to exist. A manifest listing a 404 installs
+  // anyway, with a blank tile.
+  for (const icon of manifest.icons as { src: string }[]) {
+    expect((await page.request.get(icon.src)).status()).toBe(200);
+  }
+
+  // And the shop is still its own app.
+  await page.goto("/?intro=0");
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    "href",
+    "/manifest.webmanifest",
+  );
+});
