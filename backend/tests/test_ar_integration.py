@@ -121,6 +121,70 @@ def test_manual_corners_are_applied_inline(admin_client):
     assert statuses[0]["glb_url"]
 
 
+def test_rebuilding_an_unchanged_carpet_produces_the_same_files(admin_client):
+    """Reported from the panel: edit a size, rebuild, and the AR file comes back
+    showing a small piece of the carpet as if it were the whole carpet.
+
+    Stated as an invariant rather than as the symptom: rebuilding something
+    nobody changed must produce what it produced before. Storage is
+    content-addressed — the filename is a hash of the bytes — so an unchanged
+    texture is an unchanged URL, and this assertion needs nothing decoded.
+
+    Rectification is not idempotent. Feeding a rectified carpet back through
+    corner detection finds a rectangle *inside* it — an inner border, a
+    medallion — and crops to that, and every rebuild crops again.
+    """
+    carpet = _make_carpet(admin_client, slug="rebuild-twice", sizes=((200, 300),))
+    admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/images",
+        files={"file": ("carpet.png", _carpet_photo(), "image/png")},
+    )
+
+    admin_client.post(f"/api/v1/admin/carpets/{carpet['id']}/ar/generate")
+    first = admin_client.get(f"/api/v1/admin/carpets/{carpet['id']}/ar").json()[0]
+    assert first["ar_status"] == "ready", first
+
+    admin_client.post(f"/api/v1/admin/carpets/{carpet['id']}/ar/generate")
+    second = admin_client.get(f"/api/v1/admin/carpets/{carpet['id']}/ar").json()[0]
+    assert second["ar_status"] == "ready", second
+
+    assert second["glb_url"] == first["glb_url"], (
+        "the rebuild produced a different texture from the same photo and the "
+        "same size — the second run read the rectified image as its source"
+    )
+    assert second["usdz_url"] == first["usdz_url"]
+
+
+def test_the_panel_and_the_pipeline_read_the_same_photo():
+    """The corner editor's coordinates have to mean something to the builder.
+
+    `suggest_corners` reads the original upload, so the handles the shopkeeper
+    drags are in that image's pixel space. If the builder resolves its source
+    any other way — say, to a rectified copy an earlier run left behind — those
+    same numbers land somewhere else entirely, and a *corrected* crop comes out
+    worse than the one it was correcting.
+
+    No database here on purpose: this is one function's contract, and the pair
+    of URLs is the whole input.
+    """
+    from app.ar.pipeline import _load_source_image
+    from app.models import CarpetImage
+
+    storage = Storage()
+    original = storage.save(_carpet_photo(size=(1000, 750)), kind="full", ext="png")
+    # A rectified copy is a different shape by construction: it has been warped
+    # to the carpet's real proportions, so its size gives it away.
+    rectified = storage.save(_carpet_photo(size=(400, 600)), kind="rectified", ext="png")
+
+    image = CarpetImage(url=original, rectified_url=rectified)
+    loaded = _load_source_image(storage, image)
+
+    assert (loaded.width, loaded.height) == (1000, 750), (
+        "the builder warped the rectified copy instead of the photograph the "
+        "panel measures corners against"
+    )
+
+
 def test_corner_suggestion_reports_confidence(admin_client):
     carpet = _make_carpet(admin_client, slug="corner-suggest", sizes=((200, 300),))
     admin_client.post(

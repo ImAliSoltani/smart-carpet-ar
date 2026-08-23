@@ -44,11 +44,26 @@ class ArPipelineError(RuntimeError):
 
 
 def _load_source_image(storage: Storage, image: CarpetImage) -> Image.Image:
-    url = image.rectified_url or image.url
+    """The photograph, always — never a rectified copy of it.
+
+    **Rectification is not idempotent, and this is where that bites.** The
+    source used to resolve to `rectified_url or url`, so the first run warped
+    the photograph and the second warped that result: corner detection run on
+    an already-rectified carpet finds a rectangle *inside* it — an inner
+    border, a medallion — and crops to that. Every rebuild cropped again, and a
+    shopkeeper who edited a size and pressed rebuild got a piece of their
+    carpet presented as the whole of it.
+
+    The panel is the other half of the argument. `suggest_corners` measures
+    against `url`, so every handle the shopkeeper drags is in the photograph's
+    pixel space; a builder reading anything else applies those numbers to an
+    image they do not describe, and a *corrected* crop lands further from the
+    carpet than the one it was correcting.
+    """
     try:
-        return Image.open(storage.open_public_url(url))
+        return Image.open(storage.open_public_url(image.url))
     except (OSError, ValueError) as exc:
-        raise ArPipelineError(f"تصویر منبع قابل خواندن نیست: {url}") from exc
+        raise ArPipelineError(f"تصویر منبع قابل خواندن نیست: {image.url}") from exc
 
 
 def build_variant_assets(
@@ -115,6 +130,7 @@ async def generate_for_carpet(
 
     source = _load_source_image(storage, primary)
     built: list[VariantAssets] = []
+    last_confidence = 0.0
 
     for variant in carpet.variants:
         try:
@@ -132,21 +148,27 @@ async def generate_for_carpet(
         variant.ar_status = ArAssetStatus.READY
         variant.ar_error = None
         built.append(assets)
+        last_confidence = confidence
 
-        if primary.rectified_url is None:
-            # Keep the rectified texture once so the admin can review the crop.
-            rectified = rectify(
-                source,
-                width_cm=variant.width_cm,
-                length_cm=variant.length_cm,
-                corners=corners,
-            )
-            buffer = BytesIO()
-            rectified.image.save(buffer, format="WEBP", quality=90, method=6)
-            primary.rectified_url = storage.save(buffer.getvalue(), kind="rectified", ext="webp")
-            logger.info(
-                "rectified %s with confidence %.2f", carpet.slug, confidence
-            )
+    if built:
+        # One preview of the crop, refreshed on every run rather than written
+        # once. Written once, it recorded the *first* crop forever — so the one
+        # picture meant to show a shopkeeper what their correction did was the
+        # picture from before they corrected anything.
+        #
+        # It is no longer read back as a source; that is stated at
+        # `_load_source_image` and is the bug this block used to feed.
+        first = carpet.variants[0]
+        preview = rectify(
+            source,
+            width_cm=first.width_cm,
+            length_cm=first.length_cm,
+            corners=corners,
+        )
+        buffer = BytesIO()
+        preview.image.save(buffer, format="WEBP", quality=90, method=6)
+        primary.rectified_url = storage.save(buffer.getvalue(), kind="rectified", ext="webp")
+        logger.info("rectified %s with confidence %.2f", carpet.slug, last_confidence)
 
     await session.commit()
     return built
