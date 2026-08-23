@@ -338,21 +338,45 @@ export class CarpetPlacer {
     this.carpetGroup.position.set(x + offset.x, y + offset.y, z + offset.z);
   }
 
-  /** Match room brightness so the rug does not glow against a dim floor. */
+  /**
+   * Shape the rug's light from the room — but gently, and mostly by direction.
+   *
+   * **Reported: the rug looks dark on the floor.** This is where it came from,
+   * and the mistake is conceptual rather than arithmetic. The estimate measures
+   * the room's *absolute* light, and the previous clamps let it scale the
+   * ambient term all the way down to 0.25 from a neutral 1.0 and the sun to
+   * 0.15 from 0.6 — a rug lit at roughly a quarter strength in an ordinary
+   * indoor room.
+   *
+   * The floor it sits on is not lit that way. It is a camera feed, and the
+   * phone's auto-exposure has already pulled it up to look normally bright
+   * whatever the true lux is. So dimming the rug to match a physical
+   * measurement dims it against a background that refused to be dimmed, and the
+   * only thing in the frame that looks underexposed is the product.
+   *
+   * We cannot read the camera's exposure, so the honest thing is to stop
+   * pretending the estimate is an absolute scale. Direction is genuinely
+   * useful and stays as it was — it puts the highlight and the shading on the
+   * side the room's light actually comes from. Intensity becomes a nudge
+   * around neutral: enough that a bright window or a dim corner reads
+   * differently, never enough to make the rug the darkest thing on screen.
+   */
   _updateLighting(frame) {
     const estimate = frame.getLightEstimate?.(this.lightProbe);
     if (!estimate) return;
     const sh = estimate.sphericalHarmonicsCoefficients;
     if (sh?.length >= 3) {
-      // DC term of the SH expansion approximates overall irradiance.
-      const intensity = Math.max(0.25, Math.min(2.0, (sh[0] + sh[1] + sh[2]) / 3));
-      this.ambient.intensity = intensity;
+      // The L0 band's three channels — a rough irradiance proxy, in units that
+      // are not ours. Mapped into a band around 1.0 rather than used raw.
+      const measured = (sh[0] + sh[1] + sh[2]) / 3;
+      this.ambient.intensity = Math.max(0.85, Math.min(1.45, 0.85 + measured * 0.3));
     }
     const direction = estimate.primaryLightDirection;
     if (direction) this.sun.position.set(-direction.x, -direction.y, -direction.z);
     const primary = estimate.primaryLightIntensity;
     if (primary) {
-      this.sun.intensity = Math.max(0.15, Math.min(1.2, (primary.x + primary.y + primary.z) / 3));
+      const measured = (primary.x + primary.y + primary.z) / 3;
+      this.sun.intensity = Math.max(0.45, Math.min(0.95, 0.45 + measured * 0.25));
     }
   }
 

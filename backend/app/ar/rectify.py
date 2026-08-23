@@ -170,13 +170,30 @@ def rectify(
         confidence = 1.0  # a human placed these
 
     # Output resolution follows the real aspect ratio, capped on the long edge.
+    #
+    # **A cap, not a target.** `max_texture_px` used to be written straight into
+    # the long edge, so a quad measuring 500px across in the photograph was
+    # stretched to 2400 and the file carried five times the pixels of the detail
+    # it actually had. Interpolation invents nothing; the extra megabytes are
+    # blur, and they are megabytes a phone downloads before the rug appears.
+    #
+    # The quad's own longest side is the honest ceiling: it is how much of the
+    # carpet the camera really resolved.
+    xs = [x for x, _ in corners]
+    ys = [y for _, y in corners]
+    measured = max(
+        max(xs) - min(xs),
+        max(ys) - min(ys),
+    )
+    long_edge = max(64, min(max_texture_px, round(measured)))
+
     aspect = width_cm / length_cm
     if aspect >= 1.0:
-        out_w = max_texture_px
-        out_h = max(1, round(max_texture_px / aspect))
+        out_w = long_edge
+        out_h = max(1, round(long_edge / aspect))
     else:
-        out_h = max_texture_px
-        out_w = max(1, round(max_texture_px * aspect))
+        out_h = long_edge
+        out_w = max(1, round(long_edge * aspect))
 
     source = np.array(corners, dtype=np.float32)
     target = np.array(

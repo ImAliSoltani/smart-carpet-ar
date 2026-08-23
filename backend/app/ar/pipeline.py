@@ -43,27 +43,40 @@ class ArPipelineError(RuntimeError):
     """Asset generation failed for a reason worth showing the shopkeeper."""
 
 
-def _load_source_image(storage: Storage, image: CarpetImage) -> Image.Image:
-    """The photograph, always — never a rectified copy of it.
+def ar_source_url(image: CarpetImage) -> str:
+    """Which file the AR pipeline warps — and which one the panel measures.
 
-    **Rectification is not idempotent, and this is where that bites.** The
-    source used to resolve to `rectified_url or url`, so the first run warped
-    the photograph and the second warped that result: corner detection run on
-    an already-rectified carpet finds a rectangle *inside* it — an inner
-    border, a medallion — and crops to that. Every rebuild cropped again, and a
-    shopkeeper who edited a size and pressed rebuild got a piece of their
-    carpet presented as the whole of it.
+    **One function because two callers reading this differently is a bug that
+    has already happened twice.** The corner editor sends coordinates in the
+    pixel space of whatever it displayed; the builder applies them to whatever
+    it loaded. If those are different images the numbers describe nothing, and
+    *correcting* a bad crop moves it further from the carpet.
 
-    The panel is the other half of the argument. `suggest_corners` measures
-    against `url`, so every handle the shopkeeper drags is in the photograph's
-    pixel space; a builder reading anything else applies those numbers to an
-    image they do not describe, and a *corrected* crop lands further from the
-    carpet than the one it was correcting.
+    **Never `rectified_url`, and rectification is why.** It is not idempotent.
+    The source used to resolve to `rectified_url or url`, and nothing writes
+    `rectified_url` until a build finishes — so the first run warped the
+    photograph and every run after it warped that result. Corner detection on
+    an already-rectified carpet finds a rectangle *inside* it, an inner border
+    or a medallion, and crops to that. A shopkeeper who edited a size and
+    pressed rebuild got a piece of their carpet presented as the whole of it.
+
+    **The largest derivative, not the smallest.** `texture_url` is the 2048px
+    one the model comment already names as the AR pipeline's input. The
+    pipeline was reading `url` — the 800px card built for a grid thumbnail — so
+    every rug in the shop was woven onto an 800px texture and then scaled *up*
+    to 2400. That is where «the pattern on the floor is not sharp» comes from.
+    The fallbacks descend by size, for rows written before those columns
+    existed.
     """
+    return image.texture_url or image.full_url or image.url
+
+
+def _load_source_image(storage: Storage, image: CarpetImage) -> Image.Image:
+    url = ar_source_url(image)
     try:
-        return Image.open(storage.open_public_url(image.url))
+        return Image.open(storage.open_public_url(url))
     except (OSError, ValueError) as exc:
-        raise ArPipelineError(f"تصویر منبع قابل خواندن نیست: {image.url}") from exc
+        raise ArPipelineError(f"تصویر منبع قابل خواندن نیست: {url}") from exc
 
 
 def build_variant_assets(

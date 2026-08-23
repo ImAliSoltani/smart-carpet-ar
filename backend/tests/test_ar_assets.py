@@ -114,8 +114,33 @@ class TestRectify:
         photo = _photo_of_carpet_on_floor()
         landscape = rectify(photo, width_cm=400, length_cm=300, max_texture_px=1000)
         portrait = rectify(photo, width_cm=300, length_cm=400, max_texture_px=1000)
-        assert max(landscape.image.size) == 1000
-        assert max(portrait.image.size) == 1000
+        assert max(landscape.image.size) <= 1000
+        assert max(portrait.image.size) <= 1000
+
+    def test_the_cap_is_a_ceiling_and_not_a_target(self):
+        """A texture never carries more pixels than the photograph resolved.
+
+        This assertion used to read `== max_texture_px`, which quietly made the
+        cap a target: a carpet measuring a few hundred pixels across in the
+        photo was stretched to the cap and the file carried several times the
+        pixels of the detail it actually had. Interpolation invents nothing, so
+        those are megabytes of blur — downloaded by a phone before the rug
+        appears.
+        """
+        photo = _photo_of_carpet_on_floor()
+        corners = ((100.0, 100.0), (700.0, 100.0), (700.0, 500.0), (100.0, 500.0))
+
+        generous = rectify(
+            photo, width_cm=300, length_cm=200, corners=corners, max_texture_px=4000
+        )
+        # 600px across in the photograph, so 600 across in the texture.
+        assert max(generous.image.size) == 600
+
+        # And the ceiling still holds when it is the smaller of the two.
+        tight = rectify(
+            photo, width_cm=300, length_cm=200, corners=corners, max_texture_px=200
+        )
+        assert max(tight.image.size) == 200
 
 
 class TestRoundTrip:

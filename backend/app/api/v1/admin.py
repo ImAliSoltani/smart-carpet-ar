@@ -14,6 +14,7 @@ from sqlalchemy import func, select
 
 from app.api.deps import DbSession, EmbeddingDep, StorageDep
 from app.ar import pipeline as ar_pipeline
+from app.ar.pipeline import ar_source_url
 from app.ar.rectify import detect_corners
 from app.core.config import get_settings
 from app.core.security import client_key, read_upload
@@ -412,8 +413,12 @@ async def suggest_corners(
 ) -> ArCornerSuggestion:
     """گوشه‌های تشخیص‌داده‌شده برای پیش‌نمایش و اصلاح دستی در پنل."""
     image_row = await _primary_image(session, carpet_id)
+    # The same file the builder warps, resolved by the same function. The
+    # handles the shopkeeper drags are in this image's pixel space and are sent
+    # back as raw coordinates, so any disagreement here is a crop applied to an
+    # image that does not describe it.
     try:
-        source = Image.open(storage.open_public_url(image_row.url))
+        source = Image.open(storage.open_public_url(ar_source_url(image_row)))
     except (OSError, ValueError) as exc:
         raise HTTPException(422, detail="تصویر منبع قابل خواندن نیست") from exc
 
