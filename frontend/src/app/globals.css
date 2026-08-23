@@ -824,6 +824,82 @@ body {
   }
 }
 
+/* Photographs that drift inside a frame that holds still.
+ *
+ * The last of the four things the visual direction owed itself: the layout is
+ * deliberately calm, and this is the depth that keeps a wall of quiet cards
+ * from reading as a contact sheet.
+ *
+ * **Scroll-driven, so there is no scroll listener.** `animation-timeline: view()`
+ * ties progress to the element's own travel through the viewport, and Chromium
+ * runs it off the main thread — twenty-four of these cost about what one
+ * `scroll` handler would. `@supports` guards it because the fallback is not
+ * "no parallax", it is *worse*: without a timeline the same animation runs once
+ * on the document timeline, so every photograph would slide once at load and
+ * stop. Better to have nothing than that.
+ *
+ * **Longhands, not the `animation` shorthand**, and that is not style. The
+ * shorthand writes `animation-duration: 0s`, and a scroll-driven animation with
+ * a zero duration reports a perfectly valid `1.08` scale and an identity
+ * transform at every scroll position — it exists and never moves. What it needs
+ * is `auto`, meaning «fill the range», which only the longhand can say. The
+ * shorthand also resets `animation-timeline`, so the timeline would have had to
+ * follow it anyway. Measured at four scroll offsets before and after: identity
+ * at all four, then −3% through +3%.
+ *
+ * `scale` rather than a scale inside the keyframe: it is its own property now,
+ * so it composes with the keyframe's `translate3d` instead of overwriting it.
+ * 1.08 gives 4% of overflow on each side and the drift asks for 3, which is
+ * the margin that stops the frame's own background showing at the extremes. */
+/* Registered, so it can be animated at all: an unregistered custom property is
+   a string to the animation engine and jumps from one value to the other. */
+@property --drift {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+
+@keyframes toranjan-drift {
+  from {
+    --drift: -3%;
+  }
+  to {
+    --drift: 3%;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* 🔑 The timeline lives on the card, not on the layer that moves, and the
+       two are split for a measured reason.
+
+       `view()` reports the element's progress through its nearest scroll
+       container — and `overflow: hidden` makes one. The photo frame clips, so
+       a timeline on the layer inside it measured that layer against a box it
+       exactly fills and never left: `currentTime` pinned to 50% at every scroll
+       offset, an animation running perfectly and holding still. On the card,
+       outside the clip, the same timeline reads 14.6% → 38.3% → 62.3% → 86.2%
+       across the same four offsets.
+
+       So the card carries the timeline and animates a variable; the clipped
+       layer reads the variable. A custom property crosses the clip boundary
+       that the timeline cannot. */
+    .toranjan-drift-scope {
+      animation-name: toranjan-drift;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    .toranjan-drift {
+      scale: 1.08;
+      transform: translate3d(0, var(--drift, 0%), 0);
+    }
+  }
+}
+
 @keyframes toranjan-fade-in {
   from {
     opacity: 0;

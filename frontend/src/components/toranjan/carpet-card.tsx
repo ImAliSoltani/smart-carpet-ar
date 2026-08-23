@@ -115,6 +115,12 @@ export function CarpetCard({
 
   return (
     <motion.div
+      // Carries the scroll timeline the photograph inside drifts on. It has to
+      // be out here: the frame below clips, and a clip is a scroll container,
+      // which pins `view()` progress to the middle forever. See the note in
+      // globals.css. framer owns this element's `transform`; the timeline only
+      // animates a custom property, so the two never touch.
+      className="toranjan-drift-scope"
       initial={reduced ? false : { opacity: 0, y: 14 }}
       whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -8% 0px" }}
@@ -141,6 +147,22 @@ export function CarpetCard({
             happening instead of one. */}
         <ViewTransition name={carpetPhotoName(carpet.slug)} default={CARPET_PHOTO_CLASS}>
           <Link href={href} className="relative block aspect-3/4 overflow-hidden bg-bg">
+            {/* The drift lives on a layer of its own, not on the photograph.
+                The photograph already owns a transform — the hover scale below
+                — and two rules writing `transform` on one element means the
+                last one wins rather than both applying. A wrapper gives each
+                its own, and they compose the way the eye expects: the frame
+                holds still, the layer drifts with the scroll, the picture
+                inside it leans in under the pointer.
+
+                Only when `revealed` exists, and that is not a detail. That is
+                the case where this layer is the *room* shot and `object-cover`
+                is already cropping it, so drifting reveals more of a photograph
+                rather than exposing the edge of a cut-out. On a single-image
+                carpet this layer is the rug itself at `object-contain`, and
+                sliding a letterboxed cut-out inside its own padding is not
+                parallax, it is a picture that will not sit still. */}
+            <div className={cn("absolute inset-0", revealed && "toranjan-drift")}>
             {gallery[currentImageIndex] && (
               <Image
                 key={currentImageIndex}
@@ -163,6 +185,7 @@ export function CarpetCard({
                 )}
               />
             )}
+            </div>
 
             {/* The rug itself, on top, faded in while the pointer is on the
                 card.
