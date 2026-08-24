@@ -1,0 +1,351 @@
+@import '@fontsource/vazirmatn/arabic-400.css';
+@import '@fontsource/vazirmatn/arabic-500.css';
+@import '@fontsource/vazirmatn/arabic-600.css';
+@import '@fontsource/vazirmatn/arabic-700.css';
+
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Vazirmatn', ui-sans-serif, system-ui, Tahoma, sans-serif;
+
+  --shadow-glow-orange:
+    0 0 32px rgb(249 115 22 / 0.22),
+    0 0 64px rgb(249 115 22 / 0.08),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+
+  --animate-orb-float-1: orb-float-1 18s ease-in-out infinite;
+  --animate-orb-float-2: orb-float-2 22s ease-in-out infinite;
+  --animate-orb-float-3: orb-float-3 16s ease-in-out infinite;
+  --animate-mesh-shift: mesh-shift 14s ease-in-out infinite;
+  --animate-card-enter: card-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-shake: shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  --animate-pulse-ring: pulse-ring 2.5s ease-in-out infinite;
+  --animate-spin-slow: spin 0.75s linear infinite;
+  --animate-success-pop: success-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-success-ring: success-ring 0.7s ease-out forwards;
+  --shadow-glow-green:
+    0 0 32px rgb(34 197 94 / 0.28),
+    0 0 64px rgb(34 197 94 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -40px) scale(1.08); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-35px, 35px) scale(1.12); }
+}
+
+@keyframes orb-float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  40% { transform: translate(25px, 30px) scale(0.9); }
+  80% { transform: translate(-30px, -25px) scale(1.1); }
+}
+
+@keyframes mesh-shift {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-10px); }
+  30% { transform: translateX(10px); }
+  45% { transform: translateX(-8px); }
+  60% { transform: translateX(8px); }
+  75% { transform: translateX(-4px); }
+  90% { transform: translateX(4px); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(249 115 22 / 0.45); }
+  50% { box-shadow: 0 0 0 8px rgb(249 115 22 / 0); }
+}
+
+@keyframes success-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes success-ring {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+
+@keyframes success-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes success-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-black font-sans text-white antialiased;
+    min-height: 100dvh;
+  }
+}
+
+@layer components {
+  .bg-mesh {
+    background:
+      radial-gradient(ellipse 90% 70% at 15% 20%, rgb(249 115 22 / 0.18), transparent 55%),
+      radial-gradient(ellipse 70% 55% at 85% 75%, rgb(234 88 12 / 0.14), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 100%, rgb(251 146 60 / 0.1), transparent 45%),
+      linear-gradient(180deg, #000000 0%, #0a0a0a 45%, #000000 100%);
+    @apply animate-mesh-shift;
+  }
+
+  .orb {
+    @apply absolute rounded-full pointer-events-none;
+    filter: blur(70px);
+  }
+
+  .orb-1 {
+    @apply size-[300px] top-[5%] right-[0%] animate-orb-float-1;
+    background: rgb(249 115 22 / 0.4);
+  }
+
+  .orb-2 {
+    @apply size-[240px] bottom-[10%] left-[5%] animate-orb-float-2;
+    background: rgb(234 88 12 / 0.32);
+  }
+
+  .orb-3 {
+    @apply size-[200px] top-1/2 left-1/2 animate-orb-float-3;
+    transform: translate(-50%, -50%);
+    background: rgb(251 146 60 / 0.22);
+  }
+
+  .bg-grid-lines {
+    background-image:
+      linear-gradient(rgb(249 115 22 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(249 115 22 / 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .otp-input {
+    @apply text-center text-2xl font-bold text-white outline-none transition-all duration-200;
+    background-color: rgb(255 255 255 / 0.04);
+    caret-color: #fb923c;
+  }
+
+  .otp-input::placeholder {
+    @apply text-transparent;
+  }
+
+  .otp-input:focus {
+    @apply border-orange-500 scale-[1.03];
+    background-color: rgb(249 115 22 / 0.08);
+    box-shadow:
+      0 0 0 3px rgb(249 115 22 / 0.3),
+      0 0 24px rgb(249 115 22 / 0.25);
+  }
+
+  .otp-input.filled {
+    border-color: rgb(249 115 22 / 0.7);
+    background-color: rgb(249 115 22 / 0.1);
+  }
+
+  .otp-input.error {
+    @apply border-red-500;
+    box-shadow: 0 0 0 3px rgb(239 68 68 / 0.3);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+    background-size: 200% 200%;
+    @apply transition-all duration-200 shadow-lg shadow-orange-500/25;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-position: 100% 0;
+    box-shadow: 0 10px 40px rgb(249 115 22 / 0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-55 cursor-not-allowed;
+  }
+
+  .btn-primary.is-success {
+    @apply bg-orange-500;
+    background-image: none;
+    box-shadow: 0 8px 32px rgb(249 115 22 / 0.4);
+  }
+
+  #error-message.visible {
+    @apply opacity-100;
+  }
+
+  #resend-btn:not(:disabled) {
+    @apply opacity-100 cursor-pointer;
+  }
+
+  #resend-btn:not(:disabled):hover {
+    @apply text-orange-300 underline;
+  }
+
+  .otp-input.is-valid {
+    @apply border-emerald-500 text-emerald-400;
+    background-color: rgb(34 197 94 / 0.12);
+    box-shadow: 0 0 16px rgb(34 197 94 / 0.25);
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+    @apply transition-all duration-200 shadow-lg shadow-emerald-500/30;
+  }
+
+  .btn-success:hover {
+    box-shadow: 0 10px 40px rgb(34 197 94 / 0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-back {
+    @apply text-zinc-300 border border-zinc-600 bg-zinc-900/60 transition-all duration-200;
+  }
+
+  .btn-back:hover {
+    @apply text-white border-emerald-500/40 bg-zinc-800/80;
+  }
+
+  body.success-mode .btn-back {
+    @apply border-emerald-500/30 text-emerald-200/90;
+  }
+
+  body.success-mode .btn-back:hover {
+    @apply border-emerald-500/50 bg-emerald-950/50 text-emerald-300;
+  }
+
+  .success-check-wrap {
+    @apply relative flex items-center justify-center mx-auto size-24;
+  }
+
+  .success-check-ring {
+    @apply absolute inset-0 rounded-full border-2 border-emerald-500/40 animate-success-ring;
+  }
+
+  .success-check-circle {
+    @apply relative flex items-center justify-center size-20 rounded-full bg-emerald-500/15 border-2 border-emerald-500 animate-success-pop;
+    box-shadow: 0 0 40px rgb(34 197 94 / 0.35);
+  }
+
+  .success-check-icon {
+    @apply size-12;
+  }
+
+  .success-check-circle-bg {
+    stroke: rgb(34 197 94 / 0.3);
+    stroke-width: 2;
+  }
+
+  .success-check-path {
+    stroke: #4ade80;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: success-draw 0.45s 0.35s ease forwards;
+  }
+
+  #otp-step-success.is-visible {
+    display: block;
+    animation: success-step-in 0.5s 0.2s ease both;
+  }
+
+  #otp-step-login.is-hiding {
+    @apply opacity-0 pointer-events-none;
+    transition: opacity 0.35s ease;
+  }
+
+  body.success-mode .bg-mesh {
+    background:
+      radial-gradient(ellipse 90% 70% at 15% 20%, rgb(34 197 94 / 0.2), transparent 55%),
+      radial-gradient(ellipse 70% 55% at 85% 75%, rgb(22 163 74 / 0.16), transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 100%, rgb(74 222 128 / 0.1), transparent 45%),
+      linear-gradient(180deg, #000000 0%, #052e16 45%, #000000 100%);
+  }
+
+  body.success-mode .orb-1 {
+    background: rgb(34 197 94 / 0.38);
+  }
+
+  body.success-mode .orb-2 {
+    background: rgb(22 163 74 / 0.3);
+  }
+
+  body.success-mode .orb-3 {
+    background: rgb(74 222 128 / 0.24);
+  }
+
+  body.success-mode .bg-grid-lines {
+    background-image:
+      linear-gradient(rgb(34 197 94 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(34 197 94 / 0.06) 1px, transparent 1px);
+  }
+
+  .otp-card {
+    @apply border-zinc-800 shadow-glow-orange;
+  }
+
+  .otp-card.is-success {
+    border-color: rgb(34 197 94 / 0.55) !important;
+    box-shadow:
+      0 25px 50px -12px rgb(0 0 0 / 0.25),
+      0 0 32px rgb(34 197 94 / 0.28),
+      0 0 64px rgb(34 197 94 / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / 0.08) !important;
+    background-color: rgb(6 24 14 / 0.92);
+  }
+
+  body.success-mode .animate-pulse-ring {
+    animation: none;
+    box-shadow: 0 0 24px rgb(34 197 94 / 0.35);
+  }
+}
+
+@utility sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

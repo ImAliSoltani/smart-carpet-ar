@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ورود با کد تایید | OTP Login</title>
+</head>
+<body class="min-h-screen">
+
+  <div id="bg-layer" class="fixed inset-0 z-0 overflow-hidden bg-mesh transition-all duration-700" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="absolute inset-0 opacity-50 pointer-events-none bg-grid-lines"></div>
+  </div>
+
+  <main class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <article
+      id="otp-card"
+      class="otp-card w-full max-w-md p-6 sm:p-8 rounded-3xl border bg-zinc-950/90 backdrop-blur-xl shadow-2xl animate-card-enter"
+      role="form"
+      aria-labelledby="otp-title"
+    >
+      <div id="otp-step-login">
+      <div id="login-icon" class="flex justify-center mb-6">
+        <div
+          class="flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/30 animate-pulse-ring"
+        >
+          <svg
+            class="w-7 h-7 text-orange-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.5"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <header class="text-center mb-8">
+        <h1 id="otp-title" class="text-2xl sm:text-3xl font-bold text-white mb-2">
+          ورود به حساب کاربری
+        </h1>
+        <p class="text-sm sm:text-base text-zinc-400 leading-relaxed px-2">
+          کد تایید ۴ رقمی به شماره شما ارسال شد.
+        </p>
+        <p class="text-xs text-zinc-500 mt-2 tabular-nums" dir="ltr">
+          ۰۹۱۲ ••• ••۴۵
+        </p>
+      </header>
+
+      <form id="otp-form" novalidate>
+        <fieldset class="border-0 p-0 m-0 min-w-0">
+          <legend class="sr-only">کد تایید چهار رقمی</legend>
+
+          <div
+            id="otp-inputs"
+            class="grid grid-cols-4 gap-2 sm:gap-3 mb-6"
+            dir="ltr"
+            role="group"
+            aria-label="ارقام کد تایید"
+          >
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              autocomplete="one-time-code"
+              class="otp-input h-14 rounded-xl border-2 border-zinc-700"
+              data-index="0"
+              aria-label="رقم اول"
+            />
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              class="otp-input h-14 rounded-xl border-2 border-zinc-700"
+              data-index="1"
+              aria-label="رقم دوم"
+            />
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              class="otp-input h-14 rounded-xl border-2 border-zinc-700"
+              data-index="2"
+              aria-label="رقم سوم"
+            />
+            <input
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              class="otp-input h-14 rounded-xl border-2 border-zinc-700"
+              data-index="3"
+              aria-label="رقم چهارم"
+            />
+          </div>
+
+          <p
+            id="error-message"
+            class="text-center text-sm text-red-400 mb-4 opacity-0 transition-opacity duration-200"
+            role="alert"
+            aria-live="polite"
+          >
+            کد وارد شده صحیح نیست. دوباره تلاش کنید.
+          </p>
+
+          <button
+            type="submit"
+            id="submit-btn"
+            class="btn-primary w-full py-3.5 px-4 rounded-xl text-base font-semibold text-white flex items-center justify-center gap-2"
+          >
+            <span id="btn-text">تایید و ورود</span>
+            <span
+              id="btn-spinner"
+              class="hidden"
+              aria-hidden="true"
+            >
+              <svg id="btn-spinner-icon" class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-90"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            </span>
+          </button>
+        </fieldset>
+      </form>
+
+      <footer class="mt-6 text-center">
+        <p class="text-sm text-zinc-400">
+          کد را دریافت نکردید؟
+          <button
+            type="button"
+            id="resend-btn"
+            class="text-orange-400 font-medium transition duration-200 cursor-not-allowed opacity-50"
+            disabled
+          >
+            ارسال مجدد کد
+          </button>
+        </p>
+        <p class="text-xs text-zinc-500 mt-1">
+          امکان ارسال مجدد تا
+          <span id="timer-display" class="text-orange-400 font-semibold tabular-nums" dir="ltr"
+            >۰۲:۰۰</span
+          >
+        </p>
+      </footer>
+      </div>
+
+      <div id="otp-step-success" class="hidden text-center" aria-live="polite">
+        <div class="success-check-wrap mb-6">
+          <div class="success-check-ring"></div>
+          <div class="success-check-circle">
+            <svg class="success-check-icon" viewBox="0 0 52 52" aria-hidden="true">
+              <circle class="success-check-circle-bg" cx="26" cy="26" r="25" fill="none" />
+              <path class="success-check-path" fill="none" d="M14 27l7 7 16-16" />
+            </svg>
+          </div>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-emerald-400 mb-2">ورود موفق!</h2>
+        <p class="text-sm sm:text-base text-zinc-400 mb-1">به حساب کاربری خوش آمدید</p>
+        <p class="text-xs text-emerald-500/80 mb-8">احراز هویت با موفقیت انجام شد</p>
+        <div class="flex flex-col gap-3">
+          <button type="button" id="success-continue-btn" class="btn-success w-full py-3.5 px-4 rounded-xl text-base font-semibold text-white">
+            ورود به داشبورد
+          </button>
+          <button type="button" id="success-back-btn" class="btn-back w-full py-3 px-4 rounded-xl text-base font-medium">
+            بازگشت
+          </button>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

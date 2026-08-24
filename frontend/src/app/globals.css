@@ -1235,3 +1235,415 @@ body {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   THE PANEL'S DOOR — /admin/login
+   ============================================================
+   The login page used to stand on `admin-ground-hero`: the same
+   photograph as the panel, held at a 0.45 scrim so it read as the page
+   rather than as a surface. It was the one screen whose contrast was
+   *worst* — the photograph contains a skylight, and the weakest text on
+   the card measured 4.66:1 over it, a hair above the floor.
+
+   It stands on light now instead of on a room. The ground is the panel's
+   own near-black with three slow gold pools drifting across it, and the
+   same card over that measures 11.07:1 — sampled in the browser, not
+   computed from the tokens, so it is the number after the glass has done
+   whatever it does. The photograph did not have to be sacrificed for it;
+   the number is what came free.
+
+   **This is the one place the gold is not small.** Every other rule in
+   this file keeps it to a hairline, an icon, a focus ring, because gold
+   spread wide over a page of carpets competes with the carpets. There
+   are no carpets here. There is one card, one button, and one thing to
+   do, and the door of a workroom is allowed to be the colour of the
+   workroom's own mark.
+   ============================================================ */
+
+/* Transform and opacity only. Each orb is promoted to its own layer by
+   the blur, so the drift costs a composite and not a paint — which is
+   the whole reason three of them can run forever. */
+@keyframes toranjan-orb-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(30px, -40px, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-20px, 20px, 0) scale(0.95);
+  }
+}
+
+@keyframes toranjan-orb-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-35px, 35px, 0) scale(1.12);
+  }
+}
+
+/* The centre orb is already displaced by half its own size to sit on the
+   middle of the screen, so its keyframes have to carry that offset in
+   every frame — a bare `translate3d(0,0,0)` here would snap it down and
+   right by 100px the moment the animation took over. */
+@keyframes toranjan-orb-c {
+  0%,
+  100% {
+    transform: translate3d(-50%, -50%, 0) scale(1.05);
+  }
+  40% {
+    transform: translate3d(calc(-50% + 25px), calc(-50% + 30px), 0) scale(0.9);
+  }
+  80% {
+    transform: translate3d(calc(-50% - 30px), calc(-50% - 25px), 0) scale(1.1);
+  }
+}
+
+/* A very slow breath across the whole ground. Opacity on one element,
+   which is the cheapest thing a page can animate. */
+@keyframes toranjan-auth-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes toranjan-auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Refusal, not error. It travels on X only and dies out, because a shake
+   that keeps its amplitude reads as a glitch rather than as a no. */
+@keyframes toranjan-auth-refuse {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-10px);
+  }
+  30% {
+    transform: translateX(10px);
+  }
+  45% {
+    transform: translateX(-8px);
+  }
+  60% {
+    transform: translateX(8px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+  90% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes toranjan-auth-halo {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 168, 66, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(217, 168, 66, 0);
+  }
+}
+
+@keyframes toranjan-auth-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes toranjan-auth-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* `fixed`, so the ground stays still while a short viewport scrolls the
+   card. It is the only element on the page allowed to clip: the orbs are
+   drawn far larger than the space they occupy and would otherwise put a
+   horizontal scrollbar on the document.
+
+   **Fully opaque, and that is the fix for the first version of this
+   page.** The breathing used to live here, on the layer that covers the
+   viewport — and an animated `opacity` on a fixed full-screen layer is
+   not a dimmer, it is a hole. What showed through it was `body`, which
+   carries the *shop's* ground: `rgb(250, 250, 250)`. Measured in the
+   browser at rest, mid-cycle: ground opacity 0.83 over near-white. The
+   whole page came out a flat warm grey, the orbs had nothing dark to
+   glow against, and the card had nothing to be lifted off.
+
+   So the base is opaque and never animates; the light that moves is the
+   layer below. */
+.admin-auth-ground {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, #08070b 0%, #131219 48%, #08070b 100%);
+}
+
+/* The pools of light, on their own layer so their opacity can breathe
+   without opening a hole to the page behind. Deeper than the first
+   version's alphas as well — the wash had been doing half the work of
+   filling the frame, and once it was gone the gold read as three faint
+   stains rather than as light. */
+.admin-auth-pools {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 20%, rgba(217, 168, 66, 0.2), transparent 58%),
+    radial-gradient(ellipse 70% 55% at 85% 75%, rgba(176, 124, 40, 0.16), transparent 52%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(230, 196, 127, 0.1), transparent 46%);
+  animation: toranjan-auth-breathe 14s ease-in-out infinite;
+}
+
+.admin-auth-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+/* Physical `right`/`left`, deliberately. These are three smudges of
+   light, not content — there is no reading order for them to follow, and
+   flipping them per direction would only mean maintaining two layouts of
+   something nobody reads. */
+.admin-auth-orb-1 {
+  width: 300px;
+  height: 300px;
+  top: 5%;
+  right: 0;
+  background: rgba(217, 168, 66, 0.34);
+  animation: toranjan-orb-a 18s ease-in-out infinite;
+}
+
+.admin-auth-orb-2 {
+  width: 240px;
+  height: 240px;
+  bottom: 10%;
+  left: 5%;
+  background: rgba(176, 124, 40, 0.3);
+  animation: toranjan-orb-b 22s ease-in-out infinite;
+}
+
+.admin-auth-orb-3 {
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0) scale(1.05);
+  background: rgba(230, 196, 127, 0.2);
+  animation: toranjan-orb-c 16s ease-in-out infinite;
+}
+
+/* The weave. Four percent gold on near-black is barely a value at all,
+   which is the intent: it gives the light something to fall across so
+   the ground reads as a surface rather than as a void. */
+.admin-auth-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(217, 168, 66, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 168, 66, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* A phone gets three 70px blurs across the whole viewport on the GPU
+   least able to spare them, so it gets smaller ones. The pattern matches
+   what the panel's photograph already does at this width — see the
+   `max-width: 639px` block far above. */
+@media (max-width: 639px) {
+  .admin-auth-orb {
+    filter: blur(52px);
+  }
+
+  .admin-auth-orb-1 {
+    width: 220px;
+    height: 220px;
+  }
+
+  .admin-auth-orb-2 {
+    width: 180px;
+    height: 180px;
+  }
+
+  .admin-auth-orb-3 {
+    display: none;
+  }
+}
+
+/* The card keeps `.glass-strong` for its surface — the same smoked glass
+   as the rest of the panel — and adds only the light it catches. The
+   gold halo is what marks this as the one card on the site that is the
+   page rather than an element of it. */
+.admin-auth-card {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.45),
+    0 16px 40px -16px rgba(0, 0, 0, 0.65),
+    0 0 32px rgba(217, 168, 66, 0.16),
+    0 0 72px rgba(217, 168, 66, 0.07);
+  animation: toranjan-auth-card-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.admin-auth-refuse {
+  animation: toranjan-auth-refuse 550ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.admin-auth-halo {
+  animation: toranjan-auth-halo 2.5s ease-in-out infinite;
+}
+
+/* The fields. `.glass-strong` sits on `--paper` at 0.8, and the panel's
+   ordinary `bg-paper` input would disappear into it, so these are lit
+   from within by a few percent of white instead — and answer focus with
+   gold, which is the same gold as `:focus-visible` uses everywhere else.
+
+   The ring is drawn with `box-shadow` rather than `outline` so that it
+   can be tinted and spread; `:focus-visible`'s own 2px outline still
+   lands on top of it for anyone arriving by keyboard, which is the point
+   of keeping both. */
+.admin-auth-field {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  caret-color: var(--accent-strong);
+  transition:
+    border-color var(--dur-feedback, 180ms) var(--ease, ease),
+    box-shadow var(--dur-feedback, 180ms) var(--ease, ease),
+    background-color var(--dur-feedback, 180ms) var(--ease, ease);
+}
+
+.admin-auth-field:focus,
+.admin-auth-field:focus-visible {
+  border-color: var(--accent);
+  background-color: rgba(217, 168, 66, 0.08);
+  box-shadow:
+    0 0 0 3px rgba(217, 168, 66, 0.26),
+    0 0 24px rgba(217, 168, 66, 0.2);
+}
+
+.admin-auth-field[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px rgba(239, 128, 120, 0.24);
+}
+
+/* The one wide gold surface on the site.
+   Measured against `--on-cta` (#14131a), which is what sits on it: the
+   light stop is 11.04:1, the mid 8.46:1, the dark stop 5.70:1. The
+   gradient is legible along its whole length and not only where it
+   began, which is the thing a gradient button usually gets wrong.
+   `background-size: 200%` so hover slides the light across rather than
+   swapping one flat colour for another. */
+.admin-auth-submit {
+  background-image: linear-gradient(135deg, #e6c47f 0%, #d9a842 50%, #b8862c 100%);
+  background-size: 200% 200%;
+  background-position: 0 0;
+  color: var(--on-cta);
+  box-shadow: 0 8px 28px -10px rgba(217, 168, 66, 0.55);
+  transition:
+    background-position 320ms var(--ease, ease),
+    box-shadow 220ms var(--ease, ease),
+    transform 220ms var(--ease, ease);
+}
+
+.admin-auth-submit:hover:not(:disabled) {
+  background-position: 100% 0;
+  box-shadow: 0 12px 40px -10px rgba(217, 168, 66, 0.6);
+  transform: translateY(-1px);
+}
+
+.admin-auth-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.admin-auth-submit:disabled {
+  opacity: 0.55;
+}
+
+/* ---- the lockout panel ------------------------------------------------
+   After five failed attempts in five minutes the server stops answering
+   and says how long for. The page shows that as a clock.
+
+   **It is gold, not red, and the colour is the message.** Red on this
+   card means «that pair was wrong, try again» — which is precisely the
+   one thing that is no longer available. A lockout is not a rejection to
+   correct, it is a door that opens at a stated time, so it takes the
+   page's own colour and the sentence beside it says «wait» rather than
+   «fix». The red box is still there for a wrong password; these are two
+   different answers and they no longer look alike. */
+.admin-auth-lock {
+  border: 1px solid rgba(217, 168, 66, 0.3);
+  background-color: rgba(217, 168, 66, 0.07);
+}
+
+/* The clock itself.
+   `tabular-nums` and `dir="ltr"` are set on the element — a clock reads
+   left to right in Persian too, and proportional digits make the whole
+   line shuffle sideways on every tick. What is here is only what cannot
+   be said in a utility: the size, and the light it gives off.
+
+   No animation. Everything else on this page moves, and a number that is
+   already changing once a second does not need help; a pulse under it
+   would read as urgency, which is the opposite of what a wait is. */
+.admin-auth-clock {
+  display: block;
+  margin: 0.5rem 0 0.125rem;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--accent-strong);
+  text-shadow: 0 0 24px rgba(217, 168, 66, 0.28);
+}
+
+/* Green, not gold, and that is not an exception to the paragraph at the
+   top of this section. Gold is the brand; green is the answer «yes».
+   It is the same `--status-confirmed` the panel's badges already use. */
+.admin-auth-done-ring {
+  animation: toranjan-ring 700ms ease-out both;
+}
+
+.admin-auth-done-disc {
+  box-shadow: 0 0 40px rgba(74, 222, 128, 0.3);
+  animation: toranjan-auth-pop 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.admin-auth-step-in {
+  animation: toranjan-auth-step-in 500ms 120ms ease both;
+}
+
+/* No `prefers-reduced-motion` block of its own: the blanket rule further
+   up this file already collapses every animation here to 0.01ms, and
+   each one above is written so that its *end* state is the correct
+   still image — the card at rest, the orbs at their origin, the tick
+   drawn. That is why `both` appears on every one of them. */
