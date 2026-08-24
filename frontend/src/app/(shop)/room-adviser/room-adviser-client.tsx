@@ -102,6 +102,11 @@ export function RoomAdviserClient() {
               onUpload={onUpload}
               isBusy={advice.isPending}
               maxSizeMB={8}
+              // This screen reads a *room*: its floor for where the rug goes,
+              // its walls and furniture for the colours to sit beside. Asking
+              // for «عکس فرش» here was asking for the one photograph it cannot
+              // use.
+              subject="عکس اتاق"
               hint={
                 <p className="mt-5 max-w-[42ch] text-xs leading-loose text-muted">
                   عکسی بگیرید که هم کف اتاق و هم دیوارها و مبلمان در آن باشند —

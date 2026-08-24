@@ -122,6 +122,24 @@ test("a search that matches nothing says so instead of showing everything", asyn
   await expect(page.getByText(/پیدا نشد|چیزی یافت نشد|نتیجه‌ای/)).toBeVisible();
 });
 
+test("each upload screen asks for the photograph it actually reads", async ({ page }) => {
+  // The dropzone said «عکس فرش» from inside itself, which was right for visual
+  // search and wrong for the two screens that read a *room* — the adviser wants
+  // the floor and the walls, the size guide wants the floor and a sheet of A4.
+  // Both asked for a carpet and then measured the room in whatever arrived.
+  for (const [path, subject] of [
+    ["/room-adviser", "عکس اتاق"],
+    ["/size-guide", "عکس اتاق"],
+    ["/visual-search", "عکس فرش"],
+  ] as const) {
+    await page.goto(`${path}?intro=0`);
+    await expect(page.getByText(`${subject} را اینجا رها کنید`)).toBeVisible();
+    // The spoken name too: the file input is `sr-only`, so this label is the
+    // only thing a screen reader has to go on.
+    await expect(page.getByLabel(`انتخاب ${subject}`)).toBeAttached();
+  }
+});
+
 test("one tap on «ادامه» reaches the review step without placing the order", async ({
   page,
   isMobile,

@@ -102,6 +102,9 @@ export function SizeGuideClient() {
               onUpload={onUpload}
               isBusy={guide.isPending}
               maxSizeMB={8}
+              // A room, and as much of its floor as fits — that is what the
+              // A4 sheet is measured against.
+              subject="عکس اتاق"
               hint={
                 <div className="mt-5 max-w-[42ch] space-y-2 text-xs leading-loose text-muted">
                   <p>

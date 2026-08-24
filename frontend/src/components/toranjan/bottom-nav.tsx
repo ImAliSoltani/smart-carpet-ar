@@ -4,8 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, LayoutGrid, Ruler, ShoppingBag, Sofa } from "lucide-react";
+import { Camera, Ruler, ShoppingBag, Sofa } from "lucide-react";
 
+import { RugIcon } from "@/components/toranjan/rug-icon";
 import { useCartLines } from "@/lib/store/cart";
 import { useCompare } from "@/lib/store/compare";
 import { formatNumber } from "@/lib/format";
@@ -42,7 +43,7 @@ import { cn } from "@/lib/utils";
  */
 
 const ITEMS = [
-  { href: "/carpets", label: "فرش‌ها", icon: LayoutGrid },
+  { href: "/carpets", label: "فرش‌ها", icon: RugIcon },
   { href: "/visual-search", label: "جست‌وجوی بصری", icon: Camera },
   { href: "/room-adviser", label: "مشاور چیدمان", icon: Sofa },
   { href: "/size-guide", label: "راهنمای اندازه", icon: Ruler },

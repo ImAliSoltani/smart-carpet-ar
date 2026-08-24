@@ -94,6 +94,8 @@ export function VisualSearchClient() {
               onUpload={onUpload}
               isBusy={search.isPending}
               maxSizeMB={8}
+              // The one screen that really does want the carpet.
+              subject="عکس فرش"
               hint={
                 <p className="mt-5 max-w-[38ch] text-xs leading-loose text-muted">
                   عکس از روبه‌رو و صاف بهترین نتیجه را می‌دهد. عکس اتاق هم کار

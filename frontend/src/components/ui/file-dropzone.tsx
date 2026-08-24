@@ -47,6 +47,17 @@ export interface FileDropzoneProps {
   isBusy?: boolean;
   /** Under the button, where a hint belongs — never as a placeholder. */
   hint?: React.ReactNode;
+  /**
+   * What the visitor is being asked for, as it appears mid-sentence.
+   *
+   * Required, and deliberately not defaulted. It used to be the literal
+   * «عکس فرش» inside this component, which was right for visual search and
+   * wrong for the two screens that want a photograph of a **room** — the room
+   * adviser and the size guide both asked for a carpet and then read the floor
+   * of whatever arrived. A default here would have kept that bug available to
+   * the next screen that forgot to think about it.
+   */
+  subject: string;
   className?: string;
 }
 
@@ -58,6 +69,7 @@ export function FileDropzone({
   onUpload,
   isBusy = false,
   hint,
+  subject,
   className,
 }: FileDropzoneProps) {
   const reduced = useReducedMotion();
@@ -105,7 +117,7 @@ export function FileDropzone({
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <input {...getInputProps()} aria-label="انتخاب عکس فرش" className="sr-only" />
+          <input {...getInputProps()} aria-label={`انتخاب ${subject}`} className="sr-only" />
 
           <AnimatePresence mode="wait" initial={false}>
             {chosen?.preview ? (
@@ -146,7 +158,7 @@ export function FileDropzone({
 
                 {/* Prose is formal plural, matching every other page; only the
                     error lines are familiar, matching `api/client.ts`. */}
-                <p className="text-base">عکس فرش را اینجا رها کنید</p>
+                <p className="text-base">{subject} را اینجا رها کنید</p>
                 <p className="mt-2 text-sm leading-loose text-muted">
                   یا از دستگاه خودتان انتخاب کنید — JPEG، PNG یا WebP
                 </p>
