@@ -4,12 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Camera, Ruler, ShoppingBag, Sofa } from "lucide-react";
-
-import { RugIcon } from "@/components/toranjan/rug-icon";
 import { useCartLines } from "@/lib/store/cart";
 import { useCompare } from "@/lib/store/compare";
 import { formatNumber } from "@/lib/format";
+import { TABS, directionBetween, tabIndexFor } from "@/lib/tabs";
 import { cn } from "@/lib/utils";
 
 /**
@@ -42,13 +40,6 @@ import { cn } from "@/lib/utils";
  * - **`gap`, not `space-x`.** Physical margins in a right-to-left row.
  */
 
-const ITEMS = [
-  { href: "/carpets", label: "فرش‌ها", icon: RugIcon },
-  { href: "/visual-search", label: "جست‌وجوی بصری", icon: Camera },
-  { href: "/room-adviser", label: "مشاور چیدمان", icon: Sofa },
-  { href: "/size-guide", label: "راهنمای اندازه", icon: Ruler },
-  { href: "/cart", label: "سبد خرید", icon: ShoppingBag },
-] as const;
 
 /**
  * The label opens to whatever its own words need — `auto`, not a constant.
@@ -63,13 +54,6 @@ const ITEMS = [
  */
 const LABEL_WIDTH = "auto";
 
-function isCurrent(pathname: string, href: string) {
-  // `/carpets` must also own `/carpets/{slug}` and its AR page, or browsing a
-  // rug unlights the tab that took you there. Exact match everywhere else:
-  // `/cart` has no children, and prefix-matching `/` would light on every page.
-  if (href === "/carpets") return pathname === "/carpets" || pathname.startsWith("/carpets/");
-  return pathname === href;
-}
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -121,9 +105,9 @@ export function BottomNav() {
           className="fixed inset-x-0 z-30 mx-auto flex w-fit max-w-[calc(100vw-0.75rem)] items-center gap-0.5 rounded-full border border-line bg-paper/95 p-1.5 shadow-[0_10px_40px_-18px_rgba(24,24,27,0.5)] backdrop-blur-md lg:hidden"
           style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
         >
-          {ITEMS.map((item) => {
+          {TABS.map((item, i) => {
             const Icon = item.icon;
-            const active = isCurrent(pathname, item.href);
+            const active = i === tabIndexFor(pathname);
             const isCart = item.href === "/cart";
 
             return (
@@ -139,6 +123,14 @@ export function BottomNav() {
                     : item.label
                 }
                 aria-current={active ? "page" : undefined}
+                // A tap travels the same strip a swipe does, so it animates the
+                // same way. Set here rather than in an effect after the route
+                // changes: the snapshot is taken as the navigation starts, and
+                // an attribute written afterwards arrives too late to be in it.
+                onClick={() => {
+                  const direction = directionBetween(pathname, item.href);
+                  if (direction) document.documentElement.dataset.nav = direction;
+                }}
                 className={cn(
                   "relative flex h-11 min-w-11 items-center justify-center rounded-full px-3",
                   "transition-colors duration-[--dur-feedback]",

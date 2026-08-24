@@ -113,6 +113,11 @@
      scaling one and not the other changes the choreography instead of slowing
      it. */
   --dur-page-fade: 380ms;
+  /* Stepping sideways between the five tabs. The fast end of §3-5's entrance
+     band, not the slow one: this is a move the visitor asked for and is already
+     waiting on, unlike a page arriving from nowhere. Long enough to read as a
+     direction, short enough that a second swipe is never blocked by the first. */
+  --dur-tab: 420ms;
 }
 
 /* Inspecting the morph.
@@ -133,6 +138,7 @@
 :root[data-motion="slow"] {
   --dur-morph: 3120ms;
   --dur-page-fade: 2280ms;
+  --dur-tab: 2520ms;
 }
 
 /* ============================================================
@@ -1096,6 +1102,101 @@ body {
 ::view-transition-new(root) {
   animation-duration: var(--dur-page-fade);
   animation-timing-function: var(--ease-io);
+}
+
+/* The page body is its own group now that `PageTransition` names it, so it no
+   longer inherits the timing above by being part of `root`. Without this it
+   cross-fades at the browser's 250ms default while the chrome around it takes
+   380 — two speeds for one gesture, and the faster one is the half the eye is
+   actually on. Measured after adding the boundary, not predicted. */
+::view-transition-old(shop-page),
+::view-transition-new(shop-page) {
+  animation-duration: var(--dur-page-fade);
+  animation-timing-function: var(--ease-io);
+}
+
+/* ============================================================
+   MOVING BETWEEN THE FIVE TABS
+   The bottom bar's destinations are five separate routes, and stepping between
+   them should read as sideways travel along one strip rather than as five
+   unrelated pages replacing each other. `lib/tabs.ts` sets `data-nav` on
+   <html> just before the navigation and clears it when the transition ends, so
+   these rules apply to tab moves and to nothing else — a carpet opening from
+   the grid still morphs, and every other navigation still cross-fades.
+
+   **Why this rather than a wrapper that slides.** A transformed element becomes
+   the containing block for `position: fixed` and disturbs `sticky`, and this
+   shop has a sticky header, a sticky compare tray and a fixed bottom bar. A
+   view transition animates a *snapshot* instead: nothing in the live tree is
+   transformed, so none of the three notices. This repository has already paid
+   for the other lesson twice — see the `overflow: hidden` note above.
+
+   `!important` throughout for the reason recorded at `::view-transition`:
+   React's <ViewTransition> drives the root group with scripted animations, and
+   an author `!important` declaration is what outranks those. `opacity` is
+   restored because React's own animation holds the root at 0 — right for a
+   carpet morph, where only the photograph should travel, and wrong here, where
+   the page is the thing travelling. */
+/* `shop-page` is the page body; `root` is the chrome around it — the header,
+   the footer, the bottom bar. The page travels and the chrome holds still,
+   which is what makes five routes read as one shop. Both groups are forced
+   visible because React's <ViewTransition> drives the root group's opacity to
+   0, which is right when only a photograph should move and wrong here. */
+:root[data-nav]::view-transition-group(root),
+:root[data-nav]::view-transition-group(shop-page) {
+  opacity: 1 !important;
+}
+
+:root[data-nav]::view-transition-old(shop-page),
+:root[data-nav]::view-transition-new(shop-page) {
+  animation-duration: var(--dur-tab) !important;
+  animation-timing-function: var(--ease) !important;
+  /* The default pairing composites the two snapshots with `plus-lighter`, which
+     is built for a cross-fade of the same content and turns two *different*
+     pages passing each other into a bright smear. */
+  mix-blend-mode: normal !important;
+}
+
+/* Higher index, which is further left on screen: the strip moves right. */
+:root[data-nav="next"]::view-transition-old(shop-page) {
+  animation-name: tab-exit-right !important;
+}
+:root[data-nav="next"]::view-transition-new(shop-page) {
+  animation-name: tab-enter-from-left !important;
+}
+:root[data-nav="prev"]::view-transition-old(shop-page) {
+  animation-name: tab-exit-left !important;
+}
+:root[data-nav="prev"]::view-transition-new(shop-page) {
+  animation-name: tab-enter-from-right !important;
+}
+
+/* A fifth of the width, not the whole of it. The page has already been replaced
+   by the time this runs; a full-width slide reads as a wait, while a short one
+   reads as the direction it travelled. Opacity carries the rest. */
+@keyframes tab-exit-right {
+  to {
+    transform: translateX(20%);
+    opacity: 0;
+  }
+}
+@keyframes tab-enter-from-left {
+  from {
+    transform: translateX(-20%);
+    opacity: 0;
+  }
+}
+@keyframes tab-exit-left {
+  to {
+    transform: translateX(-20%);
+    opacity: 0;
+  }
+}
+@keyframes tab-enter-from-right {
+  from {
+    transform: translateX(20%);
+    opacity: 0;
+  }
 }
 
 /* The blanket rule above cannot reach any of this. The view transition

@@ -2,6 +2,8 @@ import { SiteHeader } from "@/components/toranjan/site-header";
 import { SiteFooter } from "@/components/toranjan/site-footer";
 import { CompareTray } from "@/components/toranjan/compare-tray";
 import { BottomNav } from "@/components/toranjan/bottom-nav";
+import { TabSwipe } from "@/components/toranjan/tab-swipe";
+import { PageTransition } from "@/components/toranjan/page-transition";
 import { IntroCurtain } from "@/components/toranjan/intro/intro-curtain";
 
 /**
@@ -25,7 +27,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
     // before the first paint.
     <IntroCurtain>
       <SiteHeader />
-      {children}
+      <PageTransition>{children}</PageTransition>
       <SiteFooter />
       {/* The bottom bar is `fixed`, so unlike the compare tray it does hover
           over the end of the page. Padding the footer is safe here for the
@@ -46,6 +48,10 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           something is in it. */}
       <CompareTray />
       <BottomNav />
+      {/* Renders nothing: listeners and a direction attribute. It has to sit
+          outside the page for the same reason the tray does — the gesture
+          survives the navigation it causes. */}
+      <TabSwipe />
     </IntroCurtain>
   );
 }
