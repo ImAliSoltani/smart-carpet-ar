@@ -26,6 +26,13 @@ Corners = tuple[Corner, Corner, Corner, Corner]  # tl, tr, br, bl
 # A detected quad must cover at least this fraction of the frame, otherwise we
 # have almost certainly locked onto a motif *inside* the carpet.
 MIN_AREA_RATIO = 0.25
+# And no more than this, or it is the photograph's own border rather than
+# anything in the photograph. See the note in `detect_corners`: the frame is a
+# perfect rectangle covering everything, so it wins on score against every real
+# carpet, and it is also exactly what the no-detection fallback returns. 0.93
+# rather than something tighter because a rug shot edge to edge still leaves a
+# few percent of background in the corners, and that quad is the frame too.
+FRAME_LIKE_RATIO = 0.93
 # Below this, the admin panel opens with the corners pre-filled for review.
 CONFIDENCE_THRESHOLD = 0.55
 
@@ -132,6 +139,33 @@ def detect_corners(image: Image.Image) -> tuple[Corners, float]:
         perimeter = cv2.arcLength(contour, closed=True)
         approx = cv2.approxPolyDP(contour, 0.02 * perimeter, closed=True)
         if len(approx) != 4 or not cv2.isContourConvex(approx):
+            continue
+
+        # **The photograph's own border is not a carpet.**
+        #
+        # Reported from the panel: a rug shot on dark fabric came back with a
+        # black halo baked into the AR file. The detector had returned the whole
+        # frame — and returned it at 0.889 confidence, so nothing was flagged for
+        # review and the shopkeeper was never told to look.
+        #
+        # It is the score that does this. `regularity * (0.5 + 0.5 * coverage)`
+        # pays for being rectangle-like and for being large, and the image
+        # boundary is a perfect rectangle covering everything: a guaranteed 1.0
+        # that no real carpet can beat. Whenever the background reaches the
+        # edges — a floor, a cloth, a wall — Canny finds that boundary and it
+        # wins.
+        #
+        # Dropping the coverage term does not help: the frame still scores 1.0
+        # on regularity alone. The frame has to be excluded rather than
+        # out-scored.
+        #
+        # And excluding it costs nothing, because it is the fallback. A quad
+        # this size says exactly what «no carpet found» says, so returning it as
+        # a *detection* only adds a false confidence to it. When the carpet
+        # really does fill the frame — every image in our generated catalogue —
+        # the fallback below returns the same four corners, with a 0 that tells
+        # the truth: nothing was detected, the whole picture was used.
+        if area >= frame_area * FRAME_LIKE_RATIO:
             continue
 
         corners = order_corners(approx / scale)

@@ -9,7 +9,12 @@ import pytest
 from PIL import Image, ImageDraw
 
 from app.ar.glb_builder import build_carpet_glb
-from app.ar.rectify import detect_corners, order_corners, rectify
+from app.ar.rectify import (
+    CONFIDENCE_THRESHOLD,
+    detect_corners,
+    order_corners,
+    rectify,
+)
 from app.ar.usdz_builder import ALIGNMENT, build_carpet_usdz
 
 
@@ -92,6 +97,56 @@ class TestCornerDetection:
     def test_reports_no_confidence_on_a_featureless_photo(self):
         _, confidence = detect_corners(Image.new("RGB", (900, 700), (200, 200, 200)))
         assert confidence == 0.0, "a blank frame must not claim a detection"
+
+    def test_the_photographs_own_border_is_never_the_carpet(self):
+        """Reported: a rug shot on dark fabric baked a black halo into its AR file.
+
+        The detector had returned the entire frame — background and all — at
+        0.889 confidence, so `needs_review` was false and nobody was told to
+        look. It is the score that does it: `regularity * (0.5 + 0.5 *
+        coverage)` pays for being rectangle-like and for being large, and the
+        image boundary is a flawless rectangle covering everything. Whenever the
+        background reaches the edges, Canny finds that boundary and it beats
+        every real carpet.
+
+        Reproducing it took a few goes, and the shape of the failure is the
+        interesting part: cloth texture alone is not enough, because a contour
+        that runs off every side of the picture is not a closed quadrilateral.
+        What closes one is a **tonal step just inside the crop** — the ordinary
+        edge of an ordinary photograph. Eight pixels of it is enough to hand the
+        detector a flawless rectangle, and it takes it at 0.999.
+        """
+        margin = 8
+        image = Image.new("RGB", (1000, 1400), (150, 150, 158))
+        draw = ImageDraw.Draw(image)
+        draw.rectangle(
+            [margin, margin, 999 - margin, 1399 - margin], fill=(38, 38, 44)
+        )
+        # Cloth, so the background is not a flat field the detector can dismiss.
+        for y in range(margin, 1400 - margin, 7):
+            draw.line([(margin, y), (1000 - margin, y)], fill=(58, 58, 66), width=2)
+        # The rug, well inside the frame — a quarter of the picture is not it.
+        rug = ((250, 380), (760, 380), (760, 1040), (250, 1040))
+        draw.polygon(rug, fill=(150, 140, 120))
+        draw.polygon(
+            [(x + (505 - x) * 0.12, y + (710 - y) * 0.12) for x, y in rug],
+            outline=(240, 230, 205),
+            width=16,
+        )
+
+        corners, confidence = detect_corners(image)
+
+        width, height = image.size
+        spans_the_frame = (
+            max(x for x, _ in corners) - min(x for x, _ in corners) > width * 0.95
+            and max(y for _, y in corners) - min(y for _, y in corners) > height * 0.95
+        )
+        # Either it found the rug, or it admits it found nothing. What it may
+        # not do is hand back the whole photograph wearing a high confidence —
+        # that is the one answer that gets baked into a `.glb` unquestioned.
+        assert not (spans_the_frame and confidence >= CONFIDENCE_THRESHOLD), (
+            f"claimed the whole frame is the carpet at {confidence} confidence"
+        )
 
 
 class TestRectify:
