@@ -49,8 +49,18 @@ const ITEMS = [
   { href: "/cart", label: "سبد خرید", icon: ShoppingBag },
 ] as const;
 
-/** How wide the label may open to. Sized from «جست‌وجوی بصری», the longest. */
-const LABEL_WIDTH = 84;
+/**
+ * The label opens to whatever its own words need — `auto`, not a constant.
+ *
+ * It was 84px, «sized from جست‌وجوی بصری, the longest», and that was measured
+ * wrong: at 12.5px Vazirmatn that label is **90.3px**, so the one item whose
+ * name is the reason this bar exists was the one clipped mid-word. A fixed
+ * width also means every future label is a silent bet, and Persian labels are
+ * not short.
+ *
+ * Framer measures the natural width to animate into, so the spring survives.
+ */
+const LABEL_WIDTH = "auto";
 
 function isCurrent(pathname: string, href: string) {
   // `/carpets` must also own `/carpets/{slug}` and its AR page, or browsing a
@@ -93,7 +103,21 @@ export function BottomNav() {
           // The inset is the gesture bar on a phone without a home button. Left
           // out, the pill sits under the system indicator and the last item is
           // the one that suffers.
-          className="fixed inset-x-0 z-30 mx-auto flex w-fit max-w-[95vw] items-center gap-1 rounded-full border border-line bg-paper/95 p-2 shadow-[0_10px_40px_-18px_rgba(24,24,27,0.5)] backdrop-blur-md lg:hidden"
+          // Every number here was bought, and the budget is the reason.
+          //
+          // Four resting items sit at their 44px floor — §3-5, not negotiable —
+          // so 176px is spent before anything is drawn. The open item is its
+          // icon, its padding and its word: 143px when that word is
+          // «جست‌وجوی بصری». That leaves the gaps, the pill's own padding and
+          // the cap, and on a 360px Android all three together decide whether
+          // the label is whole or clamped mid-word.
+          //
+          // `gap-0.5` and `p-1.5` give back 12px, and the cap becomes the
+          // viewport less a 6px margin each side rather than 95vw — 348px
+          // instead of 342 on that phone, against 339 needed. `max-w` still
+          // exists because a pill wider than the screen is worse than a clipped
+          // one, and because §3-5 forbids horizontal scroll on the document.
+          className="fixed inset-x-0 z-30 mx-auto flex w-fit max-w-[calc(100vw-0.75rem)] items-center gap-0.5 rounded-full border border-line bg-paper/95 p-1.5 shadow-[0_10px_40px_-18px_rgba(24,24,27,0.5)] backdrop-blur-md lg:hidden"
           style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
         >
           {ITEMS.map((item) => {
@@ -150,7 +174,13 @@ export function BottomNav() {
                     marginInlineStart: active ? 8 : 0,
                   }}
                   transition={{ duration: reduced ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden whitespace-nowrap text-[12.5px] leading-[1.9]"
+                  // Below 360px there is no arithmetic that fits five 44px
+                  // targets and a Persian word: the icons alone are 176 and the
+                  // open item is 143. So the word is not drawn at all rather
+                  // than drawn half — the tint still says which item is
+                  // current, and `aria-label` on the link says its name whether
+                  // or not the word is painted.
+                  className="overflow-hidden whitespace-nowrap text-[12.5px] leading-[1.9] max-[359px]:hidden"
                 >
                   {item.label}
                 </motion.span>

@@ -61,6 +61,43 @@ test.describe("on a phone", () => {
     }
   });
 
+  test("shows the longest label whole, and never a word cut in half", async ({ page }) => {
+    // Reported: «جست‌وجوی بصری کامل جا نمی‌شه، زشت شده». The label box was a
+    // constant sized by eye at 84px; the word is 90.3px at 12.5px Vazirmatn, so
+    // the one item whose name is the reason this bar exists was the one clipped.
+    //
+    // Asserted as «the text is not wider than the box that draws it», which is
+    // the actual complaint and stays true whatever the width becomes. A test on
+    // the number would have to be rewritten by anyone who changes the wording,
+    // and would pass for a label that had been clipped to a new constant.
+    await page.goto("/visual-search?intro=0");
+
+    const label = page
+      .getByRole("navigation", NAV)
+      .getByRole("link", { name: "جست‌وجوی بصری" })
+      .locator("span")
+      .last();
+
+    await expect(label).toBeVisible();
+    const clipped = await label.evaluate(
+      (el) => el.scrollWidth > Math.ceil(el.getBoundingClientRect().width) + 1,
+    );
+    expect(clipped).toBe(false);
+
+    // And the pill it grew to fit must still be on the screen. §3-5 forbids the
+    // document scrolling sideways, and being clamped by `max-w` is the same
+    // clipped word by another route.
+    const overflows = await page.evaluate(() => {
+      const nav = document.querySelector('nav[aria-label="ناوبری اصلی"]')!;
+      const r = nav.getBoundingClientRect();
+      return r.left < -0.5 || r.right > window.innerWidth + 0.5;
+    });
+    expect(overflows).toBe(false);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+      await page.evaluate(() => document.documentElement.clientWidth),
+    );
+  });
+
   test("gets out of the way when the compare tray takes the bottom", async ({ page }) => {
     // Both live at the bottom of the screen and the tray is `sticky` at a
     // higher layer, so leaving the bar in place does not hide it — it

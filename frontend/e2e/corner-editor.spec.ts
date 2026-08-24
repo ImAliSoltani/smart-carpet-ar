@@ -64,11 +64,20 @@ test("a slow drag moves the handle by as much as the pointer moved", async ({ pa
   const movedX = after.x - before.x;
   const movedY = after.y - before.y;
 
-  // One pixel of slack per axis: the handle is positioned as a percentage of a
-  // frame whose width is not a whole number of pixels, so exact equality is
-  // stricter than the thing being tested.
-  expect(Math.abs(movedX - STEPS)).toBeLessThanOrEqual(1);
-  expect(Math.abs(movedY - STEPS)).toBeLessThanOrEqual(1);
+  // Two pixels of slack per axis. The handle is placed as a percentage of a
+  // frame whose width is not a whole number of pixels, and the mobile project
+  // runs at a device ratio of 2.625 — so a 40px drag lands 1 to 1.5px off, and
+  // asking for ±1 made this test flaky rather than strict. It does not
+  // accumulate: the position is recomputed from the pointer on every move
+  // rather than added to, so this is rounding of one final value.
+  //
+  // The tolerance is still nowhere near the bug it guards. That one moved the
+  // handle 173px for 40px of pointer.
+  //
+  // Caught by running the whole suite; ±1 had passed five times in a row on
+  // chromium, which is the wrong browser to repeat a sub-pixel test on.
+  expect(Math.abs(movedX - STEPS)).toBeLessThanOrEqual(2);
+  expect(Math.abs(movedY - STEPS)).toBeLessThanOrEqual(2);
 });
 
 test("grabbing a handle off-centre does not move the corner", async ({ page }) => {
