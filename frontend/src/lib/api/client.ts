@@ -35,6 +35,11 @@ export class ApiError extends Error {
     readonly status: number,
     message: string,
     readonly detail?: unknown,
+    /**
+     * Seconds until the same request is worth making again, from `Retry-After`.
+     * Present on the 429s the limiters raise, absent everywhere else.
+     */
+    readonly retryAfter?: number,
   ) {
     super(message);
     this.name = "ApiError";
@@ -44,6 +49,33 @@ export class ApiError extends Error {
   get isTransient(): boolean {
     return this.status === 0 || this.status >= 500;
   }
+}
+
+/**
+ * `Retry-After`, in seconds.
+ *
+ * The header is allowed to be either a count of seconds or an HTTP date, and
+ * ours is always the count — but reading only the count would mean a proxy or
+ * a CDN inserting the date form silently turns a countdown into nothing, which
+ * is a failure nobody would think to look for. Both are handled; anything else
+ * is `undefined` rather than `NaN`, so the caller's «is there a number» check
+ * is the only check it needs.
+ *
+ * The header is readable at all because the API is same-origin: `/api` is
+ * rewritten by this server in development (next.config.ts) and served behind
+ * one host by Caddy in production. A genuinely cross-origin API would need
+ * `Access-Control-Expose-Headers` before any of this arrived.
+ */
+function retryAfterSeconds(response: Response): number | undefined {
+  const raw = response.headers.get("Retry-After");
+  if (!raw) return undefined;
+
+  const seconds = Number(raw.trim());
+  if (Number.isFinite(seconds)) return Math.max(0, Math.round(seconds));
+
+  const at = Date.parse(raw);
+  if (Number.isNaN(at)) return undefined;
+  return Math.max(0, Math.round((at - Date.now()) / 1000));
 }
 
 /**
@@ -133,7 +165,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   if (response.status === 204) return undefined as T;
 
   const body = await response.json().catch(() => undefined);
-  if (!response.ok) throw new ApiError(response.status, messageFor(response.status, body), body);
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      messageFor(response.status, body),
+      body,
+      retryAfterSeconds(response),
+    );
+  }
   return body as T;
 }
 

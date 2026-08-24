@@ -199,10 +199,27 @@ class SlidingWindowLimiter:
     them would either strangle browsing or leave the models exposed.
     """
 
-    def __init__(self, *, limit: int, window_seconds: float, name: str) -> None:
+    #: What a caller over budget is told when the bucket does not say otherwise.
+    #: Phrased for the resource-protection case, which is what most buckets are.
+    DEFAULT_DETAIL = "درخواست‌های شما بیش از حد مجاز است؛ کمی بعد دوباره تلاش کنید"
+
+    def __init__(
+        self,
+        *,
+        limit: int,
+        window_seconds: float,
+        name: str,
+        detail: str | None = None,
+    ) -> None:
         self.limit = limit
         self.window_seconds = window_seconds
         self.name = name
+        # A bucket that counts *failed logins* is not throttling a resource, it
+        # is refusing a guess, and «درخواست‌های شما بیش از حد مجاز است» describes
+        # the wrong thing to the one person this product's panel belongs to. The
+        # sentence belongs to the bucket rather than to the endpoint because the
+        # endpoint never sees this path — `check` raises straight past it.
+        self.detail = detail or self.DEFAULT_DETAIL
         self._hits: dict[str, list[float]] = defaultdict(list)
 
     def check(self, client_key: str, *, record: bool = True) -> None:
@@ -219,7 +236,7 @@ class SlidingWindowLimiter:
             retry_after = max(1, int(self.window_seconds - (now - recent[0])))
             raise HTTPException(
                 status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="درخواست‌های شما بیش از حد مجاز است؛ کمی بعد دوباره تلاش کنید",
+                detail=self.detail,
                 headers={"Retry-After": str(retry_after)},
             )
         if record:

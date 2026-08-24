@@ -58,6 +58,32 @@ export function formatSize(widthCm: number, lengthCm: number): string {
 }
 
 /**
+ * ۰۴:۳۲ — a duration counting down, not a time of day.
+ *
+ * Its own formatter rather than `faDigits`, for two reasons that both show up
+ * only once it is on screen ticking. **`minimumIntegerDigits: 2`** is what pads
+ * the seconds: without it the clock reads «۴:۹» at nine seconds past, which is
+ * not a shorter way of writing a time, it is a different one. **`useGrouping:
+ * false`** is what stops sixty *minutes* — a limiter window is free to be long
+ * — from being printed as «۱٬۰۰۰», a thousand-separator inside a clock.
+ *
+ * Rendered `dir="ltr"` with `tabular-nums` wherever it is used: a clock is
+ * left-to-right in Persian too, and proportional digits make the whole line
+ * shuffle sideways on every tick.
+ */
+const faClockPart = new Intl.NumberFormat("fa-IR", {
+  minimumIntegerDigits: 2,
+  useGrouping: false,
+});
+
+export function formatClock(totalSeconds: number): string {
+  const whole = Math.max(0, Math.ceil(totalSeconds));
+  const minutes = Math.floor(whole / 60);
+  const seconds = whole % 60;
+  return `${faClockPart.format(minutes)}:${faClockPart.format(seconds)}`;
+}
+
+/**
  * ۱۶ مرداد ۱۴۰۵ — a Jalali date, which is the only calendar these dates are
  * ever read in.
  *

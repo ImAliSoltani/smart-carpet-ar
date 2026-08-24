@@ -19,7 +19,17 @@ SESSION_COOKIE = "farsh_admin_session"
 
 #: Failed logins only — see `SlidingWindowLimiter.check(record=False)`. Five in
 #: five minutes is generous for a person and hopeless for a dictionary.
-login_limiter = SlidingWindowLimiter(limit=5, window_seconds=300, name="admin-login")
+#:
+#: The sentence deliberately does not say «کمی بعد»: the response carries
+#: `Retry-After`, the panel's login page counts it down on screen, and a message
+#: that says «a little later» while a clock beside it says «۰۴:۳۲» is the vaguer
+#: of the two winning. It names the reason; the clock names the time.
+login_limiter = SlidingWindowLimiter(
+    limit=5,
+    window_seconds=300,
+    name="admin-login",
+    detail="تلاش‌های ناموفق بیش از حد مجاز بود؛ ورود موقتاً بسته شده است",
+)
 
 
 def _signer() -> TimestampSigner:

@@ -133,6 +133,31 @@ def test_limiter_reports_when_to_come_back() -> None:
     assert excinfo.value.headers["Retry-After"]
 
 
+def test_a_locked_out_login_says_how_long_and_says_it_is_about_attempts(
+    client: TestClient,
+) -> None:
+    """The two things the login page needs in order to draw its clock.
+
+    `Retry-After` is the number it counts down; the detail is the sentence
+    printed beside it. The generic bucket message — «درخواست‌های شما بیش از حد
+    مجاز است» — describes a throttled *resource*, which is the wrong thing to
+    tell the one person the panel belongs to when what happened is that a
+    password was guessed wrong five times.
+    """
+    auth_service.login_limiter.reset()
+    for _ in range(auth_service.login_limiter.limit):
+        client.post("/api/v1/admin/login", json={"username": "admin", "password": "wrong"})
+
+    locked = client.post(
+        "/api/v1/admin/login", json={"username": "admin", "password": "wrong"}
+    )
+    assert locked.status_code == 429
+    assert 0 < int(locked.headers["Retry-After"]) <= auth_service.login_limiter.window_seconds
+    assert "تلاش" in locked.json()["detail"]
+    assert locked.json()["detail"] != SlidingWindowLimiter.DEFAULT_DETAIL
+    auth_service.login_limiter.reset()
+
+
 def test_successful_logins_do_not_count_against_the_limit() -> None:
     """A shopkeeper cannot lock themselves out by using their own panel.
 
