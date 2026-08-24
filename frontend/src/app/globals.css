@@ -1157,6 +1157,31 @@ body {
   mix-blend-mode: normal !important;
 }
 
+/* **The bar changes with the page, in one beat.**
+   Reported: «تپ بار محو می‌شود و بعد دوباره از اول ساخته می‌شود». Unnamed, the
+   bar was part of `root` and cross-faded with the rest of the chrome — so for
+   380ms two bars were on screen at once, one showing the tab being left and one
+   showing the tab arriving, dissolving through each other. That reads as being
+   rebuilt, and it is out of step with a page sliding at 420.
+
+   Named, it gets a group of its own that does not move, and the pair swaps
+   without a fade: the bar is showing the new tab from the first frame of the
+   slide. One change, at one moment, which is what «باید یکی باشند» asks for.
+
+   `animation: none` on both halves rather than a shorter fade — a fast fade is
+   still two bars, just briefly. */
+:root[data-nav]::view-transition-group(bottom-nav) {
+  opacity: 1 !important;
+}
+:root[data-nav]::view-transition-old(bottom-nav) {
+  animation: none !important;
+  opacity: 0 !important;
+}
+:root[data-nav]::view-transition-new(bottom-nav) {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
 /* Higher index, which is further left on screen: the strip moves right. */
 :root[data-nav="next"]::view-transition-old(shop-page) {
   animation-name: tab-exit-right !important;

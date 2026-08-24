@@ -103,7 +103,15 @@ export function BottomNav() {
           // exists because a pill wider than the screen is worse than a clipped
           // one, and because §3-5 forbids horizontal scroll on the document.
           className="fixed inset-x-0 z-30 mx-auto flex w-fit max-w-[calc(100vw-0.75rem)] items-center gap-0.5 rounded-full border border-line bg-paper/95 p-1.5 shadow-[0_10px_40px_-18px_rgba(24,24,27,0.5)] backdrop-blur-md lg:hidden"
-          style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
+          // Named so the bar is its own view-transition group rather than part
+          // of the chrome's cross-fade. Unnamed, two bars dissolved through
+          // each other for 380ms on every tab change — the one being left and
+          // the one arriving — which reads as the bar being rebuilt. The rules
+          // that use this name are in `globals.css`.
+          style={{
+            bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))",
+            viewTransitionName: "bottom-nav",
+          }}
         >
           {TABS.map((item, i) => {
             const Icon = item.icon;
@@ -166,7 +174,19 @@ export function BottomNav() {
                     opacity: active ? 1 : 0,
                     marginInlineStart: active ? 8 : 0,
                   }}
-                  transition={{ duration: reduced ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  // Instant, and it was not always. The pill used to spring
+                  // open over 280ms, which was the component's signature and is
+                  // now unwatchable: the bar is snapshotted for the whole 420ms
+                  // of the page transition, so the live element is hidden while
+                  // the spring runs and is already finished by the time it
+                  // reappears. Worse, the snapshot is taken on the frame after
+                  // the commit — catching the label at the *start* of its
+                  // growth and freezing it there, which is exactly the
+                  // half-built bar that was reported.
+                  //
+                  // So the word simply appears, at the same moment the page
+                  // starts to move. One change, one beat.
+                  transition={{ duration: 0 }}
                   // Below 360px there is no arithmetic that fits five 44px
                   // targets and a Persian word: the icons alone are 176 and the
                   // open item is 143. So the word is not drawn at all rather

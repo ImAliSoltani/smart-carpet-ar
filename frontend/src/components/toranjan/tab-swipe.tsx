@@ -93,16 +93,42 @@ export function TabSwipe() {
       start.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
     };
 
-    const onUp = (event: PointerEvent) => {
+    /**
+     * Decided here, on the way, rather than on release.
+     *
+     * **This is the whole reason it did nothing on a real phone.** The first
+     * version waited for `pointerup`, and on a touchscreen that event often
+     * never comes: the moment the browser decides a finger is panning it takes
+     * the gesture for itself and sends `pointercancel` instead. Every swipe
+     * that mattered was cancelled before it was measured.
+     *
+     * The tests did not catch it because they dispatch a `pointerdown` and a
+     * `pointerup` directly, so there was never a cancel to lose to. They proved
+     * the handler and not the platform — which is the more useful half of the
+     * lesson.
+     *
+     * Crossing the threshold is now the decision, so a cancel arriving
+     * afterwards is simply too late to matter.
+     */
+    const onMove = (event: PointerEvent) => {
       const from = start.current;
-      start.current = null;
       if (!from || from.id !== event.pointerId) return;
 
       const dx = event.clientX - from.x;
       const dy = event.clientY - from.y;
+
+      // A drag that commits to vertical is a scroll, and it stays one: dropping
+      // the origin here stops a long diagonal from turning into a swipe halfway
+      // down the page.
+      if (Math.abs(dy) > SWIPE_MIN_PX && Math.abs(dy) > Math.abs(dx)) {
+        start.current = null;
+        return;
+      }
+
       if (Math.abs(dx) < SWIPE_MIN_PX) return;
       if (Math.abs(dx) < Math.abs(dy) * SWIPE_DOMINANCE) return;
 
+      start.current = null;
       // The page follows the finger. Index 0 is the rightmost tab, so a higher
       // index is further left on screen and reaching it moves the strip right —
       // which is a finger travelling right. The reasoning is written out in
@@ -110,16 +136,28 @@ export function TabSwipe() {
       go(dx > 0 ? "next" : "prev");
     };
 
-    // Passive: this never calls `preventDefault`. Scrolling has to stay
-    // completely unaffected while the gesture is still ambiguous, and it is only
-    // resolved on release — by which time the scroll, if it was one, has already
-    // happened and no tab changes because the vertical component won.
+    // `pointerup` stays as well, for the pointer stream that is never cancelled:
+    // a pen, a mouse-emulating device, and the synthetic pairs the tests send.
+    const onUp = (event: PointerEvent) => {
+      onMove(event);
+      start.current = null;
+    };
+
+    const onCancel = () => {
+      start.current = null;
+    };
+
+    // Passive throughout: this never calls `preventDefault`, so scrolling is
+    // untouched while the gesture is still ambiguous.
     window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
-    window.addEventListener("pointercancel", () => (start.current = null), { passive: true });
+    window.addEventListener("pointercancel", onCancel, { passive: true });
     return () => {
       window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
     };
   }, [go]);
 
