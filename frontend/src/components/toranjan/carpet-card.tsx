@@ -134,7 +134,8 @@ export function CarpetCard({
       // the pointer goes in a hurry.
       whileHover={reduced ? undefined : { y: -4 }}
     >
-      <Card className="group w-full overflow-hidden rounded-md border-line bg-paper shadow-none transition-shadow duration-300 hover:shadow-[0_24px_50px_-32px_rgba(24,24,27,0.45)]">
+      {/* `relative` is what the whole-card target below is measured against. */}
+      <Card className="group relative w-full overflow-hidden rounded-md border-line bg-paper shadow-none transition-shadow duration-300 hover:shadow-[0_24px_50px_-32px_rgba(24,24,27,0.45)]">
         {/* The half of the shared transition that lives in the grid. React adds
             no element of its own here — it writes `view-transition-name` onto
             the frame below for the length of the navigation and takes it off
@@ -146,7 +147,11 @@ export function CarpetCard({
             morphing out of a frame that stays behind reads as two things
             happening instead of one. */}
         <ViewTransition name={carpetPhotoName(carpet.slug)} default={CARPET_PHOTO_CLASS}>
-          <Link href={href} className="relative block aspect-3/4 overflow-hidden bg-bg">
+          {/* `z-10` keeps this link — and the arrows, dots and corner toggles
+              inside it — above the whole-card target the title stretches over
+              the frame. Without it the overlay would swallow the carousel, and
+              paging through a gallery would open the carpet instead. */}
+          <Link href={href} className="relative z-10 block aspect-3/4 overflow-hidden bg-bg">
             {/* The drift lives on a layer of its own, not on the photograph.
                 The photograph already owns a transform — the hover scale below
                 — and two rules writing `transform` on one element means the
@@ -310,10 +315,25 @@ export function CarpetCard({
             {PATTERN_LABEL[carpet.pattern]} · {MATERIAL_LABEL[carpet.material]}
           </p>
 
+          {/* The name is also the whole card.
+
+              «Anywhere on the card should open it» is answered by stretching
+              *this* link over the frame with an `::after`, rather than by
+              wrapping the card in an anchor or by having a div listen for
+              clicks. An anchor around the card would nest the wishlist button,
+              the compare toggle and the carousel arrows inside a link, which is
+              invalid and makes each of them ambiguous to a keyboard; a click
+              handler on a div would give a pointer a target that a keyboard and
+              «open in new tab» never get.
+
+              This way there is exactly one link, it is the name — which is what
+              a screen reader should announce and what a middle click should act
+              on — and the pointer target is the whole card. Everything that has
+              its own job is lifted above the overlay with `z-10`. */}
           <h3 className="mt-2 line-clamp-2 min-h-[3.6em] text-sm leading-[1.8]">
             <Link
               href={href}
-              className="bg-[linear-gradient(var(--ink),var(--ink))] bg-[length:0_1px] bg-[position:right_bottom] bg-no-repeat transition-[background-size] duration-[550ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:bg-[length:100%_1px]"
+              className="bg-[linear-gradient(var(--ink),var(--ink))] bg-[length:0_1px] bg-[position:right_bottom] bg-no-repeat transition-[background-size] duration-[550ms] ease-[cubic-bezier(.16,1,.3,1)] after:absolute after:inset-0 after:content-[''] group-hover:bg-[length:100%_1px]"
             >
               {carpet.name}
             </Link>
@@ -350,7 +370,9 @@ export function CarpetCard({
             variant="outline"
             // `h-11`: the outline variant defaults to 40px, four short of the
             // §3-5 floor, and this is the card's only action.
-            className="h-11 w-full gap-2 rounded-full border-line-2 transition-colors duration-[--dur-feedback] hover:bg-cta hover:text-on-cta"
+            // `relative z-10`: this is the one control on the card that leads
+            // somewhere else, so it has to stay above the whole-card target.
+            className="relative z-10 h-11 w-full gap-2 rounded-full border-line-2 transition-colors duration-[--dur-feedback] hover:bg-cta hover:text-on-cta"
           >
             <Link href={`${href}#ar`}>
               <Cuboid className="size-[18px] text-accent" />

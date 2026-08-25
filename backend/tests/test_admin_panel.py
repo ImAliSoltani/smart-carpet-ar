@@ -110,6 +110,100 @@ def test_confirmed_total_ignores_pending_orders(admin_client):
     assert float(confirmed["confirmed_total"]) == 12000000
 
 
+def test_an_order_line_points_back_at_its_carpet(admin_client):
+    """Reported from the panel: an order is a list of names and nothing else.
+
+    The line stores the name, the size and the price it was placed at, and that
+    is right — a later catalogue edit must not rewrite the history of an order.
+    But a name is not how anybody recognises a rug, and the next thing a
+    shopkeeper does after reading an order is go and look at the carpet.
+
+    The two assertions that matter are the id, which is what the panel's own
+    link is built from, and the picture. Both hang off the variant the line
+    still points at.
+    """
+    carpet = _carpet(admin_client, "qom-silk", "فرش قم ابریشم")
+    variant = admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/variants",
+        json={"width_cm": 150, "length_cm": 200, "price": "90000000", "stock": 3},
+    ).json()
+    admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/images",
+        files={"file": ("a.png", _png((30, 60, 140)), "image/png")},
+    )
+
+    placed = admin_client.post(
+        "/api/v1/orders",
+        json={
+            "customer_name": "علی سلطانی",
+            "customer_phone": "09121234567",
+            "address": "تهران، خیابان ولیعصر",
+            "items": [{"variant_id": variant["id"], "quantity": 1}],
+        },
+    )
+
+    # The buyer's own view of the same line stays as narrow as it was: this is
+    # a subclass in the panel's schemas, not three more fields on the public
+    # one. None of it is secret — it is the catalogue — it is simply not part
+    # of the answer to «where is my order».
+    assert set(placed.json()["items"][0]) == {
+        "carpet_name",
+        "width_cm",
+        "length_cm",
+        "unit_price",
+        "quantity",
+    }
+
+    order = admin_client.get("/api/v1/admin/orders").json()[0]
+    line = order["items"][0]
+    assert line["carpet_id"] == carpet["id"]
+    assert line["carpet_image"], "the line arrived without the carpet's photograph"
+
+    # The status reply is written straight into the panel's cached list rather
+    # than refetched, so it has to carry the same thing — otherwise confirming
+    # an order blanks every picture on the screen.
+    changed = admin_client.patch(
+        f"/api/v1/admin/orders/{order['id']}", json={"status": "confirmed"}
+    ).json()
+    assert changed["items"][0]["carpet_id"] == carpet["id"]
+    assert changed["items"][0]["carpet_image"] == line["carpet_image"]
+
+
+def test_a_line_whose_size_was_deleted_keeps_its_text(admin_client):
+    """Deleting a size must not take the order with it.
+
+    `variant_id` is `ON DELETE SET NULL` so that the order stays readable, which
+    means the way back to the carpet is genuinely gone — and the panel has to be
+    told that rather than handed a link that leads nowhere.
+    """
+    carpet = _carpet(admin_client, "kerman-cream", "فرش کرمان کرم")
+    variant = admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/variants",
+        json={"width_cm": 200, "length_cm": 300, "price": "30000000", "stock": 1},
+    ).json()
+    admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/images",
+        files={"file": ("a.png", _png((200, 190, 160)), "image/png")},
+    )
+    admin_client.post(
+        "/api/v1/orders",
+        json={
+            "customer_name": "علی سلطانی",
+            "customer_phone": "09121234567",
+            "address": "تهران، خیابان انقلاب، پلاک ۱۲",
+            "items": [{"variant_id": variant["id"], "quantity": 1}],
+        },
+    )
+
+    assert admin_client.delete(f"/api/v1/admin/variants/{variant['id']}").status_code == 204
+
+    line = admin_client.get("/api/v1/admin/orders").json()[0]["items"][0]
+    assert line["carpet_name"] == "فرش کرمان کرم"
+    assert line["width_cm"] == 200 and line["length_cm"] == 300
+    assert line["carpet_id"] is None
+    assert line["carpet_image"] is None
+
+
 def test_tracking_does_not_echo_the_delivery_address(admin_client):
     """The other half of why the admin order shape is its own.
 

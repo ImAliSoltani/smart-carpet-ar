@@ -200,6 +200,86 @@ def test_corner_suggestion_reports_confidence(admin_client):
     assert suggestion["needs_review"] == (suggestion["confidence"] < 0.55)
 
 
+def test_the_editor_reopens_on_the_crop_the_files_were_built_from(admin_client):
+    """Reported from the panel: correct the corners, build, leave, come back —
+    and the editor is showing the old automatic crop again.
+
+    Nothing recorded what a build had used, so `suggest_corners` had only one
+    answer to give and gave it every time: run detection now. For a carpet
+    nobody had corrected that looked right, because detection is deterministic.
+    For a corrected one it silently threw the correction away on screen while
+    the files on disk kept it — so the one view of the crop disagreed with the
+    product, and pressing rebuild from that screen undid the fix.
+
+    Both halves are asserted, because either alone can pass while the bug is
+    live: `corners` has to *become* the manual ones, and `detected` has to stay
+    what the detector says — that is what «بازگرداندن گوشه‌های تشخیص‌داده‌شده»
+    puts back, and a version that simply renamed the field would break it.
+    """
+    carpet = _make_carpet(admin_client, slug="corners-remembered", sizes=((200, 300),))
+    admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/images",
+        files={"file": ("carpet.png", _carpet_photo(), "image/png")},
+    )
+    corners_url = f"/api/v1/admin/carpets/{carpet['id']}/ar/corners"
+
+    before = admin_client.get(corners_url).json()
+    assert before["source"] == "detected", "nothing has been built yet"
+    assert before["corners"] == before["detected"]
+
+    # Deliberately not where the detector would put them, so that «did it come
+    # back» cannot be satisfied by a coincidence.
+    manual = [
+        {"x": 100.0, "y": 80.0},
+        {"x": 700.0, "y": 90.0},
+        {"x": 690.0, "y": 500.0},
+        {"x": 110.0, "y": 495.0},
+    ]
+    assert manual != before["detected"]
+
+    built = admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/ar/generate", json={"corners": manual}
+    )
+    assert built.json()["status"] == "ready", built.text
+
+    after = admin_client.get(corners_url).json()
+    assert after["corners"] == manual, (
+        "the editor reopened on a fresh detection instead of the crop the AR "
+        "files standing on disk were actually built from"
+    )
+    assert after["source"] == "manual"
+    assert after["detected"] == before["detected"], (
+        "detection is what the «back to automatic» button puts back; it must "
+        "still be reported beside the saved crop"
+    )
+    # A crop a person placed is not a crop to warn them about, however unsure
+    # the detector was about its own answer.
+    assert after["needs_review"] is False
+
+
+def test_an_automatic_build_is_remembered_as_automatic(admin_client):
+    """The same memory, for the build nobody touched.
+
+    Worth its own test because the two are stored by one line and told apart by
+    one flag: if the pipeline wrote its `corners` argument rather than the
+    corners rectification actually used, this case would save nothing at all —
+    the argument is `None` here — and the screen would go back to guessing.
+    """
+    carpet = _make_carpet(admin_client, slug="corners-automatic", sizes=((200, 300),))
+    admin_client.post(
+        f"/api/v1/admin/carpets/{carpet['id']}/images",
+        files={"file": ("carpet.png", _carpet_photo(), "image/png")},
+    )
+    corners_url = f"/api/v1/admin/carpets/{carpet['id']}/ar/corners"
+    detected = admin_client.get(corners_url).json()["detected"]
+
+    admin_client.post(f"/api/v1/admin/carpets/{carpet['id']}/ar/generate")
+
+    after = admin_client.get(corners_url).json()
+    assert after["source"] == "automatic"
+    assert after["corners"] == detected
+
+
 def test_generation_refuses_without_photo_or_sizes(admin_client):
     sizeless = admin_client.post(
         "/api/v1/admin/carpets",

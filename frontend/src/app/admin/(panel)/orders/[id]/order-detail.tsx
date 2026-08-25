@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, Loader2, Phone } from "lucide-react";
+import { ArrowRight, Check, ImageOff, Loader2, Phone } from "lucide-react";
 
 import { EASE_OUT, ENTER, GoldRule, staggerDelay } from "@/components/toranjan/admin-motion";
 import { OrderStatusBadge } from "@/components/toranjan/order-status-badge";
 import { adminKeys, ordersQuery, setOrderStatus } from "@/lib/api/admin";
-import { ApiError } from "@/lib/api/client";
+import { ApiError, mediaUrl } from "@/lib/api/client";
 import type { AdminOrder, OrderStatus } from "@/lib/api/types";
 import { formatDateTime, formatNumber, formatSize, formatToman } from "@/lib/format";
 import { ORDER_STATUS } from "@/lib/taxonomy";
@@ -53,6 +54,84 @@ const FLOW: { to: OrderStatus; label: string; hint: string; tone: "primary" | "q
     tone: "danger",
   },
 ];
+
+/**
+ * One line of the order — with the carpet's photograph, and a way into it.
+ *
+ * Reported by the shopkeeper: an order was a list of names. Names are what the
+ * line *stores*, on purpose, so that a later catalogue edit cannot rewrite the
+ * history of an order — but a name is not how anybody recognises a rug, and
+ * from here the next thing to do is almost always to go and look at it.
+ *
+ * The photograph and the link both hang off `carpet_id`, which the line keeps
+ * through its variant. That link can be gone: deleting a size sets the order
+ * line's `variant_id` to null so the order stays readable, and then there is
+ * genuinely no carpet to open. Such a line renders as it always did, with an
+ * empty frame — not as a link that leads nowhere.
+ *
+ * Into the panel, not into the shop. Everything else in here stays in the
+ * panel, and `/admin/carpets/{id}` is where the sizes, the stock and the
+ * photographs of that carpet are.
+ */
+function OrderLine({ item }: { item: AdminOrder["items"][number] }) {
+  const cover = mediaUrl(item.carpet_image);
+  const body = (
+    <>
+      <span className="relative block size-14 shrink-0 overflow-hidden rounded-md border border-line bg-white/[0.04]">
+        {cover ? (
+          <Image
+            src={cover}
+            alt=""
+            fill
+            sizes="56px"
+            // `contain`: the catalogue's photographs are cut out to the weave,
+            // and cropping one cuts the border off the pattern.
+            className="object-contain p-1"
+          />
+        ) : (
+          <ImageOff
+            className="absolute inset-0 m-auto size-4 text-muted"
+            strokeWidth={1.5}
+            aria-hidden
+          />
+        )}
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="block text-[14px] leading-relaxed">{item.carpet_name}</span>
+        <span className="mt-0.5 block text-[13px] text-muted">
+          {formatSize(item.width_cm, item.length_cm)}
+          {item.quantity > 1 && ` · ${formatNumber(item.quantity)} عدد`}
+        </span>
+      </span>
+
+      <span className="text-[14px]">{formatToman(item.unit_price)}</span>
+    </>
+  );
+
+  // `py-3` against the old `py-3.5`: the row is 56px of photograph now, so it
+  // already clears the §3-5 touch floor twice over and the extra padding only
+  // made a five-line order scroll.
+  const shape = "flex items-center gap-3 py-3";
+
+  return (
+    <li className="border-b border-line last:border-b-0">
+      {item.carpet_id ? (
+        <Link
+          href={`/admin/carpets/${item.carpet_id}`}
+          className={cn(
+            shape,
+            "-mx-2 rounded-lg px-2 transition-colors duration-[--dur-feedback] hover:bg-white/[0.04]",
+          )}
+        >
+          {body}
+        </Link>
+      ) : (
+        <div className={shape}>{body}</div>
+      )}
+    </li>
+  );
+}
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -176,19 +255,7 @@ export function OrderDetail({ orderId }: { orderId: number }) {
           <h2 className="mb-2 text-[16px] font-medium">اقلام سفارش</h2>
           <ul>
             {order.items.map((item, i) => (
-              <li
-                key={`${item.carpet_name}-${i}`}
-                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line py-3.5 last:border-b-0"
-              >
-                <div className="min-w-0">
-                  <p className="text-[14px] leading-relaxed">{item.carpet_name}</p>
-                  <p className="mt-0.5 text-[13px] text-muted">
-                    {formatSize(item.width_cm, item.length_cm)}
-                    {item.quantity > 1 && ` · ${formatNumber(item.quantity)} عدد`}
-                  </p>
-                </div>
-                <p className="text-[14px]">{formatToman(item.unit_price)}</p>
-              </li>
+              <OrderLine key={`${item.carpet_name}-${i}`} item={item} />
             ))}
           </ul>
           <div className="mt-4 flex items-baseline justify-between border-t border-line-2 pt-4">

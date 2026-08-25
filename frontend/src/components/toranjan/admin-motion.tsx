@@ -167,10 +167,28 @@ export function CountUp({
   // and no effect has to write it into state to keep it current.
   const shown = counts ? counted : target;
 
-  // `tabular-nums` so the width does not jitter as the digits change. Never
-  // `font-figure`: that face is subset to latin digits and a Persian numeral
-  // sent through it falls back to whatever the system has.
-  const figures = { fontVariantNumeric: "tabular-nums" } as const;
+  // Never `font-figure`: that face is subset to latin digits and a Persian
+  // numeral sent through it falls back to whatever the system has.
+  //
+  // **And never `tabular-nums`, which is what this counter used to carry.**
+  // It was here to stop the width jittering as the digits changed, and it did
+  // — by pushing the digits apart. Reported as «۴۱۱ از ۴۱۱ has a gap between
+  // the first digits», and measured in the browser at 16px in Vazirmatn:
+  //
+  //     ۴۱۱   proportional 18.4px → tabular 31.6px
+  //     411   proportional 27.0px → tabular 27.0px
+  //
+  // The Latin figures do not move because Vazirmatn's Latin digits are already
+  // tabular; asking for the feature only ever pads the Persian ones, by about
+  // 4.4px per glyph at 16px. So the gap was not a spacing bug beside the
+  // figure, it was inside it — and beside a plain `formatNumber` that had no
+  // such padding, the two halves of one sentence stopped matching.
+  //
+  // Nothing replaces it, because nothing needs to: three of the four counters
+  // are the whole line, and text that is alone in its box can change width
+  // without anything appearing to move. The fourth used to be «count از total»
+  // on one line and is now a figure with its total in the hint, like the sales
+  // card beside it.
 
   // The unit is set apart rather than run into the figure. Two reasons, and the
   // second is the one that showed: «۱٬۸۹۹٬۰۰۰ تومان» at 26px wrapped onto a
@@ -180,15 +198,11 @@ export function CountUp({
   if (money) {
     return (
       <span className={cn("whitespace-nowrap", className)}>
-        <span style={figures}>{formatNumber(shown)}</span>
+        <span>{formatNumber(shown)}</span>
         <span className="ms-1.5 text-[0.55em] font-normal text-muted">تومان</span>
       </span>
     );
   }
 
-  return (
-    <span className={cn("whitespace-nowrap", className)} style={figures}>
-      {format(shown)}
-    </span>
-  );
+  return <span className={cn("whitespace-nowrap", className)}>{format(shown)}</span>;
 }

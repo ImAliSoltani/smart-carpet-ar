@@ -204,6 +204,74 @@
         "title": "AdminCarpetRow",
         "type": "object"
       },
+      "AdminOrderItemOut": {
+        "description": "A line of an order, with enough of the carpet to recognise and open it.\n\nA subclass rather than three more fields on `OrderItemOut`, for the reason\nthe panel's other shapes are also subclasses: the public line is what a\nbuyer is shown when they track a parcel, and it should carry the name and\nthe size they bought and nothing else. None of this is secret — it is the\ncatalogue — it is simply not part of the answer to «where is my order».\n\nEvery one of them is optional, and that is the data model rather than\ncaution. `OrderItem.variant_id` is `ON DELETE SET NULL` on purpose, so that\nremoving a size a shop no longer sells leaves the orders that bought it\nreadable; the line keeps its own copy of the name, the size and the price.\nWhat it cannot keep is the way back to the carpet. So a line whose size has\nsince been deleted arrives with the text and no picture, which is exactly\nwhat is true about it.",
+        "properties": {
+          "carpet_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carpet Id"
+          },
+          "carpet_image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Carpet Image"
+          },
+          "carpet_name": {
+            "title": "Carpet Name",
+            "type": "string"
+          },
+          "length_cm": {
+            "title": "Length Cm",
+            "type": "integer"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "unit_price": {
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Unit Price",
+            "type": "string"
+          },
+          "variant_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant Id"
+          },
+          "width_cm": {
+            "title": "Width Cm",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "carpet_name",
+          "width_cm",
+          "length_cm",
+          "unit_price",
+          "quantity"
+        ],
+        "title": "AdminOrderItemOut",
+        "type": "object"
+      },
       "AdminOrderOut": {
         "description": "An order as the shopkeeper needs to see it (ROADMAP §6-17).\n\nSeparate from the public `OrderOut` in both directions.\n\nIt carries **more**: the phone number and address, without which an order\ncannot be fulfilled, and `created_at`, without which a list of orders has\nno order. And `id` — the status endpoint is keyed by id, so a management\ntable built on the public shape could list orders and never change one.\n\nIt also leaves the public shape **alone**, which is the point. Someone\ntracking a parcel proves who they are with a reference and a phone number;\nechoing the delivery address back into that response would put it one\nguessed reference away from a stranger.",
         "properties": {
@@ -230,7 +298,7 @@
           },
           "items": {
             "items": {
-              "$ref": "#/components/schemas/OrderItemOut"
+              "$ref": "#/components/schemas/AdminOrderItemOut"
             },
             "title": "Items",
             "type": "array"
@@ -351,6 +419,7 @@
         "type": "string"
       },
       "ArCornerSuggestion": {
+        "description": "Where the corner editor should open, and where automatic detection is.\n\nTwo sets, because the screen needs both. `corners` is what the handles are\nplaced on: the crop the AR files on disk were built from, if any have been\nbuilt, and detection otherwise. `detected` is always what detection says\nright now, which is what «بازگرداندن گوشه‌های تشخیص‌داده‌شده» puts back —\na button that could not exist while the two were the same field.",
         "properties": {
           "confidence": {
             "title": "Confidence",
@@ -361,6 +430,13 @@
               "$ref": "#/components/schemas/CornerPoint"
             },
             "title": "Corners",
+            "type": "array"
+          },
+          "detected": {
+            "items": {
+              "$ref": "#/components/schemas/CornerPoint"
+            },
+            "title": "Detected",
             "type": "array"
           },
           "image_height": {
@@ -374,10 +450,21 @@
           "needs_review": {
             "title": "Needs Review",
             "type": "boolean"
+          },
+          "source": {
+            "enum": [
+              "manual",
+              "automatic",
+              "detected"
+            ],
+            "title": "Source",
+            "type": "string"
           }
         },
         "required": [
           "corners",
+          "detected",
+          "source",
           "confidence",
           "needs_review",
           "image_width",
@@ -2212,7 +2299,7 @@
     },
     "/api/v1/admin/carpets/{carpet_id}/ar/corners": {
       "get": {
-        "description": "گوشه‌های تشخیص‌داده‌شده برای پیش‌نمایش و اصلاح دستی در پنل.",
+        "description": "گوشه‌هایی که فایل‌های فعلی با آن ساخته شده‌اند، کنار تشخیص خودکار.",
         "operationId": "suggest_corners_api_v1_admin_carpets__carpet_id__ar_corners_get",
         "parameters": [
           {

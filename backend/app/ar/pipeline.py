@@ -181,6 +181,21 @@ async def generate_for_carpet(
         buffer = BytesIO()
         preview.image.save(buffer, format="WEBP", quality=90, method=6)
         primary.rectified_url = storage.save(buffer.getvalue(), kind="rectified", ext="webp")
+
+        # And the crop itself, beside the picture of it.
+        #
+        # `preview.corners` rather than the `corners` argument, because they are
+        # not the same thing when nothing was passed: then rectification
+        # detected its own, and those are what the files were built from. Saving
+        # the argument would have recorded «automatic» as an absence and left
+        # the panel guessing again on the next visit.
+        #
+        # This is the whole of «the editor shows the previous crop»: the panel
+        # reads this back, so what a shopkeeper sees when they return is what
+        # their files were actually made from — theirs if they placed it, the
+        # detector's if they did not.
+        primary.ar_corners = [[float(x), float(y)] for x, y in preview.corners]
+        primary.ar_corners_manual = not preview.automatic
         logger.info("rectified %s with confidence %.2f", carpet.slug, last_confidence)
 
     await session.commit()

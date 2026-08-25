@@ -25,7 +25,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -148,6 +148,24 @@ class CarpetImage(Base, TimestampMixin):
     # Perspective-corrected top-down version, produced by the AR pipeline and
     # used as the texture. Null until that step runs.
     rectified_url: Mapped[str | None] = mapped_column(String(500))
+    # The four corners the AR files standing on disk were actually built from,
+    # in this image's own pixel space, ordered tl, tr, br, bl.
+    #
+    # Written by the pipeline on every successful build, so the panel can open
+    # the corner editor on the crop that produced the current files instead of
+    # on a fresh guess. Without it the editor re-detected on every visit: a
+    # shopkeeper who dragged the handles, built the files and came back was
+    # shown the automatic corners again — the ones their correction existed to
+    # replace — and had no way to tell what the files on disk were made from.
+    #
+    # Per image rather than per carpet, because the coordinates only mean
+    # anything against one photograph. Replacing the primary photo therefore
+    # drops back to detection, which is right: the old numbers describe a
+    # picture that is no longer the source.
+    ar_corners: Mapped[list[list[float]] | None] = mapped_column(JSONB)
+    # Whether a person placed them. The panel says so, and it is also what
+    # decides whether a low detection confidence is still worth warning about.
+    ar_corners_manual: Mapped[bool] = mapped_column(Boolean, default=False)
     position: Mapped[int] = mapped_column(Integer, default=0)
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False)
 

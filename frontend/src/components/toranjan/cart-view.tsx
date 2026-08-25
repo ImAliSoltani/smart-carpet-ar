@@ -71,9 +71,17 @@ function Toman({ value, className }: { value: number; className?: string }) {
             exit={reduced ? { opacity: 0 } : { y: "-115%", opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.42, ease: [0.16, 1, 0.3, 1] }}
             // No `font-figure` here: these are Persian figures and that face
-            // is subset to Latin digits. `tabular-nums` stays — Vazirmatn has
-            // them, and they stop the total shifting width as it rolls.
-            className={`col-start-1 row-start-1 tabular-nums ${className ?? ""}`}
+            // is subset to Latin digits.
+            //
+            // No `tabular-nums` either, and that line used to say the opposite
+            // — «Vazirmatn has them, and they stop the total shifting width as
+            // it rolls». It has them, and they are not for these digits: the
+            // feature leaves Vazirmatn's Latin figures untouched and pads every
+            // Persian one, so «۱٬۸۹۹٬۰۰۰» was set with its digits standing
+            // apart. Measured, and recorded in `CountUp`. The total does shift
+            // width when it rolls now, which is a thing that happens once per
+            // press and is already an animation.
+            className={`col-start-1 row-start-1 ${className ?? ""}`}
           >
             {formatNumber(value)}
           </motion.span>
@@ -153,7 +161,7 @@ function CartRow({ line }: { line: CartLine }) {
             <span
               aria-live="polite"
               aria-label={`تعداد: ${formatNumber(line.quantity)}`}
-              className="min-w-6 text-center text-sm tabular-nums"
+              className="min-w-6 text-center text-sm"
             >
               {formatNumber(line.quantity)}
             </span>

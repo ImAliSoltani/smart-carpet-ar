@@ -364,7 +364,7 @@ export function CheckoutForm() {
                           {formatSize(line.widthCm, line.lengthCm)} · {formatNumber(line.quantity)} عدد
                         </span>
                       </span>
-                      <span className="shrink-0 text-sm tabular-nums">
+                      <span className="shrink-0 text-sm">
                         {formatNumber(Number(line.unitPrice) * line.quantity)}
                         <span className="ms-1.5 text-[12px] text-muted">تومان</span>
                       </span>
@@ -374,7 +374,7 @@ export function CheckoutForm() {
 
                 <div className="flex items-baseline justify-between border-t border-line pt-4">
                   <span className="text-sm text-ink-2">جمع</span>
-                  <span className="text-xl tabular-nums">
+                  <span className="text-xl">
                     {formatNumber(total)}
                     <span className="ms-1.5 text-[12px] text-muted">تومان</span>
                   </span>

@@ -42,6 +42,50 @@ const SIZE_SWITCH_COOLDOWN = 350;   // ms, stops one gesture racing through size
 const MIN_FREE_SCALE = 0.35;        // free-size bounds, kept within plausible rug sizes
 const MAX_FREE_SCALE = 2.60;
 
+/**
+ * How brightly the rug is lit when nothing about the room is known yet.
+ *
+ * **These are not taste, they are arithmetic**, and they are the second half of
+ * the «the rug looks dark on the floor» report — the half that survived fixing
+ * the light *estimate*. three.js has used physically-based light units since
+ * r155, and this project is on r185. In those units a flat surface facing up
+ * renders at `irradiance / π` times its own texture, so the previous neutral —
+ * a hemisphere light at 1.0 and a sun at 0.6 — put the rug on the floor at
+ *
+ *     (1.0 + 0.6 × 0.87) / π ≈ 0.49
+ *
+ * of the photograph it was woven from. Half brightness, every time, before the
+ * room was measured at all. That is why raising the estimate's floor was not
+ * enough: the floor was under a neutral that was itself dark.
+ *
+ * Chosen so the two together come to about π, which renders the weave at the
+ * brightness of its own photograph:
+ *
+ *     (2.4 + 0.8 × 0.87) / π ≈ 0.99
+ *
+ * Not brighter than that, and the ceiling is the same argument the estimate
+ * lost on: the camera feed behind the rug is auto-exposed to look normal, so a
+ * rug lit past its own photograph would be the one overexposed thing in the
+ * frame. The split between the two keeps the sun's share small enough that the
+ * shading stays a gradient across the pile rather than a highlight.
+ */
+const AMBIENT_NEUTRAL = 2.4;
+const SUN_NEUTRAL = 0.8;
+
+/** How far the room's measured light may pull either one off neutral. */
+const NUDGE_FLOOR = 0.85;
+const NUDGE_CEILING = 1.45;
+
+/**
+ * A measurement in units that are not ours, turned into a factor around 1.
+ *
+ * `sensitivity` is how much of the reading is let through before the band
+ * clamps it; the two lights differ because they are given different estimates.
+ */
+function nudge(measured, sensitivity) {
+  return Math.min(NUDGE_CEILING, Math.max(NUDGE_FLOOR, NUDGE_FLOOR + measured * sensitivity));
+}
+
 export class CarpetPlacer {
   /**
    * @param {object} options
@@ -124,9 +168,9 @@ export class CarpetPlacer {
     this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 40);
 
     // Light estimation refines these every frame when the platform supports it.
-    this.ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbbb, 1.0);
+    this.ambient = new THREE.HemisphereLight(0xffffff, 0xbbbbbb, AMBIENT_NEUTRAL);
     this.scene.add(this.ambient);
-    this.sun = new THREE.DirectionalLight(0xffffff, 0.6);
+    this.sun = new THREE.DirectionalLight(0xffffff, SUN_NEUTRAL);
     this.sun.position.set(0.5, 1, 0.25);
     this.scene.add(this.sun);
 
@@ -360,6 +404,12 @@ export class CarpetPlacer {
    * side the room's light actually comes from. Intensity becomes a nudge
    * around neutral: enough that a bright window or a dim corner reads
    * differently, never enough to make the rug the darkest thing on screen.
+   *
+   * Which is why the numbers here are *factors* rather than intensities. When
+   * they were intensities they silently carried a second decision — what
+   * neutral means — and that decision was wrong by a factor of two (see
+   * `AMBIENT_NEUTRAL`). Written as a band around whatever neutral is, the
+   * estimate can only ever nudge, and moving neutral moves both lights with it.
    */
   _updateLighting(frame) {
     const estimate = frame.getLightEstimate?.(this.lightProbe);
@@ -367,16 +417,16 @@ export class CarpetPlacer {
     const sh = estimate.sphericalHarmonicsCoefficients;
     if (sh?.length >= 3) {
       // The L0 band's three channels — a rough irradiance proxy, in units that
-      // are not ours. Mapped into a band around 1.0 rather than used raw.
+      // are not ours. Read as a nudge around neutral rather than used raw.
       const measured = (sh[0] + sh[1] + sh[2]) / 3;
-      this.ambient.intensity = Math.max(0.85, Math.min(1.45, 0.85 + measured * 0.3));
+      this.ambient.intensity = AMBIENT_NEUTRAL * nudge(measured, 0.3);
     }
     const direction = estimate.primaryLightDirection;
     if (direction) this.sun.position.set(-direction.x, -direction.y, -direction.z);
     const primary = estimate.primaryLightIntensity;
     if (primary) {
       const measured = (primary.x + primary.y + primary.z) / 3;
-      this.sun.intensity = Math.max(0.45, Math.min(0.95, 0.45 + measured * 0.25));
+      this.sun.intensity = SUN_NEUTRAL * nudge(measured, 0.25);
     }
   }
 

@@ -162,12 +162,17 @@ export function DashboardView() {
         <Counter
           index={3}
           label="واقعیت افزوده"
-          value={
-            <>
-              <CountUp value={s.ar_ready} /> از {formatNumber(s.variants_total)}
-            </>
-          }
-          hint="سایزهایی که فایل AR دارند"
+          // The figure alone, and the total in the hint — the same shape as
+          // «فروش تأییدشده» two cards along, which has always put its «از N»
+          // there. On one line the two figures did not match: the counted one
+          // carried `tabular-nums` and the plain one did not, so the first
+          // number's digits stood apart from each other and the second's did
+          // not. The padding is gone from the counter now (see `CountUp`), and
+          // splitting the line is what lets it stay gone — a figure that is
+          // alone in its box may change width while it counts without anything
+          // beside it appearing to move.
+          value={<CountUp value={s.ar_ready} />}
+          hint={`از ${formatNumber(s.variants_total)} سایز فروشی`}
           href="/admin/ar"
           tone={arTrouble > 0 ? "attention" : "plain"}
         />

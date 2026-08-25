@@ -115,6 +115,43 @@ test("the persian text search finds a carpet by its name", async ({ page }) => {
   await expect(page.getByRole("link", { name: CARPET.name, exact: true })).toHaveCount(0);
 });
 
+test("the magnifier in the header suggests carpets as they are typed", async ({ page }) => {
+  // Reported as «there is nowhere on the site to search a product by name».
+  // The endpoint answered `?q=` the whole time and the listing page had a field
+  // for it — behind the filter panel, which is not where anybody looks for a
+  // search. So what is checked here is the reachable path: press the magnifier
+  // that is on every page, type, and be offered the carpet before submitting
+  // anything.
+  await page.goto("/carpets");
+  await page.getByRole("button", { name: /جست‌وجو در فرش‌ها/ }).click();
+
+  const field = page.getByRole("combobox", { name: /جست‌وجو در فرش‌ها/ });
+  await expect(field).toBeFocused();
+  await field.fill("نایین");
+
+  const suggestion = page.getByRole("option").filter({ hasText: "نایین" }).first();
+  await expect(suggestion).toBeVisible();
+  await suggestion.click();
+  await expect(page).toHaveURL(/\/carpets\/[^/]+$/);
+  await expect(page.getByRole("heading", { name: /نایین/ })).toBeVisible();
+});
+
+test("a name nothing matches offers a way on rather than an empty panel", async ({ page }) => {
+  await page.goto("/carpets");
+  await page.getByRole("button", { name: /جست‌وجو در فرش‌ها/ }).click();
+  await page.getByRole("combobox", { name: /جست‌وجو در فرش‌ها/ }).fill("زرافه");
+
+  // Scoped to the panel, and to the sentence that names what was typed. The
+  // bare `/پیدا نشد/` also matches the live region that announces the same
+  // thing to a screen reader, which is two elements saying one thing — right
+  // for the page, ambiguous for a locator.
+  const panel = page.getByRole("search");
+  await expect(panel.getByText("فرشی به نام «زرافه» پیدا نشد.")).toBeVisible();
+  // A dead end is the one thing a search must not be: both offers are links.
+  await expect(panel.getByRole("link", { name: "همه‌ی فرش‌ها" })).toBeVisible();
+  await expect(panel.getByRole("link", { name: "عکس" })).toBeVisible();
+});
+
 test("a search that matches nothing says so instead of showing everything", async ({ page }) => {
   // Answering with the whole catalogue reads as an answer and is not one.
   await page.goto("/carpets?q=زرافه");

@@ -115,7 +115,7 @@ function Result({ order }: { order: OrderOut }) {
                 {formatSize(item.width_cm, item.length_cm)} · {formatNumber(item.quantity)} عدد
               </span>
             </span>
-            <span className="shrink-0 text-sm tabular-nums">
+            <span className="shrink-0 text-sm">
               {formatNumber(Number(item.unit_price) * item.quantity)}
               <span className="ms-1.5 text-[12px] text-muted">تومان</span>
             </span>
@@ -125,7 +125,7 @@ function Result({ order }: { order: OrderOut }) {
 
       <div className="flex items-baseline justify-between border-t border-line pt-4">
         <span className="text-sm text-ink-2">جمع</span>
-        <span className="text-xl tabular-nums">
+        <span className="text-xl">
           {formatNumber(total)}
           <span className="ms-1.5 text-[12px] text-muted">تومان</span>
         </span>

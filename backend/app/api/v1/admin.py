@@ -1,5 +1,7 @@
 """Admin panel API: session auth, carpet/variant/image management, orders."""
 
+from collections.abc import Sequence
+
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -411,7 +413,7 @@ async def _primary_image(session: DbSession, carpet_id: int) -> CarpetImage:
 async def suggest_corners(
     session: DbSession, storage: StorageDep, carpet_id: int
 ) -> ArCornerSuggestion:
-    """گوشه‌های تشخیص‌داده‌شده برای پیش‌نمایش و اصلاح دستی در پنل."""
+    """گوشه‌هایی که فایل‌های فعلی با آن ساخته شده‌اند، کنار تشخیص خودکار."""
     image_row = await _primary_image(session, carpet_id)
     # The same file the builder warps, resolved by the same function. The
     # handles the shopkeeper drags are in this image's pixel space and are sent
@@ -422,11 +424,29 @@ async def suggest_corners(
     except (OSError, ValueError) as exc:
         raise HTTPException(422, detail="تصویر منبع قابل خواندن نیست") from exc
 
-    corners, confidence = detect_corners(source)
+    detected, confidence = detect_corners(source)
+    detected_points = [CornerPoint(x=x, y=y) for x, y in detected]
+
+    # What the last build actually used, when there has been one. Detection is
+    # still run either way — the panel offers it as the way back to automatic,
+    # and a button that has nothing to put back is not a button.
+    saved = image_row.ar_corners
+    if saved:
+        source_kind = "manual" if image_row.ar_corners_manual else "automatic"
+        opening = [CornerPoint(x=float(x), y=float(y)) for x, y in saved]
+    else:
+        source_kind = "detected"
+        opening = detected_points
+
     return ArCornerSuggestion(
-        corners=[CornerPoint(x=x, y=y) for x, y in corners],
+        corners=opening,
+        detected=detected_points,
+        source=source_kind,
         confidence=confidence,
-        needs_review=confidence < 0.55,
+        # A human has already looked at these; saying «detection was not sure»
+        # over a crop somebody placed by hand asks them to review their own
+        # decision every time they open the screen.
+        needs_review=source_kind != "manual" and confidence < 0.55,
         image_width=source.width,
         image_height=source.height,
     )
@@ -493,6 +513,56 @@ async def ar_status(session: DbSession, carpet_id: int) -> list[ArVariantStatus]
 # --- orders -----------------------------------------------------------------
 
 
+async def _with_carpets(
+    session: DbSession, orders: Sequence[Order]
+) -> list[AdminOrderOut]:
+    """Orders, with each line pointed back at the carpet it was bought from.
+
+    An order line copies the name, the size and the price it was placed at, so
+    that a later catalogue edit cannot rewrite history. That is the right rule
+    and it is why a line cannot simply *be* a carpet — but it left the panel
+    showing the shopkeeper a list of names for goods they have to go and find
+    by hand. The way back is the variant, which the line still points at unless
+    that size has since been deleted.
+
+    One query for the whole page, not one per line. The alternative — a
+    relationship walked while rendering — is the shape that answers a screen of
+    twenty orders with sixty round trips, and it does it silently.
+    """
+    out = [AdminOrderOut.model_validate(order) for order in orders]
+
+    wanted = {
+        item.variant_id for order in orders for item in order.items if item.variant_id
+    }
+    if not wanted:
+        return out
+
+    # The same photograph the shop leads with, at the size a table row wants.
+    # `thumb_url` is null on rows written before the derivatives existed, so the
+    # card-sized one is the fallback — the convention `ImageOut` documents.
+    picture = (
+        select(func.coalesce(CarpetImage.thumb_url, CarpetImage.url))
+        .where(CarpetImage.carpet_id == Carpet.id)
+        .order_by(CarpetImage.is_primary.desc(), CarpetImage.position)
+        .limit(1)
+        .correlate(Carpet)
+        .scalar_subquery()
+    )
+    rows = await session.execute(
+        select(CarpetVariant.id, Carpet.id, picture)
+        .join(Carpet, Carpet.id == CarpetVariant.carpet_id)
+        .where(CarpetVariant.id.in_(wanted))
+    )
+    by_variant = {variant_id: (carpet_id, url) for variant_id, carpet_id, url in rows}
+
+    for order in out:
+        for item in order.items:
+            found = by_variant.get(item.variant_id) if item.variant_id else None
+            if found is not None:
+                item.carpet_id, item.carpet_image = found
+    return out
+
+
 @router.get(
     "/orders", response_model=list[AdminOrderOut], dependencies=[Depends(require_admin)]
 )
@@ -503,7 +573,7 @@ async def list_orders(
     if status is not None:
         stmt = stmt.where(Order.status == status)
     orders = (await session.execute(stmt)).scalars().all()
-    return [AdminOrderOut.model_validate(order) for order in orders]
+    return await _with_carpets(session, orders)
 
 
 @router.patch(
@@ -518,4 +588,8 @@ async def update_order_status(
     order.status = payload.status
     await session.commit()
     await session.refresh(order)
-    return AdminOrderOut.model_validate(order)
+    # Through the same enrichment as the listing. The panel writes this reply
+    # straight into its cached list rather than refetching, so a bare
+    # `model_validate` here would blank every thumbnail on the screen the moment
+    # somebody confirmed an order.
+    return (await _with_carpets(session, [order]))[0]

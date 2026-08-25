@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, Loader2, Plus, Trash2, X } from "lucide-react";
 
 import { EASE_OUT } from "@/components/toranjan/admin-motion";
+import { MoneyInput, tomanDigits } from "@/components/toranjan/money-input";
 import { addVariant, adminKeys, deleteVariant, updateVariant } from "@/lib/api/admin";
 import { ApiError } from "@/lib/api/client";
 import type { AdminCarpetDetail, VariantOut } from "@/lib/api/types";
@@ -78,14 +79,12 @@ function AddRow({ carpetId, onDone }: { carpetId: number; onDone: () => void }) 
             onChange={(e) => setLength(e.target.value.replace(/[^\d]/g, ""))}
           />
         </label>
+        {/* Grouped as it is typed. Nine digits with nothing between them is a
+            figure that can only be checked by counting zeros — see
+            `MoneyInput`, which owns the punctuation and hands back digits. */}
         <label className="flex flex-col gap-1.5">
           <span className="panel-label">قیمت (تومان)</span>
-          <input
-            className={cellInput}
-            inputMode="numeric"
-            value={price}
-            onChange={(e) => setPrice(e.target.value.replace(/[^\d]/g, ""))}
-          />
+          <MoneyInput className={cellInput} value={price} onValueChange={setPrice} />
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="panel-label">موجودی</span>
@@ -129,7 +128,10 @@ function AddRow({ carpetId, onDone }: { carpetId: number; onDone: () => void }) 
 function VariantRow({ carpetId, variant }: { carpetId: number; variant: VariantOut }) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = React.useState(false);
-  const [price, setPrice] = React.useState(String(variant.price));
+  // `tomanDigits`, not `String(...)`: this field arrives as a decimal string
+  // and Postgres is free to write five hundred thousand as «5.0E+5», which the
+  // box would have shown verbatim.
+  const [price, setPrice] = React.useState(() => tomanDigits(variant.price));
   const [stock, setStock] = React.useState(String(variant.stock));
   const [confirmDelete, setConfirmDelete] = React.useState(false);
 
@@ -166,12 +168,7 @@ function VariantRow({ carpetId, variant }: { carpetId: number; variant: VariantO
         <div className="flex w-full flex-wrap items-end gap-2 sm:w-auto">
           <label className="flex flex-1 flex-col gap-1.5 sm:w-40 sm:flex-none">
             <span className="panel-label">قیمت</span>
-            <input
-              className={cellInput}
-              inputMode="numeric"
-              value={price}
-              onChange={(e) => setPrice(e.target.value.replace(/[^\d]/g, ""))}
-            />
+            <MoneyInput className={cellInput} value={price} onValueChange={setPrice} />
           </label>
           <label className="flex w-24 flex-col gap-1.5">
             <span className="panel-label">موجودی</span>
@@ -198,7 +195,7 @@ function VariantRow({ carpetId, variant }: { carpetId: number; variant: VariantO
           <button
             type="button"
             onClick={() => {
-              setPrice(String(variant.price));
+              setPrice(tomanDigits(variant.price));
               setStock(String(variant.stock));
               setEditing(false);
             }}

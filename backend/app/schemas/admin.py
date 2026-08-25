@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -77,6 +78,32 @@ class OrderStatusUpdate(BaseModel):
     status: OrderStatus
 
 
+class AdminOrderItemOut(OrderItemOut):
+    """A line of an order, with enough of the carpet to recognise and open it.
+
+    A subclass rather than three more fields on `OrderItemOut`, for the reason
+    the panel's other shapes are also subclasses: the public line is what a
+    buyer is shown when they track a parcel, and it should carry the name and
+    the size they bought and nothing else. None of this is secret — it is the
+    catalogue — it is simply not part of the answer to «where is my order».
+
+    Every one of them is optional, and that is the data model rather than
+    caution. `OrderItem.variant_id` is `ON DELETE SET NULL` on purpose, so that
+    removing a size a shop no longer sells leaves the orders that bought it
+    readable; the line keeps its own copy of the name, the size and the price.
+    What it cannot keep is the way back to the carpet. So a line whose size has
+    since been deleted arrives with the text and no picture, which is exactly
+    what is true about it.
+    """
+
+    variant_id: int | None = None
+    # The panel's own link, `/admin/carpets/{id}` — an id, because that is what
+    # the panel navigates by, and the slug is one of the things it can edit.
+    carpet_id: int | None = None
+    # The thumbnail derivative where there is one; older rows only have `url`.
+    carpet_image: str | None = None
+
+
 class AdminOrderOut(BaseModel):
     """An order as the shopkeeper needs to see it (ROADMAP §6-17).
 
@@ -106,7 +133,7 @@ class AdminOrderOut(BaseModel):
     address: str
     note: str | None
 
-    items: list[OrderItemOut]
+    items: list[AdminOrderItemOut]
 
 
 class AdminStats(BaseModel):
@@ -208,7 +235,21 @@ class ArVariantStatus(BaseModel):
 
 
 class ArCornerSuggestion(BaseModel):
+    """Where the corner editor should open, and where automatic detection is.
+
+    Two sets, because the screen needs both. `corners` is what the handles are
+    placed on: the crop the AR files on disk were built from, if any have been
+    built, and detection otherwise. `detected` is always what detection says
+    right now, which is what «بازگرداندن گوشه‌های تشخیص‌داده‌شده» puts back —
+    a button that could not exist while the two were the same field.
+    """
+
     corners: list[CornerPoint]
+    detected: list[CornerPoint]
+    # `manual`: a person placed `corners` and the current files were built from
+    # them. `automatic`: files were built, from detection. `detected`: nothing
+    # has been built for this photograph yet.
+    source: Literal["manual", "automatic", "detected"]
     confidence: float
     needs_review: bool
     image_width: int

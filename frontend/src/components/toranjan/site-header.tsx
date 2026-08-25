@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useCartCount } from "@/lib/store/cart";
-import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
+import { Heart, Menu, ShoppingBag } from "lucide-react";
 
 import {
   NavigationMenu,
@@ -18,6 +18,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CarpetSearch } from "@/components/toranjan/carpet-search";
 import { carpetListQuery } from "@/lib/api/catalog";
 import { mediaUrl } from "@/lib/api/client";
 import { formatNumber } from "@/lib/format";
@@ -43,10 +44,14 @@ import { cn } from "@/lib/utils";
  * imports a Sheet and a menu icon it never renders them, so the mobile drawer
  * is assembled here from the Sheet primitive that came in the same bundle.
  *
- * There is no search field. The roadmap puts Persian text search on the list
- * page (§6-2), next to the filters it narrows, and the shop is browsed by
- * pattern rather than by name — few visitors know a rug's title before they
- * have seen it. The magnifier is a route to that page, not a field of its own.
+ * The magnifier is a field now, and this note used to argue that it should not
+ * be: «the shop is browsed by pattern rather than by name — few visitors know
+ * a rug's title before they have seen it». That is a fair description of a
+ * first visit and of no other one. Somebody who has already seen a rug, or
+ * been told its name, or is the shopkeeper looking through their own
+ * catalogue, wants to type it — and `?q=` was answered by the listing endpoint
+ * the whole time with nothing in the interface reaching it. `CarpetSearch`
+ * owns the behaviour; the header only gives it the corner the link had.
  */
 
 /**
@@ -512,14 +517,7 @@ export function SiteHeader({
       </NavigationMenu>
 
       <div className="ms-auto flex shrink-0 items-center gap-1">
-        {/* Search is a destination, not a field — see the note at the top. */}
-        <Link
-          href="/carpets"
-          aria-label="جست‌وجو در فرش‌ها"
-          className="grid size-11 place-items-center rounded-full text-ink-2 transition-colors duration-[--dur-feedback] hover:bg-line hover:text-ink"
-        >
-          <Search className="size-5" />
-        </Link>
+        <CarpetSearch />
         <Link
           href="/favourites"
           aria-label="علاقه‌مندی‌ها"

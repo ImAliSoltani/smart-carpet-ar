@@ -112,13 +112,23 @@ export function ArReview({ carpetId }: { carpetId: number }) {
       (query.state.data ?? []).some((v) => v.ar_status === "processing") ? 2500 : false,
   });
 
-  const detected = corners.data?.corners;
+  // Two sets, and keeping them apart is the whole of «the editor shows the
+  // previous crop». `opening` is what the last build actually used — the
+  // shopkeeper's own handles if they placed them — and is what the editor is
+  // seeded from. `detected` is what automatic detection says right now, and
+  // exists so «بازگرداندن گوشه‌های تشخیص‌داده‌شده» has something to put back.
+  //
+  // They used to be one field, which is why a correction disappeared the moment
+  // you left the screen: the editor re-detected on every visit and showed the
+  // guess the correction had replaced.
+  const opening = corners.data?.corners;
+  const detected = corners.data?.detected;
 
   const [draft, setDraft] = React.useState<CornerPoint[] | null>(null);
-  const [lastDetected, setLastDetected] = React.useState<CornerPoint[] | undefined>(undefined);
-  if (detected !== lastDetected) {
-    setLastDetected(detected);
-    setDraft(detected ? detected.map((c) => ({ ...c })) : null);
+  const [lastOpening, setLastOpening] = React.useState<CornerPoint[] | undefined>(undefined);
+  if (opening !== lastOpening) {
+    setLastOpening(opening);
+    setDraft(opening ? opening.map((c) => ({ ...c })) : null);
   }
 
   // State rather than a ref, because the figure below is worked out during
@@ -131,6 +141,11 @@ export function ArReview({ carpetId }: { carpetId: number }) {
     onMutate: () => setStartedAt(Date.now()),
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.ar(carpetId) });
+      // The build records the crop it used, so the answer to «what were these
+      // files made from» has just changed. Without this the screen would keep
+      // showing the previous one until the next visit — the same staleness this
+      // whole change is about, only shorter-lived.
+      queryClient.invalidateQueries({ queryKey: adminKeys.corners(carpetId) });
       // The queue's readiness figures came from a different endpoint and are now
       // wrong; so is the dashboard's counter.
       queryClient.invalidateQueries({ queryKey: adminKeys.arQueue() });
@@ -167,6 +182,18 @@ export function ArReview({ carpetId }: { carpetId: number }) {
   const source = mediaUrl(image?.full_url ?? image?.url);
   const variants = ar.data ?? [];
   const readyCount = variants.filter((v) => v.ar_status === "ready").length;
+
+  // The queued path writes its crop when the job finishes, not when the request
+  // returns, so the mutation's own invalidation cannot reach it. The moment the
+  // last size stops processing is the moment there is something new to read.
+  const processing = variants.some((v) => v.ar_status === "processing");
+  const wasProcessing = React.useRef(false);
+  React.useEffect(() => {
+    if (wasProcessing.current && !processing) {
+      queryClient.invalidateQueries({ queryKey: adminKeys.corners(carpetId) });
+    }
+    wasProcessing.current = processing;
+  }, [processing, queryClient, carpetId]);
 
   if (carpet.isPending) {
     return <div className="glass h-96 animate-pulse rounded-xl" aria-hidden />;
@@ -241,6 +268,19 @@ export function ArReview({ carpetId }: { carpetId: number }) {
                       خودتان بررسی کنید.
                     </Notice>
                   </div>
+                )}
+
+                {/* Where the handles came from. The screen used to be silent
+                    about it, and silence was the bug: the same four handles
+                    meant «what you placed» and «what the detector guessed»
+                    with nothing to tell them apart. */}
+                {corners.data.source !== "detected" && (
+                  <p className="mt-3 flex items-start gap-1.5 text-[12.5px] leading-relaxed text-muted">
+                    <Check className="mt-0.5 size-3.5 shrink-0 text-accent" strokeWidth={2} aria-hidden />
+                    {corners.data.source === "manual"
+                      ? "این مرزبندی را خودتان تعیین کرده‌اید و فایل‌های فعلی با همین ساخته شده‌اند."
+                      : "فایل‌های فعلی با مرزبندی تشخیص خودکار ساخته شده‌اند."}
+                  </p>
                 )}
 
                 <CornerEditor

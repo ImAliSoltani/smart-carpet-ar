@@ -81,7 +81,7 @@ export interface paths {
         };
         /**
          * Suggest Corners
-         * @description گوشه‌های تشخیص‌داده‌شده برای پیش‌نمایش و اصلاح دستی در پنل.
+         * @description گوشه‌هایی که فایل‌های فعلی با آن ساخته شده‌اند، کنار تشخیص خودکار.
          */
         get: operations["suggest_corners_api_v1_admin_carpets__carpet_id__ar_corners_get"];
         put?: never;
@@ -592,6 +592,42 @@ export interface components {
             variants_count: number;
         };
         /**
+         * AdminOrderItemOut
+         * @description A line of an order, with enough of the carpet to recognise and open it.
+         *
+         *     A subclass rather than three more fields on `OrderItemOut`, for the reason
+         *     the panel's other shapes are also subclasses: the public line is what a
+         *     buyer is shown when they track a parcel, and it should carry the name and
+         *     the size they bought and nothing else. None of this is secret — it is the
+         *     catalogue — it is simply not part of the answer to «where is my order».
+         *
+         *     Every one of them is optional, and that is the data model rather than
+         *     caution. `OrderItem.variant_id` is `ON DELETE SET NULL` on purpose, so that
+         *     removing a size a shop no longer sells leaves the orders that bought it
+         *     readable; the line keeps its own copy of the name, the size and the price.
+         *     What it cannot keep is the way back to the carpet. So a line whose size has
+         *     since been deleted arrives with the text and no picture, which is exactly
+         *     what is true about it.
+         */
+        AdminOrderItemOut: {
+            /** Carpet Id */
+            carpet_id?: number | null;
+            /** Carpet Image */
+            carpet_image?: string | null;
+            /** Carpet Name */
+            carpet_name: string;
+            /** Length Cm */
+            length_cm: number;
+            /** Quantity */
+            quantity: number;
+            /** Unit Price */
+            unit_price: string;
+            /** Variant Id */
+            variant_id?: number | null;
+            /** Width Cm */
+            width_cm: number;
+        };
+        /**
          * AdminOrderOut
          * @description An order as the shopkeeper needs to see it (ROADMAP §6-17).
          *
@@ -622,7 +658,7 @@ export interface components {
             /** Id */
             id: number;
             /** Items */
-            items: components["schemas"]["OrderItemOut"][];
+            items: components["schemas"]["AdminOrderItemOut"][];
             /** Note */
             note: string | null;
             /** Reference */
@@ -670,18 +706,34 @@ export interface components {
          * @enum {string}
          */
         ArAssetStatus: "missing" | "processing" | "ready" | "failed";
-        /** ArCornerSuggestion */
+        /**
+         * ArCornerSuggestion
+         * @description Where the corner editor should open, and where automatic detection is.
+         *
+         *     Two sets, because the screen needs both. `corners` is what the handles are
+         *     placed on: the crop the AR files on disk were built from, if any have been
+         *     built, and detection otherwise. `detected` is always what detection says
+         *     right now, which is what «بازگرداندن گوشه‌های تشخیص‌داده‌شده» puts back —
+         *     a button that could not exist while the two were the same field.
+         */
         ArCornerSuggestion: {
             /** Confidence */
             confidence: number;
             /** Corners */
             corners: components["schemas"]["CornerPoint"][];
+            /** Detected */
+            detected: components["schemas"]["CornerPoint"][];
             /** Image Height */
             image_height: number;
             /** Image Width */
             image_width: number;
             /** Needs Review */
             needs_review: boolean;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "manual" | "automatic" | "detected";
         };
         /**
          * ArGenerateRequest
