@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Hero10 } from "@/components/ui/hero-10";
-// Imported rather than referenced by path. `next/image` fingerprints a static
-// import by its contents, so replacing a photograph changes its URL and no
-// browser can serve yesterday's copy — which is exactly what happened while
-// the names stayed `/brand/hero-1.webp`. Swapping the file is still the whole
-// procedure; the hash follows it.
-import hero1 from "../../../public/brand/hero-1.webp";
-import hero2 from "../../../public/brand/hero-2.webp";
-import hero3 from "../../../public/brand/hero-3.webp";
 import { HomeFeatured } from "@/components/toranjan/home-featured";
+import { HomeHero } from "@/components/toranjan/home-hero";
 import { HomePromise } from "@/components/toranjan/home-promise";
+import { HomeShowcase } from "@/components/toranjan/home-showcase";
 import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
 
 export const metadata: Metadata = {
@@ -23,45 +16,48 @@ export const metadata: Metadata = {
 /**
  * The home page.
  *
- * Its order is the argument, and the order changed on purpose. `brand-brief`
- * §5 had the cinematic entrance dissolve straight into the product grid —
- * «ورودی تحویل نمی‌دهد به فروشگاه؛ خودش تبدیل به فروشگاه می‌شود». That reads
- * beautifully and leaves the shop's whole claim unsaid: a grid of seventy
- * cards cannot tell anyone they may stand a carpet on their own floor at its
- * real size, and a visitor who never learns that has been shown an ordinary
- * carpet shop.
+ * Its order is the argument, and the order has now changed twice.
  *
- * So the entrance now lands here instead, and this page says the thing first:
- * the promise, then the invitation into the shop, then carpets. The entrance
- * is still built last (ROADMAP), and where it meets this page — the wordmark
- * settling on the dark carpet before the light page rises over it — is the
- * seam to build then, not now.
+ * `brand-brief` §5 first had the cinematic entrance dissolve straight into the
+ * product grid. That left the shop's whole claim unsaid, so the entrance was
+ * made to land here instead and this page opened by *stating* the claim: a
+ * four-card feature grid, then a hero of text with three small photographs
+ * beside it.
+ *
+ * Stating it was still not enough. «فرش را با ابعاد واقعی روی کف خانه‌ی خودتان
+ * ببینید» is a sentence any carpet shop can write, and a visitor who reads it
+ * above four icons has been given a promise, not a reason to believe one. Worse,
+ * the largest thing above the fold was a paragraph — on a page whose own brand
+ * brief says the photograph of the carpet must be the loudest element of every
+ * screen.
+ *
+ * So the claim is now *performed* first and explained afterwards: the entrance
+ * lands on a room the visitor furnishes with their own hand, and only then do
+ * the carpets, the other three features, and the rooms follow. The feature grid
+ * did not go away — it moved to where an explanation belongs, which is after
+ * the thing it explains.
+ *
+ * The showcase took the silk row's place rather than joining it. That row was
+ * «ظریف‌ترین بافت‌های کاتالوگ» as four small cards at the bottom of the page, and
+ * the catalogue holds exactly two silk carpets — a rail of two, below
+ * everything else, arguing for the most expensive things in the shop. The
+ * showcase makes the same argument at the top, one carpet at a time, with the
+ * shop's own words about each weave and the carpet's colour behind it.
  */
 export default function HomePage() {
   return (
     <main>
-      <HomePromise />
+      <HomeHero />
 
-      <Hero10
-        title="فرش ایرانی،"
-        titleLine2Prefix="با"
-        titleHighlight="اندازه‌ی واقعی"
-        description="بین فرش‌های دستباف و ماشینی بگردید، و هرکدام را پیش از خرید با ابعاد دقیق روی کف خانه‌ی خودتان بگذارید."
-        images={[hero1, hero2, hero3]}
-        imageAlts={[
-          "فرش دستباف ایرانی با نقش لچک‌ترنج",
-          "فرش پهن‌شده در اتاقی روشن",
-          "نمای نزدیک از بافت و حاشیه‌ی فرش",
-        ]}
-        primaryCTA={{ ctaEnabled: true, text: "ورود به فروشگاه", link: "/carpets" }}
-        secondaryCTA={{ ctaEnabled: true, text: "پیگیری سفارش", link: "/track" }}
-      />
+      <HomeShowcase />
 
       <HomeFeatured
         title="تازه‌ترین‌ها"
         note="آخرین فرش‌هایی که به کاتالوگ اضافه شده‌اند."
         filters={{ sort: "newest" }}
       />
+
+      <HomePromise />
 
       {/* Deliberately not `toranjan-rise`. That class animates on load, and
           everything on this page below the fold is behind the cinematic intro
@@ -89,16 +85,6 @@ export default function HomePage() {
         </ul>
       </section>
 
-      {/* Not «the cheapest». A shop that opens its front page with a bargain
-          bin has told the visitor what it thinks of its own carpets — and this
-          one's argument is craft, not price. Silk is the other end of the same
-          catalogue and needs no apology. */}
-      <HomeFeatured
-        title="ابریشم دستباف"
-        note="ظریف‌ترین بافت‌های کاتالوگ."
-        filters={{ material: ["silk"], sort: "price_desc" }}
-        href="/carpets?material=silk"
-      />
     </main>
   );
 }

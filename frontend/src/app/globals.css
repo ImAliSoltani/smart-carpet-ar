@@ -900,6 +900,24 @@ body {
   }
 }
 
+/* The slow push across a still photograph in the home page's showcase.
+   `scale` on its own property rather than inside a `transform`, so it does not
+   overwrite the centring the frame does — and small on purpose: 1.06 over
+   fourteen seconds is barely a movement, which is the point. Anything larger
+   reads as a zoom and starts competing with the carpet's own pattern.
+
+   Never applied under `prefers-reduced-motion`; the component drops the class
+   rather than relying on a media query here, because the same preference also
+   stops the carousel advancing and the two have to agree. */
+@keyframes toranjan-kenburns {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.06;
+  }
+}
+
 @keyframes toranjan-fade-in {
   from {
     opacity: 0;
