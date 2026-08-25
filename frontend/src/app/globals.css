@@ -1017,6 +1017,39 @@ body {
   outline-offset: 3px;
 }
 
+/* The one case the rule above cannot serve: a control that lives inside a
+   shell which clips.
+
+   The header's search field is a pill with `overflow-hidden` — it has to
+   clip, or the input and the dismiss button spill out of it while the pill's
+   width animates open. The ring above is drawn 3px outside the `<input>`, so
+   the pill cut its top and bottom away and left the two vertical sides
+   standing in the middle of the field. Reported as «two orange bars appear
+   when you search», and they were one ring with its ends removed.
+
+   It has to be undone *here* rather than with `focus-visible:outline-none` on
+   the element, and the reason is worth writing down: this stylesheet is
+   unlayered and Tailwind's utilities are in a layer, so an unlayered rule wins
+   whatever the specificity of the utility. Specificity only decides between
+   two unlayered rules — which is what these two are, and why the attribute is
+   enough.
+
+   Marking the element rather than deleting the ring: focus stays visible, it
+   is just drawn by the shell (`has-[input:focus-visible]:border-ink`, the same
+   darkened border the shop's `Input` primitive uses). */
+[data-focus-ring="shell"]:focus-visible {
+  outline: none;
+}
+
+/* The same clipping shell, for a control small enough to hold its own ring.
+   The search field's dismiss button is a 36px disc inside that 46px pill: at
+   the global 3px offset it needs 48px and gets cut, drawn against its own edge
+   it is the same gold ring, whole. `rounded-full` carries to the outline, so
+   it stays a circle. */
+[data-focus-ring="inset"]:focus-visible {
+  outline-offset: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

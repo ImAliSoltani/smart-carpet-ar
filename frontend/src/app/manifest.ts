@@ -19,9 +19,22 @@ import { SITE_NAME } from "@/lib/site";
  *
  * `background_color` is the splash ground and `theme_color` is the system bar;
  * both are `--bg`, so the transition from launcher to shop has no seam in it.
+ *
+ * `id` and `scope` are stated rather than left to their defaults, which is the
+ * same reasoning `admin/manifest.webmanifest` records and the shop had never
+ * been given. Both would be derived from `start_url` — so the day `start_url`
+ * moves, a browser holding this app reads it as a *different* one and installs
+ * a duplicate beside it. Written down, `start_url` is free to move.
+ *
+ * They also settle what happens now that this origin serves two apps. The
+ * panel's scope is `/admin`, which is inside this one; a browser matches the
+ * most specific scope, so opening an order from the shop app still hands over
+ * to the panel's window rather than swallowing it.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
+    scope: "/",
     name: "ترنجان — فرش دستباف با ابعاد واقعی",
     short_name: SITE_NAME,
     description:

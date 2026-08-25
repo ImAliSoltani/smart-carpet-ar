@@ -45,6 +45,31 @@ export const metadata: Metadata = {
   description:
     "فرش را پیش از خرید با مقیاس واقعی روی کف خانه‌ی خودتان ببینید. جست‌وجوی بصری، مشاور چیدمان و راهنمای اندازه.",
   applicationName: SITE_NAME,
+  /**
+   * What turns «add to home screen» into an app rather than a bookmark.
+   *
+   * Reported by the shopkeeper: the panel installs properly and the shop only
+   * seems to make a shortcut — and the two differ by exactly this line, which
+   * `app/admin/layout.tsx` has carried since the panel became installable and
+   * this file never had.
+   *
+   * `capable` is the one that does the work on iOS. Safari has honoured the
+   * manifest's `display: standalone` only since 16.4 and not consistently
+   * before that; without the meta tag an added icon opens the site back inside
+   * Safari, with its address bar and its tabs, which is precisely what a
+   * shortcut looks like. The manifest stays the source of truth everywhere
+   * else — this is the platform that does not read it.
+   *
+   * `title` because the home screen labels the icon from it, and «ترنجان — فرش
+   * دستباف با ابعاد واقعی» is a sentence, not a label; iOS truncates it to
+   * about a dozen characters and the useful half is the first word.
+   *
+   * `default` for the status bar, not the panel's `black-translucent`: that
+   * value asks the page to draw *under* the clock, which suits a dark panel
+   * whose own ground continues up there and would put the shop's header
+   * behind the status bar instead.
+   */
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "default" },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
