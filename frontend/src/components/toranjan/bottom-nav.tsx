@@ -4,10 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Camera, Ruler, ShoppingBag, Sofa } from "lucide-react";
+
+import { RugIcon } from "@/components/toranjan/rug-icon";
 import { useCartLines } from "@/lib/store/cart";
 import { useCompare } from "@/lib/store/compare";
 import { formatNumber } from "@/lib/format";
-import { TABS, directionBetween, tabIndexFor } from "@/lib/tabs";
 import { cn } from "@/lib/utils";
 
 /**
@@ -40,6 +42,13 @@ import { cn } from "@/lib/utils";
  * - **`gap`, not `space-x`.** Physical margins in a right-to-left row.
  */
 
+const ITEMS = [
+  { href: "/carpets", label: "فرش‌ها", icon: RugIcon },
+  { href: "/visual-search", label: "جست‌وجوی بصری", icon: Camera },
+  { href: "/room-adviser", label: "مشاور چیدمان", icon: Sofa },
+  { href: "/size-guide", label: "راهنمای اندازه", icon: Ruler },
+  { href: "/cart", label: "سبد خرید", icon: ShoppingBag },
+] as const;
 
 /**
  * The label opens to whatever its own words need — `auto`, not a constant.
@@ -54,6 +63,13 @@ import { cn } from "@/lib/utils";
  */
 const LABEL_WIDTH = "auto";
 
+function isCurrent(pathname: string, href: string) {
+  // `/carpets` must also own `/carpets/{slug}` and its AR page, or browsing a
+  // rug unlights the tab that took you there. Exact match everywhere else:
+  // `/cart` has no children, and prefix-matching `/` would light on every page.
+  if (href === "/carpets") return pathname === "/carpets" || pathname.startsWith("/carpets/");
+  return pathname === href;
+}
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -103,19 +119,11 @@ export function BottomNav() {
           // exists because a pill wider than the screen is worse than a clipped
           // one, and because §3-5 forbids horizontal scroll on the document.
           className="fixed inset-x-0 z-30 mx-auto flex w-fit max-w-[calc(100vw-0.75rem)] items-center gap-0.5 rounded-full border border-line bg-paper/95 p-1.5 shadow-[0_10px_40px_-18px_rgba(24,24,27,0.5)] backdrop-blur-md lg:hidden"
-          // Named so the bar is its own view-transition group rather than part
-          // of the chrome's cross-fade. Unnamed, two bars dissolved through
-          // each other for 380ms on every tab change — the one being left and
-          // the one arriving — which reads as the bar being rebuilt. The rules
-          // that use this name are in `globals.css`.
-          style={{
-            bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))",
-            viewTransitionName: "bottom-nav",
-          }}
+          style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
         >
-          {TABS.map((item, i) => {
+          {ITEMS.map((item) => {
             const Icon = item.icon;
-            const active = i === tabIndexFor(pathname);
+            const active = isCurrent(pathname, item.href);
             const isCart = item.href === "/cart";
 
             return (
@@ -131,14 +139,6 @@ export function BottomNav() {
                     : item.label
                 }
                 aria-current={active ? "page" : undefined}
-                // A tap travels the same strip a swipe does, so it animates the
-                // same way. Set here rather than in an effect after the route
-                // changes: the snapshot is taken as the navigation starts, and
-                // an attribute written afterwards arrives too late to be in it.
-                onClick={() => {
-                  const direction = directionBetween(pathname, item.href);
-                  if (direction) document.documentElement.dataset.nav = direction;
-                }}
                 className={cn(
                   "relative flex h-11 min-w-11 items-center justify-center rounded-full px-3",
                   "transition-colors duration-[--dur-feedback]",
@@ -174,19 +174,7 @@ export function BottomNav() {
                     opacity: active ? 1 : 0,
                     marginInlineStart: active ? 8 : 0,
                   }}
-                  // Instant, and it was not always. The pill used to spring
-                  // open over 280ms, which was the component's signature and is
-                  // now unwatchable: the bar is snapshotted for the whole 420ms
-                  // of the page transition, so the live element is hidden while
-                  // the spring runs and is already finished by the time it
-                  // reappears. Worse, the snapshot is taken on the frame after
-                  // the commit — catching the label at the *start* of its
-                  // growth and freezing it there, which is exactly the
-                  // half-built bar that was reported.
-                  //
-                  // So the word simply appears, at the same moment the page
-                  // starts to move. One change, one beat.
-                  transition={{ duration: 0 }}
+                  transition={{ duration: reduced ? 0 : 0.28, ease: [0.16, 1, 0.3, 1] }}
                   // Below 360px there is no arithmetic that fits five 44px
                   // targets and a Persian word: the icons alone are 176 and the
                   // open item is 143. So the word is not drawn at all rather
