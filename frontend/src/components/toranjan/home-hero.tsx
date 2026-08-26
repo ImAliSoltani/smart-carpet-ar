@@ -1,5 +1,4 @@
 import { CompareReveal } from "@/components/ui/compare-reveal";
-import { Cta } from "@/components/ui/hero-10-utils/cta";
 // Imported rather than referenced by path, for the reason `brand/README.md`
 // gives: `next/image` fingerprints a static import by its contents, so
 // replacing a photograph changes its URL and no browser can serve yesterday's
@@ -25,6 +24,24 @@ import roomWideBefore from "../../../public/brand/room-wide-before.webp";
  * divider across two photographs of somebody else's living room is not
  * augmented reality and must not be dressed as it — the second line names the
  * camera and «خانه‌ی خودتان» precisely so nobody mistakes the two.
+ *
+ * **It is a framed photograph, not a bleed.** Edge to edge, the frame is as
+ * wide as the window and its height is therefore the window's width over the
+ * photograph's ratio — 916px at 1366 — against the 368px the page had left
+ * above the fold. `object-cover` closed that gap by throwing away 548 of those
+ * 916 pixels, and because the crop is anchored at the bottom, what it threw
+ * away was the room: the sofa, the window, the plant, everything that makes the
+ * carpet's arrival mean anything. What was left was a floor.
+ *
+ * So the picture now sits in the same column as the rest of the page, with the
+ * same gutters, rounded and raised off the paper. Bounded to that column its
+ * height is the column's width over the ratio, which is a number this page can
+ * afford, and the wide crop is chosen rather than inherited: 2.7:1 is the band
+ * from above the sofa to the near fringe of the carpet, with the empty ceiling
+ * and the empty foreground taken off both ends instead of the room taken off
+ * one. `object-position` is a percentage on purpose — the band stays exactly
+ * the same at every desktop width, because both terms of the ratio scale with
+ * the column.
  *
  * **Why `<picture>` and not `next/image`.** These are two art-directed pairs,
  * not one image at two sizes: the landscape room and the portrait room are
@@ -64,10 +81,12 @@ function RoomPicture({
         // candidate and neither can wait for the lazy queue.
         loading="eager"
         fetchPriority="high"
-        // Anchored to the bottom: the cap on the frame's height crops the wall
-        // and the ceiling, which cost nothing. Cropping from the other end
-        // would take the carpet, which is the entire point of the picture.
-        className="h-full w-full object-cover object-bottom"
+        // The portrait room is drawn at its own ratio and is not cropped at
+        // all until the window is short, and then from the top: its upper
+        // two-fifths are bare wall. The landscape one is a band taken out of
+        // the middle — 85% down the overflow — because there the top is where
+        // the sofa is.
+        className="h-full w-full object-cover object-bottom lg:object-[50%_85%]"
       />
     </picture>
   );
@@ -75,8 +94,11 @@ function RoomPicture({
 
 export function HomeHero() {
   return (
-    <section className="relative isolate border-b border-line">
-      <div className="mx-auto max-w-3xl px-5 pt-6 pb-4 text-center sm:px-8 sm:pt-10 sm:pb-6">
+    // No rule under it any more: the showcase's own heading draws one across
+    // the same column a few rem below, and two lines with a section of air
+    // between them read as a mistake.
+    <section className="relative isolate pb-10 sm:pb-14">
+      <div className="mx-auto max-w-3xl px-5 pt-6 pb-5 text-center sm:px-8 sm:pt-10 sm:pb-7">
         <h1 className="text-[28px] leading-[1.35] font-bold tracking-tight text-balance text-ink sm:text-4xl">
           فرش را روی کف خانه‌ی خودتان ببینید،
           <br />
@@ -87,50 +109,39 @@ export function HomeHero() {
           خودتان می‌کنید.
         </p>
 
-        {/* Above the picture rather than below it, and the reason is the fold.
-            A landscape photograph wide enough to be a front door is 500-odd
-            pixels tall on a laptop; with the buttons underneath, the fold falls
-            between the two and the shop's one link is never seen without a
-            scroll. Read in order — claim, explanation, way in, proof — this is
-            also the sentence the page wanted to say anyway. */}
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 sm:mt-6">
-          <Cta cta={{ ctaEnabled: true, text: "ورود به فروشگاه", link: "/carpets" }} />
-          <Cta cta={{ ctaEnabled: true, text: "پیگیری سفارش", link: "/track", variant: "outline" }} />
-        </div>
       </div>
 
-      {/* Full-bleed: the frame is a direct child of the section, so it spans the
-          viewport rather than the page's text column. */}
-      <CompareReveal
-        // The caps are what keep the carpet on screen. Left to its own aspect
-        // ratio the landscape frame is 859px tall at 1280 wide, which puts the
-        // bottom of the picture — the carpet — below the fold on any laptop.
-        // The cap crops from the top instead (see `object-bottom`), and is
-        // written as «the viewport minus this page's own chrome» so it tracks
-        // the header, the headline and the buttons rather than a guess.
-        //
-        // The phone number is larger than the desktop one by roughly the height
-        // of the bottom bar. That bar is `fixed`: it does not take the space it
-        // occupies, so a frame sized to the viewport ends up with its last 84px
-        // — the near edge of the carpet and its fringe — underneath it.
-        className="aspect-[29/36] max-h-[calc(100svh-30rem)] min-h-[260px] lg:aspect-[79/53] lg:max-h-[calc(100svh-25rem)]"
-        aria-label="مقایسه‌ی یک اتاق، بدون فرش و با فرش"
-        labels={["بدون فرش", "با فرش"]}
-        before={
-          <RoomPicture
-            wide={roomWideBefore}
-            tall={roomTallBefore}
-            alt="اتاق نشیمنی با کف چوبی روشن، بدون فرش"
-          />
-        }
-        after={
-          <RoomPicture
-            wide={roomWideAfter}
-            tall={roomTallAfter}
-            alt="همان اتاق، با یک فرش دستباف لچک‌ترنج قرمز روی کف"
-          />
-        }
-      />
+      {/* The same column, the same gutters and the same rhythm as every other
+          section of this page — which is the point. The way in used to sit here
+          as two buttons, above the picture, so that the fold would not swallow
+          them; they are now under the showcase, where the visitor arrives
+          having already been shown what the shop is for. */}
+      <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
+        <CompareReveal
+          // Bounded by the column, so the height follows from the ratio and the
+          // caps are only a floor-plan for very short windows: 21rem is this
+          // page's chrome on a phone plus the bottom bar it does not reserve
+          // space for, 19rem the same sum on a desktop, which has neither the
+          // bar nor the taller headline.
+          className="aspect-[29/36] max-h-[calc(100svh-21rem)] min-h-[260px] rounded-2xl shadow-raised lg:aspect-[27/10] lg:max-h-[calc(100svh-19rem)]"
+          aria-label="مقایسه‌ی یک اتاق، بدون فرش و با فرش"
+          labels={["بدون فرش", "با فرش"]}
+          before={
+            <RoomPicture
+              wide={roomWideBefore}
+              tall={roomTallBefore}
+              alt="اتاق نشیمنی با کف چوبی روشن، بدون فرش"
+            />
+          }
+          after={
+            <RoomPicture
+              wide={roomWideAfter}
+              tall={roomTallAfter}
+              alt="همان اتاق، با یک فرش دستباف لچک‌ترنج قرمز روی کف"
+            />
+          }
+        />
+      </div>
     </section>
   );
 }

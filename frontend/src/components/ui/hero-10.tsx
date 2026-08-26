@@ -37,6 +37,12 @@ import { Cta, type CtaProps } from "@/components/ui/hero-10-utils/cta";
 
 export interface Hero10Props {
   title: string;
+  /**
+   * Which heading this title is. `h1` while the component *is* the top of a
+   * page; `h2` once something else is — a page has one first heading, and a
+   * second `h1` halfway down it is a document with two beginnings.
+   */
+  titleAs?: "h1" | "h2";
   titleLine2Prefix?: string;
   titleHighlight?: string;
   description: string;
@@ -201,6 +207,7 @@ function ImageFan({
 
 export function Hero10({
   title,
+  titleAs: Title = "h1",
   titleLine2Prefix,
   titleHighlight,
   description,
@@ -234,7 +241,7 @@ export function Hero10({
           className={cn("flex w-full max-w-2xl flex-col items-center", vs.header)}
         >
           {/* The shop's one sentence. Bold and large enough to be that. */}
-          <h1 className={cn("font-bold leading-[1.3] tracking-tight text-balance text-ink", vs.title)}>
+          <Title className={cn("font-bold leading-[1.3] tracking-tight text-balance text-ink", vs.title)}>
             {title}
             {(titleLine2Prefix || titleHighlight) && (
               <>
@@ -243,7 +250,7 @@ export function Hero10({
                 {titleHighlight && <span className="text-accent">{titleHighlight}</span>}
               </>
             )}
-          </h1>
+          </Title>
 
           {description && (
             <p className={cn("leading-loose text-balance text-muted", vs.description)}>

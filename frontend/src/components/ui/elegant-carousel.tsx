@@ -20,11 +20,13 @@ import { cn } from "@/lib/utils";
  *
  * **What changed beyond the paint:**
  *
- * - *An auto-advancing carousel needs a stop.* Upstream paused on hover and
- *   nothing else, which serves a mouse and abandons everyone else — a keyboard
- *   visitor could not stop it, and a phone has no hover at all. There is now a
- *   real pause control, it also holds while anything inside has focus, and
- *   `prefers-reduced-motion` turns autoplay and the slow zoom off entirely.
+ * - *An auto-advancing carousel needs a stop, and hover is not one.* Upstream
+ *   paused on hover and nothing else, which serves a mouse and abandons
+ *   everyone else — a keyboard visitor could not stop it, and a phone has no
+ *   hover at all. There is now a real pause control, it also holds for a
+ *   keyboard caret inside the section, and `prefers-reduced-motion` turns
+ *   autoplay and the slow zoom off entirely. The hover pause is gone: see
+ *   `advancingOnItsOwn`.
  * - *It says what it is.* The frame is a labelled carousel, each slide says
  *   which of how many it is, and the running commentary is kept out of the
  *   screen reader while it advances on its own — an announcement every seven
@@ -34,6 +36,16 @@ import { cn } from "@/lib/utils";
  *
  * The slide itself is a link. A showcase whose pictures cannot be opened is an
  * advertisement, and this one is standing in front of a shop.
+ *
+ * **Three things the first version got wrong, and what they had in common.**
+ * The turn was one commit — fade and swap together — so the carpet that flashed
+ * for a moment before the motion was the *arriving* one. The autoplay loop
+ * ended itself at the turn and left the turn to restart it, which is a carousel
+ * with one way to stop and no way back. And the hover pause stopped it for
+ * anyone whose pointer was resting on it and for every phone, which sends a
+ * `mouseenter` on a tap and no leave after it. Each was the same mistake: a
+ * piece of the machine that could only be wound by the piece it had just handed
+ * off to — and in the third case, by the visitor going away.
  */
 
 export interface CarouselSlide {
@@ -42,6 +54,11 @@ export interface CarouselSlide {
   title: string;
   /** A short qualifier under the title: origin, weave, material. */
   subtitle: string;
+  /**
+   * What the bottom bar calls this slide where there is no room for the
+   * subtitle. A quarter of a phone is about seven characters wide.
+   */
+  shortLabel?: string;
   /** The prose. Two or three sentences is the shape this layout wants. */
   description: string;
   /** A colour taken from the item itself, used to tint the frame. */
@@ -66,6 +83,8 @@ export interface ElegantCarouselProps {
 }
 
 const TRANSITION_MS = 620;
+/** Half of it. The slide that is leaving gets this; the one arriving gets the rest. */
+const FADE_MS = TRANSITION_MS / 2;
 
 function useReducedMotion(): boolean {
   return React.useSyncExternalStore(
@@ -91,57 +110,126 @@ export function ElegantCarousel({
   const reduced = useReducedMotion();
 
   const [index, setIndex] = React.useState(0);
-  const [fading, setFading] = React.useState(false);
+  /** The slide being turned to, held while the one on screen fades out. */
+  const [pending, setPending] = React.useState<number | null>(null);
   const [paused, setPaused] = React.useState(false);
-  const [hovered, setHovered] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
-  /** 0–100 for the current slide's bar. Never rendered when autoplay is off. */
-  const [progress, setProgress] = React.useState(0);
+
+  const rootRef = React.useRef<HTMLElement>(null);
+  const indexRef = React.useRef(0);
+  const pendingRef = React.useRef<number | null>(null);
+  /** 0–100 for the current slide's bar. Deliberately not state — see `setBar`. */
+  const progressRef = React.useRef(0);
+  const touchStart = React.useRef<number | null>(null);
 
   const count = slides.length;
-  // Autoplay is the exception, not the rule: it stops for a stated preference,
-  // for a held pointer, for a focused control, and for a carousel of one.
-  const playing = !reduced && !paused && !hovered && !focused && count > 1;
+  // Autoplay stops for a stated preference, for the button that says so, for a
+  // keyboard visitor reading with the caret inside it, and for a carousel of
+  // one. It does **not** stop for a pointer resting on it.
+  //
+  // It used to, because that is what the registry's answer did and what half
+  // the carousels on the web do. What that means in practice was reported as
+  // «وقتی داره ویترین رو می‌بینه pause میشه، وقتی scroll می‌کنه پایین‌تر نرمال
+  // حرکت می‌کنه»: the shop's own showcase held still for exactly the visitor
+  // who was looking at it, and ran for the one who had already gone past. The
+  // pointer is not a request. The pause button is, and it is right there.
+  const timed = !reduced && count > 1;
+  const autoplay = timed && !paused;
+  const advancingOnItsOwn = autoplay && !focused;
+  // It also stands still *through* a turn, so the bar does not start refilling
+  // behind a slide that is still leaving.
+  const playing = advancingOnItsOwn && pending === null;
+  const fading = pending !== null;
 
-  const touchStart = React.useRef<number | null>(null);
+  /**
+   * The bar's fill, written straight to the DOM as a custom property.
+   *
+   * It was state, and state at 60fps is a re-render of the whole carousel —
+   * photograph, prose and all — sixty times a second for a line two pixels
+   * tall. Writing the property leaves React out of that loop, and it is why the
+   * value is not in the `style` prop: React rewrites the properties it knows
+   * about on every commit, and would put the last render's number back.
+   */
+  const setBar = React.useCallback((pct: number) => {
+    rootRef.current?.style.setProperty("--slide-progress", `${pct}%`);
+  }, []);
+
+  React.useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
 
   const goTo = React.useCallback(
     (next: number) => {
-      setIndex((current) => {
-        const target = ((next % count) + count) % count;
-        if (target === current) return current;
-        setFading(true);
-        setProgress(0);
-        window.setTimeout(() => setFading(false), TRANSITION_MS);
-        return target;
-      });
+      // One turn at a time: a second request mid-fade would swap the carpet
+      // underneath a picture that has not finished leaving.
+      if (pendingRef.current !== null) return;
+      const target = ((next % count) + count) % count;
+      if (target === indexRef.current) return;
+      // The ref is set here and not in the effect below because the guard above
+      // has to see it within the same tick — two arrow presses in one frame are
+      // two calls before React has rendered either.
+      pendingRef.current = target;
+      setPending(target);
     },
     [count],
   );
 
-  const goNext = React.useCallback(() => goTo(index + 1), [goTo, index]);
-  const goPrev = React.useCallback(() => goTo(index - 1), [goTo, index]);
+  const goNext = React.useCallback(() => goTo(indexRef.current + 1), [goTo]);
+  const goPrev = React.useCallback(() => goTo(indexRef.current - 1), [goTo]);
 
-  // One timer drives both the bar and the turn, so the bar can never finish
+  /**
+   * The turn itself, half a transition after it was asked for: out, then swap,
+   * then in.
+   *
+   * Both halves used to land in one commit — the fade began and the index moved
+   * in the same update — so the *arriving* carpet was painted at full opacity,
+   * faded out, and faded back in. The first thing the eye caught was the next
+   * slide, before any of the motion had run.
+   */
+  React.useEffect(() => {
+    if (pending === null) return;
+    const timer = window.setTimeout(() => {
+      progressRef.current = 0;
+      setBar(0);
+      pendingRef.current = null;
+      setPending(null);
+      setIndex(pending);
+    }, FADE_MS);
+    // Upstream left this timer to expire on its own. A carousel unmounted
+    // mid-turn then set state on a component that no longer exists.
+    return () => window.clearTimeout(timer);
+  }, [pending, setBar]);
+
+  // One loop drives both the bar and the turn, so the bar can never finish
   // early or run on past the change — upstream ran two intervals side by side
   // and let them drift apart.
   React.useEffect(() => {
     if (!playing) return;
-    const started = performance.now();
     let raf = 0;
+    // Resumed where it was left rather than started from zero: a pointer that
+    // crosses the section and leaves should cost the slide the moment it was
+    // held, not the time it had already served.
+    let started = performance.now() - (progressRef.current / 100) * interval;
     const tick = (now: number) => {
       const elapsed = now - started;
       if (elapsed >= interval) {
-        setProgress(100);
+        progressRef.current = 100;
+        setBar(100);
         goNext();
-        return;
+        // Deliberately not a `return`. Ending the loop here made the turn the
+        // only thing that could ever start it again — so a turn that did not
+        // happen, for any reason at all, was a carousel that never moved and a
+        // bar that stood full for good.
+        started = now;
+      } else {
+        progressRef.current = (elapsed / interval) * 100;
+        setBar(progressRef.current);
       }
-      setProgress((elapsed / interval) * 100);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [playing, interval, index, goNext]);
+  }, [playing, interval, index, goNext, setBar]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     // Physical arrows, logical meaning: under `dir="rtl"` the visitor's «next»
@@ -179,13 +267,20 @@ export function ElegantCarousel({
 
   return (
     <section
+      ref={rootRef}
       className={cn("relative isolate overflow-hidden bg-bg", className)}
       aria-roledescription="carousel"
       aria-label={label}
       onKeyDown={onKeyDown}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setFocused(true)}
+      // Keyboard focus, not any focus. Clicking «بعدی» focuses the button it
+      // clicked, and a carousel that stops permanently because someone once
+      // pressed next is the same bug wearing different clothes. `:focus-visible`
+      // is the browser's own answer to «did they arrive here by keyboard».
+      onFocus={(e) => {
+        if (e.target instanceof Element && e.target.matches(":focus-visible")) {
+          setFocused(true);
+        }
+      }}
       onBlur={() => setFocused(false)}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -219,14 +314,18 @@ export function ElegantCarousel({
         <div
           // `aria-live` stays off while it turns by itself. It becomes polite
           // only when the visitor has taken the wheel, which is the one time an
-          // announcement answers a question they actually asked.
-          aria-live={playing ? "off" : "polite"}
+          // announcement answers a question they actually asked. It reads
+          // `advancingOnItsOwn` rather than `playing` on purpose: `playing` also
+          // goes false for the third of a second a turn takes, and a region that
+          // becomes live in the middle of one announces the automatic turns this
+          // is here to keep quiet.
+          aria-live={advancingOnItsOwn ? "off" : "polite"}
           aria-atomic="true"
           className={cn(
             "transition-opacity ease-out",
             fading ? "opacity-0" : "opacity-100",
           )}
-          style={{ transitionDuration: `${TRANSITION_MS / 2}ms` }}
+          style={{ transitionDuration: `${FADE_MS}ms` }}
         >
           {/* Persian digits, because every other number in this shop is — a
               Latin counter here would be the only «03» on a page of «۰۳».
@@ -311,7 +410,7 @@ export function ElegantCarousel({
               "relative aspect-4/5 w-full overflow-hidden rounded-2xl bg-paper shadow-raised transition-opacity ease-out sm:aspect-3/4 lg:aspect-4/5 lg:max-h-[600px]",
               fading ? "opacity-0" : "opacity-100",
             )}
-            style={{ transitionDuration: `${TRANSITION_MS / 2}ms` }}
+            style={{ transitionDuration: `${FADE_MS}ms` }}
           >
             <Image
               // Keyed by slide, so React swaps the element instead of mutating
@@ -355,19 +454,38 @@ export function ElegantCarousel({
               onClick={() => goTo(i)}
               aria-label={`رفتن به ${s.title}`}
               aria-current={i === index}
-              className="group flex-1 py-3 focus-visible:outline-none"
+              // `min-w-0` is the whole fix for a bar that ran off the phone.
+              // A flex item's automatic minimum is its content, and the label
+              // below is `nowrap`, so `flex-1` could not shrink these four
+              // buttons past «قم · ابریشم · لچک‌ترنج» — the row was 443px wide
+              // inside 375, the fourth button started 68px off the near edge,
+              // and the section's `overflow-hidden` cut it there. `truncate`
+              // never got a say, because nothing was ever too narrow for it.
+              className="group min-w-0 flex-1 py-3 focus-visible:outline-none"
             >
               <span className="block h-0.5 w-full overflow-hidden rounded-full bg-line">
                 <span
                   className="block h-full rounded-full transition-[width] duration-100 ease-linear group-focus-visible:bg-accent"
                   style={{
-                    width: i === index ? `${playing ? progress : 100}%` : i < index ? "100%" : "0%",
+                    width:
+                      i === index
+                        ? // The running value, or a plain «you are here» marker
+                          // where there is no timer to report.
+                          timed
+                          ? "var(--slide-progress, 0%)"
+                          : "100%"
+                        : i < index
+                          ? "100%"
+                          : "0%",
                     backgroundColor: i === index ? slide.accent : "var(--line-2)",
                   }}
                 />
               </span>
               <span className="mt-2 block truncate text-start text-[12px] text-muted transition-colors duration-[--dur-feedback] group-hover:text-ink-2">
-                {s.subtitle}
+                {/* Even truncated, three facts in 78px is «قم · ابری…». The
+                    short label is one of them whole. */}
+                <span className="sm:hidden">{s.shortLabel ?? s.subtitle}</span>
+                <span className="hidden sm:inline">{s.subtitle}</span>
               </span>
             </button>
           ))}

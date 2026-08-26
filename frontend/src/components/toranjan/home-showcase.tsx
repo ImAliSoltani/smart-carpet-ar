@@ -76,6 +76,15 @@ export function HomeShowcase() {
       subtitle: [carpet.origin, MATERIAL_LABEL[carpet.material], PATTERN_LABEL[carpet.pattern]]
         .filter(Boolean)
         .join(" · "),
+      // A quarter of a phone's width holds one of those three, and only on a
+      // phone — the wide layout has room for all three and keeps them.
+      //
+      // The pattern, not the city. The showcase is «the most expensive silk and
+      // wool», which in this catalogue is two Qom silks and two others, so a
+      // row labelled by origin read «قم، قم، اراک، کاشان» — two of four saying
+      // the same word about two different carpets. The pattern is what the eye
+      // is choosing between here anyway.
+      shortLabel: PATTERN_LABEL[carpet.pattern],
       description: carpet.description ?? "",
       // The carpet's own dominant colour, which the descriptor pass already
       // worked out. Falling back to the accent keeps the wash on-brand rather
