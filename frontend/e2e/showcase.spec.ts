@@ -121,6 +121,29 @@ test.describe("autoplay", () => {
   });
 });
 
+test("spends its seven seconds on someone who is looking", async ({ page }) => {
+  // Reported from a real phone: «چرا فقط بعد از لمس شروع می‌کند؟». It could not
+  // be reproduced in an emulated one — but the timer did start at mount, which
+  // on this page is behind the entrance film and two screens below the fold. A
+  // visitor who scrolls down then arrives somewhere in the middle of an
+  // interval, which looks exactly like a carousel that does not move.
+  //
+  // Asserted from both ends, because only the pair says anything: it must not
+  // turn while it cannot be seen, and it must turn once it can — without being
+  // touched, which is the whole point.
+  const label = counter(page);
+  const first = await label.getAttribute("aria-label");
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(9_000);
+  expect(await label.getAttribute("aria-label")).toBe(first);
+
+  await page.locator(SHOWCASE).scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => label.getAttribute("aria-label"), { timeout: 20_000 })
+    .not.toBe(first);
+});
+
 test("keeps the labels under its bar on the screen", async ({ page, isMobile }) => {
   test.skip(!isMobile, "the row is only ever tight on a phone");
 

@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { useVisibilityPause } from "@/lib/use-visibility-pause";
 
 /**
  * A before/after comparator: two pictures stacked, and a divider you drag.
@@ -91,39 +92,6 @@ function useReducedMotion(): boolean {
     () => window.matchMedia(MOTION_QUERY).matches,
     () => false,
   );
-}
-
-/** Whether the element is worth animating — on screen, and the tab in front. */
-function useVisibilityPause<T extends Element>(
-  ref: React.RefObject<T | null>,
-  { threshold = 0.1 }: { threshold?: number } = {},
-): boolean {
-  const [onScreen, setOnScreen] = React.useState(true);
-  const [tabVisible, setTabVisible] = React.useState(true);
-
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => setOnScreen(entries.some((e) => e.isIntersecting)),
-      { threshold },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, threshold]);
-
-  React.useEffect(() => {
-    // No synchronous first read. A tab that is already hidden at mount leaves
-    // this `true` until the next `visibilitychange` — which costs nothing,
-    // because the browser does not schedule `requestAnimationFrame` in a hidden
-    // tab either. Calling it here would be a `setState` in an effect body for
-    // a state that is already correct in every case that can be observed.
-    const onVis = () => setTabVisible(document.visibilityState !== "hidden");
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
-
-  return onScreen && tabVisible;
 }
 
 /** The standard controlled/uncontrolled value pair. */

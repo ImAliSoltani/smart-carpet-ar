@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
 import { formatNumber } from "@/lib/format";
+import { useVisibilityPause } from "@/lib/use-visibility-pause";
 import { cn } from "@/lib/utils";
 
 /**
@@ -46,6 +47,14 @@ import { cn } from "@/lib/utils";
  * `mouseenter` on a tap and no leave after it. Each was the same mistake: a
  * piece of the machine that could only be wound by the piece it had just handed
  * off to — and in the third case, by the visitor going away.
+ *
+ * **A fourth, found while looking for a fifth.** «چرا فقط بعد از لمس شروع
+ * می‌کند؟» could not be reproduced in an emulated phone — but the search turned
+ * up a carousel that had been counting its seven seconds since the moment it
+ * mounted, which on the front page is behind the entrance film and far below
+ * the fold. Whatever the phone was doing, this is the same complaint from the
+ * other end: arrive at a carousel mid-interval and it looks like one that is
+ * not moving. It now counts only while it is on the visitor's screen.
  */
 
 export interface CarouselSlide {
@@ -136,9 +145,25 @@ export function ElegantCarousel({
   const timed = !reduced && count > 1;
   const autoplay = timed && !paused;
   const advancingOnItsOwn = autoplay && !focused;
+
+  /**
+   * And it does not run where nobody can see it.
+   *
+   * The timer used to start at mount, which on the front page is behind the
+   * entrance film and two screens below the fold. So the showcase spent its
+   * first turns on an empty room, and the visitor who finally scrolled down
+   * arrived somewhere in the middle of an interval — three seconds of a still
+   * picture, then a turn, or none at all before they gave up and touched it.
+   * The seven seconds are meant to be seven seconds of *somebody looking*.
+   *
+   * It is also the honest reading of the timer: a carousel is a thing that
+   * turns for a reader, and when there is no reader there is nothing to turn.
+   */
+  const onScreen = useVisibilityPause(rootRef, { threshold: 0.2 });
+
   // It also stands still *through* a turn, so the bar does not start refilling
   // behind a slide that is still leaving.
-  const playing = advancingOnItsOwn && pending === null;
+  const playing = advancingOnItsOwn && onScreen && pending === null;
   const fading = pending !== null;
 
   /**
@@ -157,6 +182,16 @@ export function ElegantCarousel({
   React.useEffect(() => {
     indexRef.current = index;
   }, [index]);
+
+  React.useEffect(() => {
+    if (onScreen) return;
+    // Gone off screen: the bar rewinds, so the next arrival gets a whole
+    // interval rather than the tail of one that ran behind their back. This is
+    // the one place a rewind is right — everywhere else a pause holds the bar
+    // where it stood, because there the visitor is still there.
+    progressRef.current = 0;
+    setBar(0);
+  }, [onScreen, setBar]);
 
   const goTo = React.useCallback(
     (next: number) => {
