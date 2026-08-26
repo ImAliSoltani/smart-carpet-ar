@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { HomeFeatured } from "@/components/toranjan/home-featured";
 import { HomeHero } from "@/components/toranjan/home-hero";
 import { HomePromise } from "@/components/toranjan/home-promise";
+import { HomeRooms } from "@/components/toranjan/home-rooms";
 import { HomeShowcase } from "@/components/toranjan/home-showcase";
 import { Hero10 } from "@/components/ui/hero-10";
 // Imported rather than referenced by path. `next/image` fingerprints a static
@@ -14,7 +14,6 @@ import { Hero10 } from "@/components/ui/hero-10";
 import hero1 from "../../../public/brand/hero-1.webp";
 import hero2 from "../../../public/brand/hero-2.webp";
 import hero3 from "../../../public/brand/hero-3.webp";
-import { NAV_ROOMS, ROOM_LABEL } from "@/lib/taxonomy";
 
 export const metadata: Metadata = {
   title: { absolute: "ترنجان — فرش را پیش از خرید در خانه‌ی خودتان ببینید" },
@@ -107,32 +106,7 @@ export default function HomePage() {
 
       <HomePromise />
 
-      {/* Deliberately not `toranjan-rise`. That class animates on load, and
-          everything on this page below the fold is behind the cinematic intro
-          while it plays — the entrance would run, finish, and be over before
-          the visitor ever saw this section. Below the fold wants a scroll
-          trigger, which is what the carpet card already uses. */}
-      <section className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8">
-        <h2 className="mb-8 border-t border-line pt-8 text-xl font-bold tracking-tight sm:text-2xl">
-          برای کدام اتاق؟
-        </h2>
-        {/* Rooms rather than patterns: someone arriving at a carpet shop knows
-            which room is empty long before they know what a lachak-toranj is.
-            The pattern names are in the header's menu, for whoever does. */}
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {NAV_ROOMS.map((room) => (
-            <li key={room}>
-              <Link
-                href={`/carpets?room=${room}`}
-                className="flex h-24 items-center justify-center rounded-xl border border-line bg-paper text-[15px] shadow-panel transition-colors duration-[--dur-feedback] hover:border-line-2 hover:text-accent"
-              >
-                {ROOM_LABEL[room]}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
+      <HomeRooms />
     </main>
   );
 }
